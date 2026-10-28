@@ -1,0 +1,293 @@
+{
+  "metadados": {
+    "versao": "1.0.0",
+    "descricao": "Dataset fictício de unidades e clientes da Distribuidora Vetor para simulação acadêmica.",
+    "contexto": "Projeto Integrador — Bolsa Futuro Digital / Desafio 2",
+    "observacao": "Os dados contidos neste arquivo são exclusivamente fictícios para fins didáticos de frontend e visualização de dados."
+  },
+  "tenants": [
+    {
+      "id": "tenant-sudeste",
+      "nome": "Unidade Sudeste (Matriz)",
+      "porte": "Grande",
+      "regiao": "Sudeste",
+      "carteiraTotalClientes": 1200,
+      "riscoAbsoluto": 100,
+      "saudeCarteira": {
+        "saudavel": 960,
+        "atencao": 140,
+        "risco": 70,
+        "critico": 30
+      },
+      "funnel90d": {
+        "gerada": 450,
+        "vista": 380,
+        "sucesso": 285
+      },
+      "engajamentoMedio": 82.5,
+      "historicoTendencia": [
+        { "mes": "Mai/2026", "engajamento": 78.0, "sucessoFunil": 59.2 },
+        { "mes": "Jun/2026", "engajamento": 79.5, "sucessoFunil": 60.8 },
+        { "mes": "Jul/2026", "engajamento": 80.2, "sucessoFunil": 61.5 },
+        { "mes": "Ago/2026", "engajamento": 81.0, "sucessoFunil": 62.1 },
+        { "mes": "Set/2026", "engajamento": 81.8, "sucessoFunil": 62.9 },
+        { "mes": "Out/2026", "engajamento": 82.5, "sucessoFunil": 63.3 }
+      ]
+    },
+    {
+      "id": "tenant-sul",
+      "nome": "Unidade Sul",
+      "porte": "Médio",
+      "regiao": "Sul",
+      "carteiraTotalClientes": 550,
+      "riscoAbsoluto": 55,
+      "saudeCarteira": {
+        "saudavel": 410,
+        "atencao": 85,
+        "risco": 40,
+        "critico": 15
+      },
+      "funnel90d": {
+        "gerada": 210,
+        "vista": 175,
+        "sucesso": 120
+      },
+      "engajamentoMedio": 76.0,
+      "historicoTendencia": [
+        { "mes": "Mai/2026", "engajamento": 72.0, "sucessoFunil": 53.0 },
+        { "mes": "Jun/2026", "engajamento": 73.5, "sucessoFunil": 54.2 },
+        { "mes": "Jul/2026", "engajamento": 74.0, "sucessoFunil": 55.0 },
+        { "mes": "Ago/2026", "engajamento": 75.1, "sucessoFunil": 56.4 },
+        { "mes": "Set/2026", "engajamento": 75.8, "sucessoFunil": 56.8 },
+        { "mes": "Out/2026", "engajamento": 76.0, "sucessoFunil": 57.1 }
+      ]
+    },
+    {
+      "id": "tenant-nordeste",
+      "nome": "Unidade Nordeste",
+      "porte": "Médio",
+      "regiao": "Nordeste",
+      "carteiraTotalClientes": 400,
+      "riscoAbsoluto": 90,
+      "saudeCarteira": {
+        "saudavel": 240,
+        "atencao": 70,
+        "risco": 60,
+        "critico": 30
+      },
+      "funnel90d": {
+        "gerada": 160,
+        "vista": 110,
+        "sucesso": 65
+      },
+      "engajamentoMedio": 64.2,
+      "historicoTendencia": [
+        { "mes": "Mai/2026", "engajamento": 68.0, "sucessoFunil": 46.5 },
+        { "mes": "Jun/2026", "engajamento": 67.2, "sucessoFunil": 45.0 },
+        { "mes": "Jul/2026", "engajamento": 66.0, "sucessoFunil": 43.8 },
+        { "mes": "Ago/2026", "engajamento": 65.5, "sucessoFunil": 42.1 },
+        { "mes": "Set/2026", "engajamento": 64.8, "sucessoFunil": 41.2 },
+        { "mes": "Out/2026", "engajamento": 64.2, "sucessoFunil": 40.6 }
+      ]
+    },
+    {
+      "id": "tenant-centro-oeste",
+      "nome": "Unidade Centro-Oeste",
+      "porte": "Pequeno",
+      "regiao": "Centro-Oeste",
+      "carteiraTotalClientes": 150,
+      "riscoAbsoluto": 35,
+      "saudeCarteira": {
+        "saudavel": 80,
+        "atencao": 35,
+        "risco": 22,
+        "critico": 13
+      },
+      "funnel90d": {
+        "gerada": 70,
+        "vista": 45,
+        "sucesso": 24
+      },
+      "engajamentoMedio": 58.8,
+      "historicoTendencia": [
+        { "mes": "Mai/2026", "engajamento": 62.0, "sucessoFunil": 38.0 },
+        { "mes": "Jun/2026", "engajamento": 61.0, "sucessoFunil": 37.5 },
+        { "mes": "Jul/2026", "engajamento": 60.5, "sucessoFunil": 36.0 },
+        { "mes": "Ago/2026", "engajamento": 59.8, "sucessoFunil": 35.5 },
+        { "mes": "Set/2026", "engajamento": 59.2, "sucessoFunil": 34.8 },
+        { "mes": "Out/2026", "engajamento": 58.8, "sucessoFunil": 34.3 }
+      ]
+    }
+  ],
+  "clientes": [
+    {
+      "id": "CLI-001",
+      "nome": "Supermercado Alvorada Ltda",
+      "tenantId": "tenant-sudeste",
+      "unidadeNome": "Unidade Sudeste (Matriz)",
+      "segmento": "Supermercado Regional",
+      "statusSaude": "Saudável",
+      "scoreSaudeAtual": 92,
+      "tempoContratoMeses": 28,
+      "ticketMedioMensal": "R$ 48.500,00",
+      "historicoScore": [
+        { "periodo": "Mai/2026", "score": 82 },
+        { "periodo": "Jun/2026", "score": 85 },
+        { "periodo": "Jul/2026", "score": 88 },
+        { "periodo": "Ago/2026", "score": 89 },
+        { "periodo": "Set/2026", "score": 90 },
+        { "periodo": "Out/2026", "score": 92 }
+      ],
+      "eventos": [
+        {
+          "id": "EVT-101",
+          "data": "2026-05-10T14:30:00Z",
+          "tipo": "Reunião Comercial",
+          "categoria": "comercial",
+          "descricao": "Reunião de alinhamento com a diretoria de suprimentos para expansão do mix de produtos frigorificados."
+        },
+        {
+          "id": "EVT-102",
+          "data": "2026-06-18T10:00:00Z",
+          "tipo": "Sucesso na Tarefa",
+          "categoria": "operacional",
+          "descricao": "Pedido mensal de alto valor despachado e conferido no centro de distribuição com taxa de acerto de 100%."
+        },
+        {
+          "id": "EVT-103",
+          "data": "2026-08-04T16:15:00Z",
+          "tipo": "Renovação de Contrato",
+          "categoria": "sucesso",
+          "descricao": "Aditivo contratual de 12 meses assinado com aumento de cota em 15%."
+        },
+        {
+          "id": "EVT-104",
+          "data": "2026-09-22T09:45:00Z",
+          "tipo": "Visita Técnica",
+          "categoria": "relacionamento",
+          "descricao": "Visita do consultor de campo para treinamento da equipe de recebimento da filial 2."
+        },
+        {
+          "id": "EVT-105",
+          "data": "2026-10-15T11:20:00Z",
+          "tipo": "Alinhamento Trimestral",
+          "categoria": "sucesso",
+          "descricao": "Revisão de QBR concluída. Indicadores de NPS do cliente atingiram nota máxima (10/10)."
+        }
+      ]
+    },
+    {
+      "id": "CLI-002",
+      "nome": "Atacado Horizonte S/A",
+      "tenantId": "tenant-nordeste",
+      "unidadeNome": "Unidade Nordeste",
+      "segmento": "Atacado Distribuidor",
+      "statusSaude": "Risco",
+      "scoreSaudeAtual": 48,
+      "tempoContratoMeses": 14,
+      "ticketMedioMensal": "R$ 32.200,00",
+      "historicoScore": [
+        { "periodo": "Mai/2026", "score": 75 },
+        { "periodo": "Jun/2026", "score": 68 },
+        { "periodo": "Jul/2026", "score": 61 },
+        { "periodo": "Ago/2026", "score": 56 },
+        { "periodo": "Set/2026", "score": 51 },
+        { "periodo": "Out/2026", "score": 48 }
+      ],
+      "eventos": [
+        {
+          "id": "EVT-201",
+          "data": "2026-05-20T08:30:00Z",
+          "tipo": "Sucesso na Tarefa",
+          "categoria": "operacional",
+          "descricao": "Implementação do módulo de cotação online concluído."
+        },
+        {
+          "id": "EVT-202",
+          "data": "2026-07-03T15:00:00Z",
+          "tipo": "Atraso no Pedido",
+          "categoria": "alerta",
+          "descricao": "Romaneio 8832 atrasou 48 horas devido a problemas logísticos na rota interestadual."
+        },
+        {
+          "id": "EVT-203",
+          "data": "2026-08-12T11:10:00Z",
+          "tipo": "Chamado Aberto",
+          "categoria": "suporte",
+          "descricao": "Ticket aberto reclamando de divergência nas notas fiscais de bonificação comercial."
+        },
+        {
+          "id": "EVT-204",
+          "data": "2026-09-19T14:40:00Z",
+          "tipo": "Queda no Engajamento",
+          "categoria": "alerta",
+          "descricao": "Nenhum pedido efetuado nos últimos 30 dias na plataforma B2B. Redução drástica de acessos."
+        },
+        {
+          "id": "EVT-205",
+          "data": "2026-10-18T16:00:00Z",
+          "tipo": "Reunião de Resgate",
+          "categoria": "critico",
+          "descricao": "Tentativa de contato emergencial com o comprador chefe para renegociar prazos e evitar churn."
+        }
+      ]
+    },
+    {
+      "id": "CLI-003",
+      "nome": "Distribuidora Grão Nobre",
+      "tenantId": "tenant-centro-oeste",
+      "unidadeNome": "Unidade Centro-Oeste",
+      "segmento": "Cereais e Grãos",
+      "statusSaude": "Crítico",
+      "scoreSaudeAtual": 32,
+      "tempoContratoMeses": 9,
+      "ticketMedioMensal": "R$ 19.800,00",
+      "historicoScore": [
+        { "periodo": "Mai/2026", "score": 60 },
+        { "periodo": "Jun/2026", "score": 52 },
+        { "periodo": "Jul/2026", "score": 45 },
+        { "periodo": "Ago/2026", "score": 41 },
+        { "periodo": "Set/2026", "score": 36 },
+        { "periodo": "Out/2026", "score": 32 }
+      ],
+      "eventos": [
+        {
+          "id": "EVT-301",
+          "data": "2026-06-05T10:00:00Z",
+          "tipo": "Reunião Comercial",
+          "categoria": "comercial",
+          "descricao": "Apresentação de novas condições de frete para a safra do segundo semestre."
+        },
+        {
+          "id": "EVT-302",
+          "data": "2026-07-25T17:30:00Z",
+          "tipo": "Inadimplência Notificada",
+          "categoria": "critico",
+          "descricao": "Duplicatas vencidas há mais de 25 dias sem compensação bancária."
+        },
+        {
+          "id": "EVT-303",
+          "data": "2026-08-15T09:00:00Z",
+          "tipo": "Bloqueio Temporário",
+          "categoria": "critico",
+          "descricao": "Conta bloqueada temporariamente para novas faturas pelo departamento financeiro da Matriz."
+        },
+        {
+          "id": "EVT-304",
+          "data": "2026-09-10T14:15:00Z",
+          "tipo": "Tentativa de Renegociação",
+          "categoria": "alerta",
+          "descricao": "Proposta de parcelamento do saldo devedor enviada por e-mail com resposta pendente."
+        },
+        {
+          "id": "EVT-305",
+          "data": "2026-10-21T15:50:00Z",
+          "tipo": "Alerta de Churn",
+          "categoria": "critico",
+          "descricao": "Cliente sinalizou interesse em romper parceria com acionamento do departamento jurídico."
+        }
+      ]
+    }
+  ]
+}
+
