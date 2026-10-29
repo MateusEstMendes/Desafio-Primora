@@ -1,20 +1,21 @@
 /* ==========================================================================
-   VISÃO EXECUTIVA MINIMALISTA — SEM "CARD-IN-CARD", FOCO EM DADOS ESTATÍSTICOS
+   VISÃO EXECUTIVA — GALLERY ARCHITECTURE (DESIGN.md)
    ========================================================================== */
 
 .visao-geral-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
-/* 1. Faixa Única Contínua de KPIs (Ledger Strip com divisórias de 1px) */
+/* 1. Faixa Única Contínua de KPIs (Ledger Strip com 16px radius) */
 .kpi-ledger-strip {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border-radius: var(--radius-cards);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
 }
 
 @media (max-width: 991px) {
@@ -30,12 +31,12 @@
 }
 
 .kpi-ledger-cell {
-  padding: 16px 20px;
-  border-right: 1px solid var(--border-subtle);
+  padding: 24px 28px;
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 6px;
+  gap: 10px;
 }
 
 .kpi-ledger-cell:last-child {
@@ -48,14 +49,14 @@
   }
   .kpi-ledger-cell:nth-child(1),
   .kpi-ledger-cell:nth-child(2) {
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-default);
   }
 }
 
 @media (max-width: 575px) {
   .kpi-ledger-cell {
     border-right: none !important;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-default);
   }
   .kpi-ledger-cell:last-child {
     border-bottom: none;
@@ -70,11 +71,12 @@
 }
 
 .kpi-ledger-label {
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
 }
 
 .kpi-ledger-main {
@@ -84,17 +86,20 @@
 }
 
 .kpi-ledger-number {
-  font-size: 26px;
-  font-weight: 700;
+  font-family: var(--font-lyon-display);
+  font-size: 46px;
+  font-weight: 300;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 0.95;
 }
 
 .kpi-ledger-sub {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-family: var(--font-suisse-intl);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
@@ -103,20 +108,20 @@
 }
 
 .kpi-unit-tag {
-  font-size: 11px;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
   color: var(--text-muted);
   font-weight: 500;
-}
-
-.kpi-sub-text {
-  font-size: 12px;
-  color: var(--text-muted);
+  letter-spacing: 0.08em;
 }
 
 .chart-card-subtitle {
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .chart-container-responsive {
@@ -124,39 +129,43 @@
 }
 
 .clients-strip-label {
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 .clients-strip-pills {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .units-table-unit-name {
   display: block;
-  font-weight: 600;
-  font-size: 12px;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-primary);
 }
 
 .units-table-unit-porte {
-  color: var(--text-muted);
+  font-family: var(--font-roboto-mono);
+  color: var(--text-secondary);
   font-size: 11px;
+  text-transform: uppercase;
 }
 
 .units-table-risk-sub {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 400;
   font-size: 11px;
-  margin-left: 3px;
+  margin-left: 4px;
 }
 
-/* 3. Grid Inferior: Tabela Direta de Unidades + Tendência 6m */
+/* Grid Inferior: Tabela Direta de Unidades + Tendência 6m */
 .bottom-summary-grid {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
@@ -172,22 +181,23 @@
 .minimal-units-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .minimal-units-table th {
-  font-size: 11px;
-  font-weight: 600;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
   text-align: left;
-  padding: 8px 10px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--border-default);
 }
 
 .minimal-units-table td {
-  padding: 10px;
+  padding: 12px 10px;
   border-bottom: 1px solid var(--border-subtle);
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
@@ -195,11 +205,11 @@
 
 .minimal-units-table tbody tr {
   cursor: pointer;
-  transition: background-color 150ms ease, box-shadow 150ms ease;
+  transition: background-color 0.2s ease;
 }
 
 .minimal-units-table tbody tr:hover {
-  background-color: var(--bg-subtle);
+  background-color: var(--bg-elevated);
 }
 
 .minimal-units-table tbody tr:focus-visible {
@@ -217,50 +227,32 @@
 
 /* Faixa Compacta de Contas Monitoradas */
 .compact-clients-strip {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .compact-client-pill {
   background-color: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: 3px;
-  padding: 5px 10px;
-  font-family: inherit;
-  font-size: 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-suisse-intl);
+  font-size: 12px;
   color: var(--text-primary);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-variant-numeric: tabular-nums;
 }
 
 .compact-client-pill:hover {
   border-color: var(--brand-primary);
-}
-
-.flat-action-btn {
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 3px;
-  border: 1px solid var(--border-default);
-  background-color: var(--bg-subtle);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.flat-action-btn:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background-color: var(--bg-surface);
+  background-color: var(--brand-primary-soft);
 }

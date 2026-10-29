@@ -1,11 +1,11 @@
 /* ==========================================================================
-   COMPARATIVO REGIONAL — FUNILAMENTO ESTATÍSTICO & DONUT DE CONCENTRAÇÃO
+   COMPARATIVO REGIONAL — FUNILAMENTO ESTATÍSTICO & DONUT DE CONCENTRAÇÃO (DESIGN.md)
    ========================================================================== */
 
 .comparativo-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
 .comparativo-top-charts-grid {
@@ -24,7 +24,7 @@
   display: grid;
   grid-template-columns: 185px 1fr;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (max-width: 575px) {
@@ -43,22 +43,23 @@
 .regional-share-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .regional-share-table th {
-  font-size: 11px;
-  font-weight: 600;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
   text-align: left;
-  padding: 6px 8px;
+  padding: 8px 8px;
   border-bottom: 1px solid var(--border-default);
 }
 
 .regional-share-table td {
-  padding: 7px 8px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--border-subtle);
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
@@ -66,11 +67,11 @@
 
 .regional-share-table tr {
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: background-color 0.2s ease;
 }
 
 .regional-share-table tr:hover {
-  background-color: var(--bg-subtle);
+  background-color: var(--bg-elevated);
 }
 
 .regional-share-table tr:focus-visible {
@@ -99,8 +100,8 @@
 .ux-rationale-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-top: 14px;
 }
 
 @media (max-width: 767px) {
@@ -111,30 +112,31 @@
 
 .ux-rationale-block {
   background-color: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
-  padding: 14px 16px;
-  font-size: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 20px 24px;
+  font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .ux-rationale-block h4 {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  font-weight: 700;
+  margin: 0 0 10px 0;
+  font-family: var(--font-lyon-display);
+  font-size: 22px;
+  font-weight: 300;
   color: var(--text-primary);
 }
 
 .ux-formula-code {
   display: block;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 3px;
-  padding: 8px 10px;
-  margin: 8px 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  color: var(--brand-primary);
-  font-weight: 600;
+  color: var(--brand-cyan);
+  font-weight: 500;
 }

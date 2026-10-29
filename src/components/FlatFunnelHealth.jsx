@@ -26,38 +26,38 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
     funil.vista > 0 ? Number(((funil.sucesso / funil.vista) * 100).toFixed(1)) : 0;
   const taxaPerdaTotal = Number((100 - taxaConversao).toFixed(1));
 
-  // Fatias ordenadas da maior para a menor (boas práticas de visualização financeira)
+  // Fatias ordenadas da maior para a menor
   const categoriasSaude = [
     {
       key: 'saudavel',
       name: 'Saudável',
       dotClass: 'geo-dot--success',
-      color: themeTokens?.statusSuccess || '#059669',
-      textColor: themeTokens?.statusSuccessText || '#047857',
+      color: themeTokens?.statusSuccess || '#10B981',
+      textColor: themeTokens?.statusSuccessText || '#34D399',
       value: saude.saudavel || 0
     },
     {
       key: 'atencao',
       name: 'Atenção',
       dotClass: 'geo-dot--warning',
-      color: themeTokens?.statusWarning || '#D97706',
-      textColor: themeTokens?.statusWarningText || '#92400E',
+      color: themeTokens?.statusWarning || '#F59E0B',
+      textColor: themeTokens?.statusWarningText || '#FBBF24',
       value: saude.atencao || 0
     },
     {
       key: 'risco',
       name: 'Risco',
       dotClass: 'geo-dot--risk',
-      color: themeTokens?.statusRisk || '#EA580C',
-      textColor: themeTokens?.statusRiskText || '#C2410C',
+      color: themeTokens?.statusRisk || '#F97316',
+      textColor: themeTokens?.statusRiskText || '#FB923C',
       value: saude.risco || 0
     },
     {
       key: 'critico',
       name: 'Crítico',
       dotClass: 'geo-dot--critical',
-      color: themeTokens?.statusCritical || '#DC2626',
-      textColor: themeTokens?.statusCriticalText || '#B91C1C',
+      color: themeTokens?.statusCritical || '#EF4444',
+      textColor: themeTokens?.statusCriticalText || '#F87171',
       value: saude.critico || 0
     }
   ].map((cat) => ({
@@ -70,11 +70,22 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
       {/* 1. COMPOSIÇÃO DE SAÚDE DA CARTEIRA (DONUT FINANCEIRO + TABELA DIRETA) */}
       <section className="flat-card" aria-labelledby="health-heading">
         <div className="flat-card-header">
-          <h2 id="health-heading" className="flat-card-title">
-            Composição de Saúde da Carteira
-          </h2>
-          <span className="tabular-nums" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            Risco Consolidado:{' '}
+          <div>
+            <span className="flat-section-eyebrow">ALOCAÇÃO DE RISCO</span>
+            <h2 id="health-heading" className="flat-card-title">
+              Saúde da Carteira
+            </h2>
+          </div>
+          <span
+            className="tabular-nums"
+            style={{
+              fontFamily: 'var(--font-roboto-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            Exposição:{' '}
             <strong style={{ color: 'var(--status-critical-text)' }}>
               {formatarPercentual(taxaRisco)} ({formatarNumero(riscoAbsoluto)})
             </strong>
@@ -91,12 +102,12 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={58}
-                  outerRadius={84}
+                  innerRadius={60}
+                  outerRadius={86}
                   startAngle={90}
                   endAngle={-270}
-                  paddingAngle={1}
-                  stroke={themeTokens?.bgSurface || '#FFFFFF'}
+                  paddingAngle={2}
+                  stroke={themeTokens?.bgSurface || '#181A1C'}
                   strokeWidth={2}
                   isAnimationActive={false}
                 >
@@ -108,7 +119,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                   contentStyle={{
                     backgroundColor: themeTokens?.chartTooltipBg,
                     border: `1px solid ${themeTokens?.chartTooltipBorder}`,
-                    borderRadius: 4,
+                    borderRadius: 8,
                     boxShadow: 'none',
                     color: themeTokens?.textPrimary,
                     fontSize: 12
@@ -122,7 +133,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
             </ResponsiveContainer>
             <div className="donut-center-label">
               <span className="donut-center-value">{formatarNumero(carteiraTotal)}</span>
-              <span className="donut-center-sub">Contas</span>
+              <span className="donut-center-sub">CONTAS</span>
             </div>
           </div>
 
@@ -139,13 +150,20 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                 {categoriasSaude.map((cat) => (
                   <tr key={cat.key}>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 600 }}>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          fontWeight: 500
+                        }}
+                      >
                         <span className={`geo-dot ${cat.dotClass}`} aria-hidden="true" />
                         <span>{cat.name}</span>
                       </span>
                     </td>
                     <td className="num-col">{formatarNumero(cat.value)}</td>
-                    <td className="num-col" style={{ fontWeight: 700, color: cat.textColor }}>
+                    <td className="num-col" style={{ fontWeight: 600, color: cat.textColor }}>
                       {formatarPercentual(cat.pct)}
                     </td>
                   </tr>
@@ -166,12 +184,23 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
       {/* 2. FUNIL COMERCIAL DE TAREFAS (90 DIAS) */}
       <section className="flat-card" aria-labelledby="funnel-heading">
         <div className="flat-card-header">
-          <h2 id="funnel-heading" className="flat-card-title">
-            Funil Comercial (90d)
-          </h2>
-          <span className="tabular-nums" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          <div>
+            <span className="flat-section-eyebrow">EFICIÊNCIA DE EXECUÇÃO</span>
+            <h2 id="funnel-heading" className="flat-card-title">
+              Funil Comercial (90d)
+            </h2>
+          </div>
+          <span
+            className="tabular-nums"
+            style={{
+              fontFamily: 'var(--font-roboto-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              color: 'var(--text-secondary)'
+            }}
+          >
             Conversão:{' '}
-            <strong style={{ color: 'var(--status-success)' }}>
+            <strong style={{ color: 'var(--brand-cyan)' }}>
               {formatarPercentual(taxaConversao)}
             </strong>
           </span>
@@ -180,7 +209,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
         <div className="funnel-minimal-list">
           <div className="funnel-minimal-item">
             <div className="funnel-minimal-row">
-              <span className="funnel-minimal-name">1. Geradas</span>
+              <span className="funnel-minimal-name">01 · TAREFAS GERADAS</span>
               <span className="funnel-minimal-numbers">
                 {formatarNumero(funil.gerada)}
                 <span className="funnel-minimal-pct">(100,0%)</span>
@@ -196,7 +225,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
 
           <div className="funnel-minimal-item">
             <div className="funnel-minimal-row">
-              <span className="funnel-minimal-name">2. Visualizadas</span>
+              <span className="funnel-minimal-name">02 · VISUALIZADAS</span>
               <span className="funnel-minimal-numbers">
                 {formatarNumero(funil.vista)}
                 <span className="funnel-minimal-pct">
@@ -217,8 +246,8 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
 
           <div className="funnel-minimal-item">
             <div className="funnel-minimal-row">
-              <span className="funnel-minimal-name">3. Convertidas (Sucesso)</span>
-              <span className="funnel-minimal-numbers" style={{ color: 'var(--status-success)' }}>
+              <span className="funnel-minimal-name">03 · CONVERTIDAS (SUCESSO)</span>
+              <span className="funnel-minimal-numbers" style={{ color: 'var(--status-success-text)' }}>
                 {formatarNumero(funil.sucesso)}
                 <span className="funnel-minimal-pct">({formatarPercentual(taxaConversao)})</span>
               </span>
@@ -237,7 +266,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
 
         <div className="funnel-minimal-kpis">
           <div>
-            <span className="funnel-mini-stat-label">Eficiência Vistas &rarr; Sucesso</span>
+            <span className="funnel-mini-stat-label">Vistas &rarr; Sucesso</span>
             <span className="funnel-mini-stat-val">{formatarPercentual(eficienciaPosVista)}</span>
           </div>
           <div>

@@ -44,7 +44,14 @@ export default function TopBar({
       <header className="topbar-header">
         <div className="topbar-inner">
           {/* Identidade Institucional Primora + Distribuidora Vetor */}
-          <a href="#top" onClick={(e) => { e.preventDefault(); handleNavSelect('visao-geral'); }} className="topbar-brand">
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavSelect('visao-geral');
+            }}
+            className="topbar-brand"
+          >
             <img
               src={themeMode === 'dark' ? '/primora-logo-white.webp' : '/primora-logo.png'}
               alt="Primora Soluções em Tecnologia"
@@ -52,12 +59,12 @@ export default function TopBar({
             />
             <span className="topbar-brand-divider" aria-hidden="true" />
             <div className="topbar-brand-titles">
-              <span className="topbar-company-name">DISTRIBUIDORA VETOR</span>
-              <span className="topbar-system-label">Inteligência Comercial Multi-Tenant</span>
+              <span className="topbar-company-name">Distribuidora Vetor</span>
+              <span className="topbar-system-label">MULTI-TENANT INTELLIGENCE</span>
             </div>
           </a>
 
-          {/* Navegação Central Desktop */}
+          {/* Navegação Central Desktop — Nav Glass Buttons (DESIGN.md) */}
           {!isMobile && (
             <nav className="topbar-nav" aria-label="Módulos do painel">
               {navItems.map((item) => {
@@ -70,7 +77,7 @@ export default function TopBar({
                     className={`topbar-nav-btn ${isActive ? 'topbar-nav-btn--active' : ''}`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <span className="topbar-nav-step">{item.step}.</span>
+                    <span className="topbar-nav-step">{item.step}</span>
                     <span>{item.label}</span>
                   </button>
                 );
@@ -78,19 +85,19 @@ export default function TopBar({
             </nav>
           )}
 
-          {/* Controles Globais: Escopo Multi-Tenant + Alternador White/Dark UI */}
+          {/* Controles Globais: Escopo Multi-Tenant + Alternador Tema + Primary White CTA */}
           <div className="topbar-controls">
             {!isMobile && (
               <div className="topbar-tenant-control">
                 <label htmlFor="global-tenant-select" className="topbar-control-label">
-                  Escopo:
+                  ESCOPO
                 </label>
                 <Select
                   id="global-tenant-select"
                   value={selectedTenantId}
                   onChange={onTenantChange}
                   options={tenantOptions}
-                  style={{ width: 270 }}
+                  style={{ width: 250 }}
                   size="middle"
                   aria-label="Selecionar unidade regional (tenant)"
                 />
@@ -103,17 +110,32 @@ export default function TopBar({
               className="topbar-theme-toggle"
               aria-label={
                 themeMode === 'dark'
-                  ? 'Alternar para modo claro (White UI)'
-                  : 'Alternar para modo escuro (Dark UI)'
+                  ? 'Alternar para modo claro (Silver Day)'
+                  : 'Alternar para modo escuro (Obsidian Gallery)'
               }
-              title="Alternar tema visual (White UI / Dark UI)"
+              title="Alternar tema visual (Obsidian Dark / Silver Light)"
             >
               <span
                 className={`geo-dot ${themeMode === 'dark' ? 'geo-dot--cyan' : 'geo-dot--brand'}`}
                 aria-hidden="true"
               />
-              <span>{themeMode === 'dark' ? 'Dark UI' : 'White UI'}</span>
+              <span>{themeMode === 'dark' ? 'OBSIDIAN' : 'SILVER'}</span>
             </button>
+
+            {!isMobile && (
+              <button
+                type="button"
+                className="topbar-primary-cta"
+                onClick={() => {
+                  onTenantChange('tenant-centro-oeste');
+                  handleNavSelect('comparativo');
+                }}
+                title="Auditar a unidade mais crítica agora (Unidade Centro-Oeste)"
+              >
+                <span>Auditar Críticos</span>
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            )}
 
             {isMobile && (
               <Button
@@ -128,7 +150,7 @@ export default function TopBar({
           {/* Sub-barra Mobile com Seletor Global Multi-Tenant sempre visível */}
           {isMobile && (
             <div className="topbar-mobile-subbar">
-              <span className="topbar-control-label">Escopo:</span>
+              <span className="topbar-control-label">ESCOPO</span>
               <Select
                 value={selectedTenantId}
                 onChange={onTenantChange}
@@ -150,7 +172,7 @@ export default function TopBar({
         open={mobileDrawerOpen}
         width={280}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {navItems.map((item) => {
             const isActive = currentTab === item.key;
             return (
@@ -159,9 +181,9 @@ export default function TopBar({
                 type="button"
                 onClick={() => handleNavSelect(item.key)}
                 className={`topbar-nav-btn ${isActive ? 'topbar-nav-btn--active' : ''}`}
-                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 12px' }}
+                style={{ width: '100%', justifyContent: 'flex-start', padding: '12px 14px' }}
               >
-                <span className="topbar-nav-step">{item.step}.</span>
+                <span className="topbar-nav-step">{item.step}</span>
                 <span>{item.label}</span>
               </button>
             );

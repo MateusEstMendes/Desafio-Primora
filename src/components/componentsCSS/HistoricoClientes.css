@@ -1,18 +1,18 @@
 /* ==========================================================================
-   JORNADA DE CLIENTES — DRILL-DOWN ANALÍTICO DE CONTA SEM "CARD-IN-CARD"
+   JORNADA DE CLIENTES — DRILL-DOWN ANALÍTICO DE CONTA (DESIGN.md)
    ========================================================================== */
 
 .clientes-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
-/* Seletor Horizontal Enxuto de Contas */
+/* Seletor Horizontal de Contas (16px Cards) */
 .client-tabs-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 14px;
 }
 
 @media (max-width: 900px) {
@@ -24,18 +24,19 @@
 .client-tab-item {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
-  padding: 12px 16px;
+  border-radius: 16px;
+  padding: 18px 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   text-align: left;
 }
 
 .client-tab-item:hover {
   border-color: var(--brand-primary);
+  background-color: var(--bg-elevated);
 }
 
 .client-tab-item:focus-visible {
@@ -45,44 +46,53 @@
 
 .client-tab-item--active {
   border-color: var(--brand-primary);
-  border-left: 3px solid var(--brand-primary);
   background-color: var(--brand-primary-soft);
 }
 
 .client-tab-title-row {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-suisse-intl);
+  font-size: 15px;
+  font-weight: 500;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .client-tab-subtitle {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  display: block;
 }
 
 .client-tab-score {
-  font-size: 15px;
-  font-weight: 700;
+  font-family: var(--font-lyon-display);
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
   display: block;
   font-variant-numeric: tabular-nums;
 }
 
 .account-code-sub {
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 12px;
+  font-family: var(--font-roboto-mono);
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 11px;
 }
 
 /* Faixa Contínua de Metadados Financeiros e Contratuais da Conta */
 .account-ledger-strip {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
+  border-radius: 16px;
   display: grid;
   grid-template-columns: 1.6fr repeat(5, 1fr);
+  overflow: hidden;
 }
 
 @media (max-width: 1100px) {
@@ -98,12 +108,12 @@
 }
 
 .account-ledger-cell {
-  padding: 12px 16px;
-  border-right: 1px solid var(--border-subtle);
+  padding: 18px 20px;
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;
+  gap: 6px;
 }
 
 .account-ledger-cell:last-child {
@@ -111,16 +121,18 @@
 }
 
 .account-ledger-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
 }
 
 .account-ledger-val {
-  font-size: 14px;
-  font-weight: 700;
+  font-family: var(--font-suisse-intl);
+  font-size: 15px;
+  font-weight: 500;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
@@ -145,7 +157,7 @@
   gap: 16px;
 }
 
-/* Linha do Tempo Limpa (Sem Caixas Pesadas) */
+/* Linha do Tempo Limpa */
 .minimal-timeline {
   display: flex;
   flex-direction: column;
@@ -153,9 +165,9 @@
 
 .minimal-timeline-row {
   display: grid;
-  grid-template-columns: 115px 1fr;
-  gap: 14px;
-  padding: 12px 0;
+  grid-template-columns: 125px 1fr;
+  gap: 16px;
+  padding: 16px 0;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -167,22 +179,23 @@
 @media (max-width: 575px) {
   .minimal-timeline-row {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: 6px;
   }
 }
 
 .minimal-timeline-time {
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-weight: 400;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
-  padding-top: 2px;
+  padding-top: 3px;
 }
 
 .minimal-timeline-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .minimal-timeline-title-row {
@@ -193,14 +206,15 @@
 }
 
 .minimal-timeline-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .minimal-timeline-desc {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 300;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
 }

@@ -10,9 +10,9 @@ export default function AcademicBanner() {
         <div className="academic-spec-title-group">
           <span className="geo-badge geo-badge--brand">Protótipo Acadêmico</span>
           <span className="academic-spec-label">
-            Desafio Técnico 2 · Bolsa Futuro Digital — Primora Soluções em TI & Distribuidora Vetor
+            Desafio Técnico 2 · Bolsa Futuro Digital — Primora Soluções em TI &amp; Distribuidora Vetor
           </span>
-          <span className="geo-badge">ReactJS + Ant Design</span>
+          <span className="geo-badge">Origin Gallery Style (Blue Edition)</span>
           <span className="geo-badge">Dataset Local JSON (RF01–RF12)</span>
         </div>
 
@@ -28,11 +28,13 @@ export default function AcademicBanner() {
 
       {expanded && (
         <div className="academic-spec-details">
-          Painel interno de inteligência comercial multi-tenant projetado sob diretrizes estritas de{' '}
-          <strong>Flat Design</strong> (cores 100% sólidas, zero sombras, zero gradientes, bordas de
-          1px e tipografia com números tabulares <code>tabular-nums</code>). Os dados de unidades
-          regionais (tenants) e carteiras de clientes são fictícios para avaliação de arquitetura
-          front-end e tomada de decisão executiva.
+          Painel interno de inteligência comercial multi-tenant redesenhado segundo a referência{' '}
+          <strong>Origin Gallery (DESIGN.md — Blue &amp; Bright Blue Edition)</strong>: superfícies
+          noturnas em camadas (Obsidian <code>#0f1011</code>, Graphite <code>#2e2e2e</code> e Silver
+          Inverted <code>#cacaca</code>), cartões cromáticos full-bleed em azul brilhante (
+          <code>#2970ff</code>) e azul profundo (<code>#1d4ed8</code>), sinais de dados em Cyan
+          Signal (<code>#00b3dd</code>) e tipografia em três vozes (Serif Display peso 300, Sans UI
+          e Roboto Mono uppercase com <code>tabular-nums</code>).
         </div>
       )}
     </aside>

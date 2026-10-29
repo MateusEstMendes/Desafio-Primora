@@ -1,12 +1,12 @@
 /* ==========================================================================
-   ACADEMIC BANNER — ESPECIFICAÇÃO TÉCNICA COLAPSÁVEL E DISCRETA
+   ACADEMIC BANNER — ESPECIFICAÇÃO TÉCNICA COLAPSÁVEL (DESIGN.md)
    ========================================================================== */
 
 .academic-spec-bar {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
-  padding: 10px 16px;
+  border-radius: 16px;
+  padding: 16px 24px;
 }
 
 .academic-spec-header {
@@ -25,33 +25,37 @@
 }
 
 .academic-spec-label {
-  font-size: 12px;
-  font-weight: 700;
+  font-family: var(--font-suisse-intl);
+  font-size: 13px;
+  font-weight: 400;
   color: var(--text-primary);
 }
 
 .academic-spec-toggle {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-default);
-  border-radius: 3px;
-  padding: 4px 10px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 600;
+  background-color: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--text-secondary);
   cursor: pointer;
 }
 
 .academic-spec-toggle:hover {
   border-color: var(--brand-primary);
-  color: var(--brand-primary);
+  color: var(--text-primary);
 }
 
 .academic-spec-details {
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-subtle);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 300;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
 }

@@ -1,5 +1,8 @@
 /* ==========================================================================
-   TOPBAR EXECUTIVA — NAVEGAÇÃO GLOBAL + SELETOR MULTI-TENANT + MODO VISUAL
+   TOPBAR EXECUTIVA — GLASSMORPHIC STICKY BAR (DESIGN.md)
+   - Backdrop-filter blur(24px) sobre o canvas Obsidian (#0f1011)
+   - Nav Glass Buttons (8px radius, 9px/12px padding)
+   - Primary CTA Button (White #ffffff fill, Black #000000 text, 8px radius, right arrow)
    ========================================================================== */
 
 .topbar-header {
@@ -8,14 +11,20 @@
   z-index: 1000;
   width: 100%;
   background-color: var(--bg-header);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .topbar-header {
   border-bottom: 1px solid var(--border-default);
 }
 
 .topbar-inner {
-  max-width: 1440px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
-  padding: 0 28px;
-  min-height: 64px;
+  padding: 0 24px;
+  min-height: 74px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,7 +33,7 @@
 
 @media (max-width: 991px) {
   .topbar-inner {
-    padding: 10px 14px;
+    padding: 12px 16px;
     flex-wrap: wrap;
   }
 }
@@ -38,7 +47,7 @@
 }
 
 .topbar-logo {
-  height: 28px;
+  height: 26px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -47,82 +56,98 @@
 .topbar-brand-divider {
   width: 1px;
   height: 26px;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="light"] .topbar-brand-divider {
   background-color: var(--border-default);
 }
 
 .topbar-brand-titles {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .topbar-company-name {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-lyon-display);
+  font-size: 20px;
+  font-weight: 300;
   color: var(--text-primary);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .topbar-system-label {
+  font-family: var(--font-roboto-mono);
   font-size: 10px;
-  font-weight: 600;
-  color: var(--brand-primary);
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  color: var(--brand-cyan);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   margin-top: 2px;
 }
 
-/* Navegação Central de Módulos */
+/* Navegação Central de Módulos — Nav Glass Buttons (DESIGN.md) */
 .topbar-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background-color: var(--bg-subtle);
-  padding: 3px;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
+  gap: 8px;
 }
 
 .topbar-nav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  border-radius: 3px;
-  border: 1px solid transparent;
-  background-color: transparent;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background-color: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-suisse-intl);
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
   white-space: nowrap;
 }
 
+[data-theme="light"] .topbar-nav-btn {
+  border-color: var(--border-default);
+  background-color: rgba(15, 16, 17, 0.03);
+}
+
 .topbar-nav-btn:hover {
   color: var(--text-primary);
-  background-color: var(--bg-surface);
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme="light"] .topbar-nav-btn:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--brand-primary);
 }
 
 .topbar-nav-btn--active {
   background-color: var(--brand-primary);
-  color: var(--text-on-brand);
+  color: #ffffff;
   border-color: var(--brand-primary);
 }
 
 .topbar-nav-btn--active:hover {
   background-color: var(--brand-primary-hover);
-  color: var(--text-on-brand);
+  border-color: var(--brand-primary-hover);
+  color: #ffffff;
 }
 
 .topbar-nav-step {
+  font-family: var(--font-roboto-mono);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 500;
   opacity: 0.85;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
 }
 
-/* Controles Globais Direitos: Seletor de Tenant e Tema */
+/* Controles Globais Direitos */
 .topbar-controls {
   display: flex;
   align-items: center;
@@ -137,42 +162,78 @@
 }
 
 .topbar-control-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
   white-space: nowrap;
 }
 
 .topbar-theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 11px;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
-  background-color: var(--bg-subtle);
+  gap: 7px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-roboto-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.topbar-theme-toggle:hover {
-  border-color: var(--brand-primary);
+[data-theme="light"] .topbar-theme-toggle {
+  border-color: var(--border-default);
   background-color: var(--bg-surface);
 }
 
-/* Barra Secundária Mobile para o Seletor de Tenant */
+.topbar-theme-toggle:hover {
+  border-color: var(--brand-primary);
+}
+
+/* Primary CTA Button (DESIGN.md: White fill #ffffff, Black text #000000, 8px radius, 12px/18px padding) */
+.topbar-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  font-family: var(--font-suisse-intl);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+[data-theme="light"] .topbar-primary-cta {
+  background-color: #0f1011;
+  color: #ffffff;
+  border-color: #0f1011;
+}
+
+.topbar-primary-cta:hover {
+  background-color: var(--color-blue-gleam);
+  border-color: var(--color-blue-gleam);
+  color: #ffffff;
+}
+
+/* Barra Secundária Mobile */
 .topbar-mobile-subbar {
   width: 100%;
   padding-top: 8px;
   margin-top: 8px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -187,11 +248,13 @@
   right: 0;
   z-index: 999;
   background-color: var(--bg-header);
-  border-top: 1px solid var(--border-default);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   justify-content: space-around;
   align-items: stretch;
-  height: 54px;
+  height: 58px;
 }
 
 .mobile-bottom-nav-btn {
@@ -199,10 +262,10 @@
   background: transparent;
   border: none;
   border-top: 2px solid transparent;
-  color: var(--text-muted);
-  font-family: inherit;
+  color: var(--text-secondary);
+  font-family: var(--font-suisse-intl);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -214,6 +277,6 @@
 .mobile-bottom-nav-btn--active {
   color: var(--brand-primary);
   border-top-color: var(--brand-primary);
-  background-color: var(--bg-subtle);
-  font-weight: 700;
+  background-color: rgba(41, 112, 255, 0.12);
+  font-weight: 500;
 }

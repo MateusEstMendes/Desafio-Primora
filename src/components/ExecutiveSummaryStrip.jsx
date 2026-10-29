@@ -9,7 +9,7 @@ export default function ExecutiveSummaryStrip({
   onSelectTenant,
   onNavigateTab
 }) {
-  // 1. Unidades que merecem atenção agora (Taxa de risco proporcional > 15%)
+  // 1. Unidades que merecem atenção agora (Taxa de risco proporcional >= 15%)
   const unidadesCriticas = unidadesClassificadas.filter((u) => u.taxaRiscoProporcional >= 15);
 
   // 2. Unidades estáveis / Benchmarks (Menor taxa de risco proporcional e maior conversão)
@@ -29,20 +29,23 @@ export default function ExecutiveSummaryStrip({
   };
 
   return (
-    <section aria-label="Resumo executivo de decisão rápida em 5 segundos" className="exec-strip-grid">
-      {/* PERGUNTA 1: Quais unidades merecem atenção agora? */}
-      <article className="exec-pillar exec-pillar--critical">
+    <section
+      aria-label="Painéis cromáticos de decisão executiva (Regra dos 5 segundos)"
+      className="exec-strip-grid"
+    >
+      {/* CARD 1: BRIGHT BLUE GLEAM (#2970FF) — Quais unidades merecem atenção agora? */}
+      <article className="exec-pillar exec-pillar--blue-gleam">
         <div>
           <div className="exec-pillar-top">
-            <div>
-              <span className="flat-section-eyebrow">01 · Decisão Imediata</span>
-              <h2 className="exec-pillar-question">Quais unidades merecem atenção agora?</h2>
-            </div>
-            <span className="geo-badge geo-badge--critical">
-              <span className="geo-dot geo-dot--critical" aria-hidden="true" />
-              {unidadesCriticas.length} em Alerta
-            </span>
+            <span className="exec-eyebrow-mono">01 · DECISÃO IMEDIATA</span>
+            <span className="exec-pill-tag">{unidadesCriticas.length} EM ALERTA</span>
           </div>
+          <h2 className="exec-pillar-question">
+            <em>Atenção</em> prioritária por risco proporcional
+          </h2>
+          <p className="exec-pillar-desc">
+            Unidades com exposição crítica normalizada pelo porte da carteira ativa.
+          </p>
         </div>
 
         <div className="exec-pillar-rows">
@@ -61,29 +64,23 @@ export default function ExecutiveSummaryStrip({
                     onSelectTenant(isSelected ? 'todos' : u.id);
                   }
                 }}
-                className={`exec-item-row exec-item-row--interactive ${
+                className={`exec-item-row exec-item-row--on-blue ${
                   isSelected ? 'exec-item-row--selected' : ''
                 }`}
                 title="Clique para filtrar esta unidade no painel"
               >
                 <div className="exec-item-main">
-                  <span className="exec-item-title">
-                    <span className="geo-dot geo-dot--critical" aria-hidden="true" />
-                    {u.nome}
-                  </span>
+                  <span className="exec-item-title">{u.nome}</span>
                   <span className="exec-item-sub">
-                    Porte {u.porte} · {formatarNumero(u.riscoAbsolutoCalculado)} de{' '}
-                    {formatarNumero(u.carteiraTotalClientes)} contas em risco/crítico
+                    Porte {u.porte} · {formatarNumero(u.riscoAbsolutoCalculado)}/
+                    {formatarNumero(u.carteiraTotalClientes)} em risco
                   </span>
                 </div>
                 <div className="exec-item-metric">
-                  <span
-                    className="exec-item-metric-val"
-                    style={{ color: 'var(--status-critical)' }}
-                  >
+                  <span className="exec-item-metric-val">
                     {formatarPercentual(u.taxaRiscoProporcional)}
                   </span>
-                  <span className="geo-delta geo-delta--negative">
+                  <span className="exec-item-delta">
                     ▼ {delta > 0 ? `+${delta}` : delta} pts (6m)
                   </span>
                 </div>
@@ -93,7 +90,7 @@ export default function ExecutiveSummaryStrip({
         </div>
 
         <div className="exec-pillar-footer">
-          <span>Critério: Risco proporcional normalizado por porte</span>
+          <span>Normalizado por carteira</span>
           <button
             type="button"
             className="exec-action-link"
@@ -104,18 +101,19 @@ export default function ExecutiveSummaryStrip({
         </div>
       </article>
 
-      {/* PERGUNTA 2: Como está a jornada de cada cliente? */}
-      <article className="exec-pillar exec-pillar--journey">
+      {/* CARD 2: DEEP BLUE (#1D4ED8) — Como está a jornada de cada cliente? */}
+      <article className="exec-pillar exec-pillar--deep-blue">
         <div>
           <div className="exec-pillar-top">
-            <div>
-              <span className="flat-section-eyebrow">02 · Fluxo Comercial & Retenção</span>
-              <h2 className="exec-pillar-question">Como está a jornada de cada cliente?</h2>
-            </div>
-            <span className="geo-badge geo-badge--brand">
-              {clientesPrioritarios.length} Contas Monitoradas
-            </span>
+            <span className="exec-eyebrow-mono">02 · RETENÇÃO & JORNADA</span>
+            <span className="exec-pill-tag">{clientesPrioritarios.length} CONTAS</span>
           </div>
+          <h2 className="exec-pillar-question">
+            <em>Jornada</em> das contas monitoradas
+          </h2>
+          <p className="exec-pillar-desc">
+            Acompanhamento cronológico de interações, alertas operacionais e score B2B.
+          </p>
         </div>
 
         <div className="exec-pillar-rows">
@@ -123,18 +121,6 @@ export default function ExecutiveSummaryStrip({
             const hist = cli.historicoScore || [];
             const deltaScore =
               hist.length >= 2 ? hist[hist.length - 1].score - hist[0].score : 0;
-            const isCrit = cli.statusSaude === 'Crítico';
-            const isRisk = cli.statusSaude === 'Risco';
-            const dotClass = isCrit
-              ? 'geo-dot--critical'
-              : isRisk
-              ? 'geo-dot--risk'
-              : 'geo-dot--success';
-            const colorVar = isCrit
-              ? 'var(--status-critical)'
-              : isRisk
-              ? 'var(--status-risk)'
-              : 'var(--status-success)';
 
             return (
               <div
@@ -152,27 +138,20 @@ export default function ExecutiveSummaryStrip({
                     onNavigateTab('historico-clientes');
                   }
                 }}
-                className="exec-item-row exec-item-row--interactive"
+                className="exec-item-row exec-item-row--on-blue"
                 title="Abrir linha do tempo de eventos deste cliente"
               >
                 <div className="exec-item-main">
-                  <span className="exec-item-title">
-                    <span className={`geo-dot ${dotClass}`} aria-hidden="true" />
-                    {cli.nome}
-                  </span>
+                  <span className="exec-item-title">{cli.nome}</span>
                   <span className="exec-item-sub">
-                    {cli.unidadeNome.replace('Unidade ', '')} · Ticket {cli.ticketMedioMensal}
+                    {cli.unidadeNome.replace('Unidade ', '')} · {cli.ticketMedioMensal}
                   </span>
                 </div>
                 <div className="exec-item-metric">
-                  <span className="exec-item-metric-val" style={{ color: colorVar }}>
-                    Score {cli.scoreSaudeAtual}/100
+                  <span className="exec-item-metric-val">
+                    {cli.scoreSaudeAtual}/100
                   </span>
-                  <span
-                    className={`geo-delta ${
-                      deltaScore >= 0 ? 'geo-delta--positive' : 'geo-delta--negative'
-                    }`}
-                  >
+                  <span className="exec-item-delta">
                     {deltaScore >= 0 ? `▲ +${deltaScore}` : `▼ ${deltaScore}`} pts
                   </span>
                 </div>
@@ -182,30 +161,30 @@ export default function ExecutiveSummaryStrip({
         </div>
 
         <div className="exec-pillar-footer">
-          <span>Eventos ordenados cronologicamente</span>
+          <span>Timeline de eventos</span>
           <button
             type="button"
             className="exec-action-link"
             onClick={() => onNavigateTab('historico-clientes')}
           >
-            Inspecionar timeline &rarr;
+            Inspecionar contas &rarr;
           </button>
         </div>
       </article>
 
-      {/* PERGUNTA 3: Onde a operação está funcionando bem? */}
-      <article className="exec-pillar exec-pillar--benchmark">
+      {/* CARD 3: SILVER INVERTED CARD (#CACACA, #000000 TEXT — DESIGN.md Stat/Inverted Card) */}
+      <article className="exec-pillar exec-pillar--silver-inverted">
         <div>
           <div className="exec-pillar-top">
-            <div>
-              <span className="flat-section-eyebrow">03 · Benchmark Interno</span>
-              <h2 className="exec-pillar-question">Onde a operação está funcionando bem?</h2>
-            </div>
-            <span className="geo-badge geo-badge--success">
-              <span className="geo-dot geo-dot--success" aria-hidden="true" />
-              Entrega Estável
-            </span>
+            <span className="exec-eyebrow-mono exec-eyebrow-mono--dark">03 · BENCHMARK INTERNO</span>
+            <span className="exec-pill-tag exec-pill-tag--dark">OPERAÇÃO ESTÁVEL</span>
           </div>
+          <h2 className="exec-pillar-question exec-pillar-question--dark">
+            <em>Referência</em> de conversão e estabilidade
+          </h2>
+          <p className="exec-pillar-desc exec-pillar-desc--dark">
+            Unidades com alta conversão no funil de 90 dias e risco controlado.
+          </p>
         </div>
 
         <div className="exec-pillar-rows">
@@ -227,29 +206,23 @@ export default function ExecutiveSummaryStrip({
                     onSelectTenant(isSelected ? 'todos' : u.id);
                   }
                 }}
-                className={`exec-item-row exec-item-row--interactive ${
-                  isSelected ? 'exec-item-row--selected' : ''
+                className={`exec-item-row exec-item-row--on-silver ${
+                  isSelected ? 'exec-item-row--selected-silver' : ''
                 }`}
                 title="Clique para inspecionar os indicadores desta unidade referência"
               >
                 <div className="exec-item-main">
-                  <span className="exec-item-title">
-                    <span className="geo-dot geo-dot--success" aria-hidden="true" />
-                    {u.nome}
-                  </span>
-                  <span className="exec-item-sub">
-                    {formatarPercentual(taxaSaudavel)} saudável · Risco controlado (
-                    {formatarPercentual(u.taxaRiscoProporcional)})
+                  <span className="exec-item-title exec-item-title--dark">{u.nome}</span>
+                  <span className="exec-item-sub exec-item-sub--dark">
+                    {formatarPercentual(taxaSaudavel)} saudável · Risco{' '}
+                    {formatarPercentual(u.taxaRiscoProporcional)}
                   </span>
                 </div>
                 <div className="exec-item-metric">
-                  <span
-                    className="exec-item-metric-val"
-                    style={{ color: 'var(--status-success)' }}
-                  >
+                  <span className="exec-item-metric-val exec-item-metric-val--dark">
                     Funil {formatarPercentual(u.taxaConversaoFunil)}
                   </span>
-                  <span className="geo-delta geo-delta--positive">
+                  <span className="exec-item-delta exec-item-delta--dark">
                     ▲ +{delta} pts engaj.
                   </span>
                 </div>
@@ -258,18 +231,18 @@ export default function ExecutiveSummaryStrip({
           })}
         </div>
 
-        <div className="exec-pillar-footer">
-          <span>Referência de conversão e retenção de carteira</span>
+        <div className="exec-pillar-footer exec-pillar-footer--dark">
+          <span>Benchmark de retenção</span>
           {selectedTenantId !== 'todos' ? (
             <button
               type="button"
-              className="exec-action-link"
+              className="exec-action-link exec-action-link--dark"
               onClick={() => onSelectTenant('todos')}
             >
-              Resetar filtro global
+              Resetar filtro &rarr;
             </button>
           ) : (
-            <span>Clique em uma unidade para drill-down</span>
+            <span>Clique para drill-down</span>
           )}
         </div>
       </article>

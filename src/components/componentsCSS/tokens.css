@@ -1,134 +1,235 @@
 /* ==========================================================================
-   SISTEMA DE DESIGN TOKENS — ESTRITO FLAT DESIGN (PRIMORA & DISTRIBUIDORA VETOR)
-   Regras:
-   - Profundidade: box-shadow: none, sem chanfros, sem blur/glassmorphism, bordas 1px
-   - Cores: 100% sólidas, zero gradientes, blocos suaves/pastéis com alto contraste
-   - Geometria: Retângulos (4px), Círculos (status/pontos) e Triângulos (▲/▼ deltas)
-   - Tipografia: Inter + font-variant-numeric: tabular-nums
+   ORIGIN GALLERY STYLE SYSTEM (DESIGN.md) — BLUE & BRIGHT BLUE EDITION
+   - Theme: Nocturnal gallery of quiet wealth (Obsidian #0f1011, Abyss #090a0b, Graphite #2e2e2e, Silver #cacaca)
+   - Chromatic Palette: Bright Blue (#2970ff / #3b82f6), Cyan Signal (#00b3dd), Deep Blue (#1d4ed8), Periwinkle (#90b8f0) — ZERO PURPLE
+   - Three-Voice Typography: Serif Display (Weight 300) + Sans UI (Weights 300/400) + Roboto Mono Uppercase (Weights 400/500)
+   - Flat Elevation: Differentiated by surface color stepping, zero card drop shadows, glassmorphism on sticky nav
    ========================================================================== */
 
 :root,
-[data-theme="light"] {
-  --bg-canvas: #F4F6F9;
-  --bg-surface: #FFFFFF;
-  --bg-subtle: #EEF2F6;
-  --bg-elevated: #F8FAFC;
-  --bg-header: #FFFFFF;
-  --bg-footer: #EEF2F6;
-
-  --border-default: #D5DCE6;
-  --border-subtle: #E2E8F0;
-  --border-strong: #64748B;
-  --border-focus: #684CB1;
-
-  --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --text-muted: #475569; /* Slate-600: Contraste 7.0:1 no canvas e 7.5:1 na surface (WCAG AAA) */
-  --text-on-brand: #FFFFFF;
-
-  /* Identidade Primora (100% Sólida) */
-  --brand-primary: #684CB1;
-  --brand-primary-hover: #533898;
-  --brand-primary-soft: #F3F0FA;
-  --brand-primary-border: #D4C6F0;
-
-  --brand-cyan: #0891B2;
-  --brand-cyan-text: #0E7490;
-  --brand-cyan-soft: #ECFEFF;
-  --brand-cyan-border: #A5F3FC;
-
-  /* Cores Semânticas de Decisão (Fills Gráficos + Badges Pastéis + Textos Calibrados) */
-  --status-success: #059669;
-  --status-success-text: #047857; /* 5.2:1 no soft e 5.5:1 no white */
-  --status-success-soft: #ECFDF5;
-  --status-success-border: #6EE7B7;
-
-  --status-warning: #D97706;
-  --status-warning-text: #92400E; /* 6.8:1 no soft e 7.1:1 no white */
-  --status-warning-soft: #FFFBEB;
-  --status-warning-border: #FCD34D;
-
-  --status-risk: #EA580C;
-  --status-risk-text: #C2410C; /* 4.9:1 no soft e 5.2:1 no white */
-  --status-risk-soft: #FFF7ED;
-  --status-risk-border: #FDBA74;
-
-  --status-critical: #DC2626;
-  --status-critical-text: #B91C1C; /* 5.9:1 no soft e 6.5:1 no white */
-  --status-critical-soft: #FEF2F2;
-  --status-critical-border: #FCA5A5;
-
-  /* Paleta Categórica Neutra para Geografias (Desacoplada de Status de Alerta) */
-  --category-1: #684CB1; /* Roxo Primora (Sudeste) */
-  --category-2: #0891B2; /* Ciano Corporativo (Sul) */
-  --category-3: #2563EB; /* Azul Royal (Nordeste) */
-  --category-4: #4F46E5; /* Índigo Tecnológico (Centro-Oeste) */
-
-  --chart-grid: #E2E8F0;
-  --chart-axis: #64748B;
-}
-
 [data-theme="dark"] {
-  --bg-canvas: #0D151E;
-  --bg-surface: #141F2B;
-  --bg-subtle: #1B2938;
-  --bg-elevated: #1F2D3D;
-  --bg-header: #141F2B;
-  --bg-footer: #0D151E;
+  /* DESIGN.md Color Tokens — Blue & Bright Blue Edition */
+  --color-blue-gleam: #2970ff;
+  --color-bright-blue: #3b82f6;
+  --color-cyan-signal: #00b3dd;
+  --color-pale-blue: #bae6fd;
+  --color-deep-blue: #1d4ed8;
+  --color-sky-bloom: #38bdf8;
+  --color-periwinkle: #90b8f0;
 
-  --border-default: #263648;
-  --border-subtle: #1E2C3B;
-  --border-strong: #47607E;
-  --border-focus: #8B6FD4;
+  /* Neutral & Gallery Surfaces */
+  --color-obsidian: #0f1011;
+  --color-abyss: #090a0b;
+  --color-graphite: #2e2e2e;
+  --color-steel: #3f4041;
+  --color-silver: #cacaca;
+  --color-fog: #6a6b6b;
+  --color-ash: #9f9fa0;
+  --color-cloud: #f5f5f7;
+  --color-pure: #ffffff;
+  --color-void: #000000;
 
-  --text-primary: #F1F5F9;
-  --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  --text-on-brand: #FFFFFF;
+  /* Named Surfaces (DESIGN.md) */
+  --surface-obsidian-canvas: #0f1011;
+  --surface-abyss: #090a0b;
+  --surface-graphite-card: #2e2e2e;
+  --surface-steel-hover: #3f4041;
+  --surface-silver-inverted: #cacaca;
 
-  /* Identidade Primora Dark (100% Sólida) */
-  --brand-primary: #8B6FD4;
-  --brand-primary-hover: #9F85E0;
-  --brand-primary-soft: #1E1A34;
-  --brand-primary-border: #43356E;
+  /* Semantic Application Mapping */
+  --bg-canvas: #0f1011;
+  --bg-abyss: #090a0b;
+  --bg-surface: #181a1c;
+  --bg-subtle: #222427;
+  --bg-elevated: #2e2e2e;
+  --bg-steel: #3f4041;
+  --bg-silver: #cacaca;
+  --bg-header: rgba(15, 16, 17, 0.78);
+  --bg-footer: #090a0b;
 
-  --brand-cyan: #0ED5FA;
-  --brand-cyan-text: #38BDF8;
-  --brand-cyan-soft: #102A37;
-  --brand-cyan-border: #164E63;
+  --border-default: #2e2e2e;
+  --border-subtle: #222427;
+  --border-strong: #3f4041;
+  --border-focus: #2970ff;
 
-  /* Cores Semânticas de Decisão Dark */
-  --status-success: #34D399;
-  --status-success-text: #34D399;
-  --status-success-soft: #0F2922;
-  --status-success-border: #065F46;
+  --text-primary: #ffffff;
+  --text-cloud: #f5f5f7;
+  --text-secondary: #9f9fa0;
+  --text-muted: #6a6b6b;
+  --text-on-brand: #ffffff;
 
-  --status-warning: #FBBF24;
-  --status-warning-text: #FBBF24;
-  --status-warning-soft: #292011;
-  --status-warning-border: #78350F;
+  /* Brand & Data Signal Colors (Bright Blue + Cyan Signal) */
+  --brand-primary: #2970ff;
+  --brand-primary-hover: #3b82f6;
+  --brand-primary-soft: #102347;
+  --brand-primary-border: #1d4ed8;
 
-  --status-risk: #FB923C;
-  --status-risk-text: #FB923C;
-  --status-risk-soft: #2C1A12;
-  --status-risk-border: #7C2D12;
+  --brand-cyan: #00b3dd;
+  --brand-cyan-text: #38bdf8;
+  --brand-cyan-soft: #092832;
+  --brand-cyan-border: #0086a8;
 
-  --status-critical: #F87171;
-  --status-critical-text: #F87171;
-  --status-critical-soft: #2C1519;
-  --status-critical-border: #7F1D1D;
+  /* Decision Semantics */
+  --status-success: #10b981;
+  --status-success-text: #34d399;
+  --status-success-soft: #0d2821;
+  --status-success-border: #065f46;
 
-  /* Paleta Categórica Neutra Dark */
-  --category-1: #8B6FD4;
-  --category-2: #0ED5FA;
-  --category-3: #60A5FA;
-  --category-4: #818CF8;
+  --status-warning: #f59e0b;
+  --status-warning-text: #fbbf24;
+  --status-warning-soft: #281f10;
+  --status-warning-border: #78350f;
 
-  --chart-grid: #1E2C3B;
-  --chart-axis: #94A3B8;
+  --status-risk: #f97316;
+  --status-risk-text: #fb923c;
+  --status-risk-soft: #2a1810;
+  --status-risk-border: #7c2d12;
+
+  --status-critical: #ef4444;
+  --status-critical-text: #f87171;
+  --status-critical-soft: #2a1417;
+  --status-critical-border: #7f1d1d;
+
+  /* Regional Categorical Palette (100% Blue Spectrum) */
+  --category-1: #2970ff;
+  --category-2: #00b3dd;
+  --category-3: #90b8f0;
+  --category-4: #1d4ed8;
+
+  --chart-grid: #262729;
+  --chart-axis: #9f9fa0;
+
+  /* Typography — Font Families */
+  --font-lyon-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-suisse-intl: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-suisse-intl-trial: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-roboto-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Typography — Scale */
+  --text-mono-label: 12px;
+  --leading-mono-label: 2;
+  --text-body-sm: 14px;
+  --leading-body-sm: 1.67;
+  --text-body: 16px;
+  --leading-body: 1.5;
+  --text-subheading: 18px;
+  --leading-subheading: 1.5;
+  --text-heading-lg: 38px;
+  --leading-heading-lg: 0.9;
+  --text-display-sm: 80px;
+  --leading-display-sm: 1;
+  --text-display: 96px;
+  --leading-display: 0.9;
+
+  /* Spacing & Layout (DESIGN.md) */
+  --spacing-unit: 4px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-60: 60px;
+  --spacing-68: 68px;
+  --spacing-80: 80px;
+  --spacing-100: 100px;
+
+  --page-max-width: 1200px;
+  --section-gap: 48px;
+  --card-padding: 32px;
+  --element-gap: 12px;
+
+  /* Named Radii (DESIGN.md) */
+  --radius-cards: 16px;
+  --radius-inputs: 8px;
+  --radius-buttons: 8px;
+  --radius-navitems: 8px;
+  --radius-statblocks: 16px;
+  --radius-pillbuttons: 9999px;
+  --radius-featurecards: 30px;
+  --radius-categorytiles: 30px;
+  --radius-full: 1440px;
+
+  /* Structural Gradients (DESIGN.md) */
+  --gradient-dark-chrome: linear-gradient(135deg, rgb(43, 43, 44), rgb(19, 19, 19));
+  --gradient-sky-atmosphere: linear-gradient(
+    180deg,
+    rgb(15, 16, 17) 0%,
+    rgb(19, 29, 39) 24%,
+    rgb(26, 71, 136) 56%,
+    rgb(41, 112, 255) 82%,
+    rgb(15, 16, 17) 100%
+  );
 }
 
-/* Estrutura Geral da Aplicação */
+[data-theme="light"] {
+  --bg-canvas: #f5f5f7;
+  --bg-abyss: #eaecef;
+  --bg-surface: #ffffff;
+  --bg-subtle: #eceef2;
+  --bg-elevated: #f8fafc;
+  --bg-steel: #cacaca;
+  --bg-silver: #0f1011;
+  --bg-header: rgba(245, 245, 247, 0.84);
+  --bg-footer: #eaecef;
+
+  --border-default: #d4d8e0;
+  --border-subtle: #e4e7ec;
+  --border-strong: #6a6b6b;
+  --border-focus: #2563eb;
+
+  --text-primary: #0f1011;
+  --text-cloud: #090a0b;
+  --text-secondary: #4a4b4d;
+  --text-muted: #6a6b6b;
+  --text-on-brand: #ffffff;
+
+  --brand-primary: #2563eb;
+  --brand-primary-hover: #1d4ed8;
+  --brand-primary-soft: #eff6ff;
+  --brand-primary-border: #bfdbfe;
+
+  --brand-cyan: #0095b8;
+  --brand-cyan-text: #007794;
+  --brand-cyan-soft: #ecfeff;
+  --brand-cyan-border: #a5f3fc;
+
+  --status-success: #059669;
+  --status-success-text: #047857;
+  --status-success-soft: #ecfdf5;
+  --status-success-border: #6ee7b7;
+
+  --status-warning: #d97706;
+  --status-warning-text: #92400e;
+  --status-warning-soft: #fffbeb;
+  --status-warning-border: #fcd34d;
+
+  --status-risk: #ea580c;
+  --status-risk-text: #c2410c;
+  --status-risk-soft: #fff7ed;
+  --status-risk-border: #fdba74;
+
+  --status-critical: #dc2626;
+  --status-critical-text: #b91c1c;
+  --status-critical-soft: #fef2f2;
+  --status-critical-border: #fca5a5;
+
+  --category-1: #2563eb;
+  --category-2: #00b3dd;
+  --category-3: #3b82f6;
+  --category-4: #1e40af;
+
+  --chart-grid: #e2e8f0;
+  --chart-axis: #6a6b6b;
+}
+
+/* ==========================================================================
+   APP SHELL & GALLERY CANVAS
+   ========================================================================== */
+
 .app-shell {
   min-height: 100dvh;
   background-color: var(--bg-canvas);
@@ -139,24 +240,283 @@
 
 .app-main-content {
   width: 100%;
-  max-width: 1440px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
-  padding: 20px 28px 40px 28px;
+  padding: 28px 24px 64px 24px;
   flex: 1;
 }
 
 @media (max-width: 767px) {
   .app-main-content {
-    padding: 12px 12px 80px 12px;
+    padding: 16px 14px 88px 14px;
   }
 }
 
-/* Blocos Superficiais Flat (1px solid, 4px radius, zero shadow) */
+/* ==========================================================================
+   ATMOSPHERIC HERO SECTION (DESIGN.md)
+   ========================================================================== */
+
+.origin-hero-band {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-default);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15, 16, 17, 0.94) 0%,
+      rgba(19, 29, 39, 0.85) 28%,
+      rgba(26, 71, 136, 0.36) 62%,
+      rgba(41, 112, 255, 0.16) 84%,
+      var(--bg-canvas) 100%
+    );
+  padding: 48px 24px 40px 24px;
+}
+
+[data-theme="light"] .origin-hero-band {
+  background:
+    linear-gradient(
+      180deg,
+      #f5f5f7 0%,
+      #e6f0ff 55%,
+      #f5f5f7 100%
+    );
+}
+
+.origin-hero-inner {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+/* Promo Eyebrow Badge (DESIGN.md) */
+.promo-eyebrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1440px;
+  padding: 8px 28px;
+  font-family: var(--font-roboto-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .promo-eyebrow-badge {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.22);
+  color: #0f1011;
+}
+
+/* Display Headline (DESIGN.md: Lyon Display / Serif weight 300, 0.9 line-height, italic contrast) */
+.origin-display-headline {
+  font-family: var(--font-lyon-display);
+  font-weight: 300;
+  font-size: clamp(44px, 6.2vw, 80px);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  color: var(--text-cloud);
+  margin: 0;
+  max-width: 920px;
+}
+
+.origin-display-headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-primary);
+}
+
+/* Section Subhead (DESIGN.md: Suisse Int'l 18px weight 300, Ash #9f9fa0) */
+.origin-section-subhead {
+  font-family: var(--font-suisse-intl);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0;
+}
+
+/* AI Prompt Input (DESIGN.md) */
+.origin-ai-prompt-wrap {
+  width: 100%;
+  max-width: 620px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.origin-ai-prompt-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px 10px 8px 22px;
+}
+
+[data-theme="light"] .origin-ai-prompt-form {
+  background-color: #ffffff;
+  border-color: #d4d8e0;
+}
+
+.origin-ai-prompt-form:focus-within {
+  border-color: var(--color-blue-gleam);
+}
+
+.origin-ai-prompt-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fafafa;
+  font-family: var(--font-suisse-intl);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+[data-theme="light"] .origin-ai-prompt-input {
+  color: #0f1011;
+}
+
+.origin-ai-prompt-input::placeholder {
+  color: var(--color-ash);
+}
+
+.origin-ai-submit-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+[data-theme="light"] .origin-ai-submit-btn {
+  background: var(--color-blue-gleam);
+  border-color: var(--color-blue-gleam);
+}
+
+.origin-ai-submit-btn:hover {
+  background: var(--color-blue-gleam);
+  border-color: var(--color-blue-gleam);
+}
+
+.origin-ai-Quick-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.origin-ai-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  padding: 5px 14px;
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+[data-theme="light"] .origin-ai-chip {
+  background: rgba(15, 16, 17, 0.05);
+  border-color: rgba(15, 16, 17, 0.12);
+}
+
+.origin-ai-chip:hover {
+  background: rgba(41, 112, 255, 0.22);
+  border-color: var(--color-blue-gleam);
+  color: var(--text-primary);
+}
+
+.origin-ai-answer-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--brand-primary);
+  border-radius: 12px;
+  padding: 12px 18px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-cloud);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Award Laurel Social Proof Row (DESIGN.md) */
+.origin-laurel-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding-top: 12px;
+}
+
+.origin-laurel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+}
+
+.origin-laurel-title {
+  font-family: var(--font-lyon-display);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text-cloud);
+  display: block;
+  line-height: 1.1;
+}
+
+.origin-laurel-sub {
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* ==========================================================================
+   SURFACES & CARDS (DESIGN.md: Flat Gallery Stepping, 16px-30px Radius)
+   ========================================================================== */
+
 .flat-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 4px;
-  padding: 16px 20px;
+  border-radius: var(--radius-cards);
+  padding: 28px 32px;
+}
+
+@media (max-width: 767px) {
+  .flat-card {
+    padding: 20px 18px;
+  }
 }
 
 .flat-card-header {
@@ -164,50 +524,97 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 12px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-default);
   flex-wrap: wrap;
 }
 
 .flat-card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-family: var(--font-lyon-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text-cloud);
+  line-height: 1.05;
   letter-spacing: -0.01em;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .flat-section-eyebrow {
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
   display: block;
 }
 
-/* Foco e Acessibilidade (WCAG 2.1 AA) */
+/* Primary CTA Button (DESIGN.md: White fill #ffffff, Black text #000000, 8px radius) */
+.btn-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: var(--font-suisse-intl);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary-cta:hover {
+  background-color: #f5f5f7;
+  border-color: #f5f5f7;
+  color: #000000;
+}
+
+/* Ghost Outline Button (DESIGN.md) */
+.flat-action-btn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background-color: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-roboto-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-theme="light"] .flat-action-btn {
+  border-color: var(--border-default);
+}
+
+.flat-action-btn:hover {
+  border-color: var(--brand-primary);
+  background-color: var(--brand-primary);
+  color: #ffffff;
+}
+
+/* Focus & Accessibility */
 :focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
-/* Transições Suaves & Motion (motion-design system) */
-button,
-a,
-input,
-select,
-.flat-action-btn,
-.compact-client-pill,
-.client-tab-item {
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
-}
+/* ==========================================================================
+   BADGES, DOTS & DELTAS (Roboto Mono Uppercase)
+   ========================================================================== */
 
-/* Formas Geométricas Básicas (Círculos, Retângulos, Triângulos) */
 .geo-dot {
   display: inline-block;
   width: 8px;
@@ -244,11 +651,14 @@ select,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 8px;
+  padding: 4px 12px;
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 600;
-  border-radius: 4px;
-  border: 1px solid var(--border-default);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+  border: 1px solid var(--border-strong);
   background-color: var(--bg-subtle);
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
@@ -281,8 +691,12 @@ select,
 
 .geo-badge--brand {
   background-color: var(--brand-primary-soft);
-  color: var(--brand-primary);
+  color: #60a5fa;
   border-color: var(--brand-primary-border);
+}
+
+[data-theme="light"] .geo-badge--brand {
+  color: var(--brand-primary);
 }
 
 .geo-badge--cyan {
@@ -294,9 +708,12 @@ select,
 .geo-delta {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  font-family: var(--font-roboto-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -312,21 +729,24 @@ select,
   color: var(--text-muted);
 }
 
-/* Rodapé Técnico Corporativo */
+/* ==========================================================================
+   FOOTER (Abyss #090a0b)
+   ========================================================================== */
+
 .app-footer {
   background-color: var(--bg-footer);
   border-top: 1px solid var(--border-default);
-  padding: 20px 28px;
+  padding: 32px 24px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .app-footer-inner {
-  max-width: 1440px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
 }
 
 .app-footer-row {

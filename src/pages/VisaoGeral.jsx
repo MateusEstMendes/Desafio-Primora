@@ -20,6 +20,7 @@ import {
   formatarPercentual
 } from '../utils/metrics';
 import { getRiskSemanticTokens } from '../utils/themeTokens';
+import ExecutiveSummaryStrip from '../components/ExecutiveSummaryStrip';
 import FlatFunnelHealth from '../components/FlatFunnelHealth';
 import '../components/componentsCSS/VisaoGeral.css';
 
@@ -166,7 +167,7 @@ export default function VisaoGeral({
 
   return (
     <div className="visao-geral-container">
-      {/* BLOCO 1: FAIXA CONTÍNUA DE INDICADORES (LEDGER STRIP SEM CAIXAS REDUNDANTES) */}
+      {/* BLOCO 1: FAIXA CONTÍNUA DE INDICADORES (LEDGER STRIP) */}
       <section className="kpi-ledger-strip" aria-label="Indicadores executivos consolidados">
         <div className="kpi-ledger-cell">
           <div className="kpi-ledger-header">
@@ -187,7 +188,7 @@ export default function VisaoGeral({
             <span className="kpi-ledger-number">
               {formatarNumero(estatisticasAgregadas.carteiraTotal)}
             </span>
-            <span className="kpi-unit-tag">contas</span>
+            <span className="kpi-unit-tag">CONTAS</span>
           </div>
           <div className="kpi-ledger-sub">
             <span>{estatisticasAgregadas.nome}</span>
@@ -268,7 +269,7 @@ export default function VisaoGeral({
             </span>
           </div>
           <div className="kpi-ledger-main">
-            <span className="kpi-ledger-number">
+            <span className="kpi-ledger-number" style={{ color: 'var(--brand-cyan)' }}>
               {formatarPercentual(estatisticasAgregadas.engajamento)}
             </span>
           </div>
@@ -278,17 +279,29 @@ export default function VisaoGeral({
         </div>
       </section>
 
-      {/* BLOCO 2: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
+      {/* BLOCO 2: FEATURE CATEGORY CARDS & SILVER INVERTED CARD (DESIGN.md 3-Column Gallery) */}
+      <ExecutiveSummaryStrip
+        unidadesClassificadas={unidadesClassificadas}
+        clientes={clientes}
+        selectedTenantId={selectedTenantId}
+        onSelectTenant={onSelectTenant}
+        onNavigateTab={onNavigateTab}
+      />
+
+      {/* BLOCO 3: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
       <FlatFunnelHealth estatisticas={estatisticasAgregadas} themeTokens={themeTokens} />
 
-      {/* BLOCO 3: QUADRO DIRETO DE UNIDADES (ATENÇÃO VS. BENCHMARK) + TENDÊNCIA SEMESTRAL */}
+      {/* BLOCO 4: QUADRO DIRETO DE UNIDADES (ATENÇÃO VS. BENCHMARK) + TENDÊNCIA SEMESTRAL */}
       <div className="bottom-summary-grid">
         {/* Esquerda: Resumo Direto das 4 Unidades Regionais */}
         <section className="flat-card" aria-labelledby="units-summary-heading">
           <div className="flat-card-header">
-            <h2 id="units-summary-heading" className="flat-card-title">
-              Desempenho por Unidade Regional
-            </h2>
+            <div>
+              <span className="flat-section-eyebrow">MATRIZ DE UNIDADES</span>
+              <h2 id="units-summary-heading" className="flat-card-title">
+                Desempenho por Regional
+              </h2>
+            </div>
             <button
               type="button"
               className="flat-action-btn"
@@ -338,7 +351,7 @@ export default function VisaoGeral({
                       <span className="units-table-unit-porte">{u.porte}</span>
                     </td>
                     <td className="num-col">{formatarNumero(u.carteiraTotalClientes)}</td>
-                    <td className="num-col" style={{ fontWeight: 700, color: sem.color }}>
+                    <td className="num-col" style={{ fontWeight: 600, color: sem.color }}>
                       {formatarPercentual(u.taxaRiscoProporcional)}
                       <span className="units-table-risk-sub">
                         ({u.riscoAbsolutoCalculado})
@@ -400,24 +413,27 @@ export default function VisaoGeral({
                 className="flat-action-btn"
                 onClick={() => onNavigateTab('historico-clientes')}
               >
-                Ver todas ({clientes.length}) na Jornada &rarr;
+                Ver todas ({clientes.length}) &rarr;
               </button>
             </div>
           </div>
         </section>
 
-        {/* Direita: Série Temporal Semestral */}
+        {/* Direita: Série Temporal Semestral — Cyan Signal (#00b3dd) + Bright Blue (#2970ff) */}
         <section className="flat-card" aria-labelledby="trend-chart-heading">
           <div className="flat-card-header">
-            <h2 id="trend-chart-heading" className="flat-card-title">
-              Evolução Semestral (6m)
-            </h2>
+            <div>
+              <span className="flat-section-eyebrow">SINAIS DE TENDÊNCIA</span>
+              <h2 id="trend-chart-heading" className="flat-card-title">
+                Evolução Semestral (6m)
+              </h2>
+            </div>
             <span className="chart-card-subtitle">
               {selectedTenant ? selectedTenant.nome : 'Média Nacional'}
             </span>
           </div>
 
-          <div className="chart-container-responsive" style={{ height: isMobile ? 210 : 235 }}>
+          <div className="chart-container-responsive" style={{ height: isMobile ? 220 : 250 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={estatisticasAgregadas.tendencias}
@@ -439,7 +455,7 @@ export default function VisaoGeral({
                   contentStyle={{
                     backgroundColor: themeTokens.chartTooltipBg,
                     border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                    borderRadius: 4,
+                    borderRadius: 8,
                     boxShadow: 'none',
                     color: themeTokens.textPrimary,
                     fontSize: 12
@@ -449,26 +465,26 @@ export default function VisaoGeral({
                 <Legend
                   verticalAlign="top"
                   height={28}
-                  wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
+                  wrapperStyle={{ fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-roboto-mono)' }}
                 />
                 <Line
-                  type="linear"
+                  type="monotone"
                   dataKey="engajamento"
                   name="Engajamento (%)"
                   stroke={themeTokens.brandPrimary}
-                  strokeWidth={2}
-                  dot={{ r: 3.5, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
-                  activeDot={{ r: 5, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
                   isAnimationActive={false}
                 />
                 <Line
-                  type="linear"
+                  type="monotone"
                   dataKey="sucessoFunil"
                   name="Sucesso Funil (%)"
                   stroke={themeTokens.brandCyan}
-                  strokeWidth={2}
-                  dot={{ r: 3.5, fill: themeTokens.brandCyan, strokeWidth: 0 }}
-                  activeDot={{ r: 5, fill: themeTokens.brandCyan, strokeWidth: 0 }}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: themeTokens.brandCyan, strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: themeTokens.brandCyan, strokeWidth: 0 }}
                   isAnimationActive={false}
                 />
               </LineChart>

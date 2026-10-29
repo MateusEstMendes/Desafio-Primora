@@ -1,51 +1,60 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark light" />
     <script>
       try {
-        document.querySelector('meta[name="color-scheme"]').content =
-          localStorage.getItem('color-scheme') ?? 'light';
+        const savedTheme = localStorage.getItem('color-scheme') || 'dark';
+        document.documentElement.dataset.theme = savedTheme;
+        document.querySelector('meta[name="color-scheme"]').content = savedTheme;
       } catch (e) {}
     </script>
     <link rel="icon" type="image/png" href="/primora-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel Executivo Multi-Tenant — Distribuidora Vetor | Primora</title>
-    <!-- Tipografia Técnica e Limpa: Inter -->
+    <!-- Tipografia em Três Vozes (DESIGN.md):
+         1. Serif Display (Weight 300 Editorial): Cormorant Garamond / Playfair Display
+         2. Neo-Grotesque Sans (UI & Subheads): Inter (Weights 300, 400, 500, 600)
+         3. Technical Monospace (Uppercase Labels & Data): Roboto Mono (Weights 400, 500) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        /* MANDATORY: Apply color-scheme to :root for viewport-wide theming */
-        color-scheme: light dark;
+        color-scheme: dark light;
 
-        --primora-purple-light: #684cb1;
-        --primora-purple-dark: #8b6fd4;
-        --primora-cyan-light: #0891b2;
-        --primora-cyan-dark: #0ed5fa;
+        /* DESIGN.md Tokens — Blue & Bright Blue Edition (No Purple) */
+        --color-blue-gleam: #2970ff;
+        --color-bright-blue: #3b82f6;
+        --color-cyan-signal: #00b3dd;
+        --color-pale-blue: #bae6fd;
+        --color-deep-blue: #1d4ed8;
+        --color-sky-bloom: #38bdf8;
+        --color-periwinkle: #90b8f0;
 
-        --bg-canvas: light-dark(#f4f6f9, #0d151e);
-        --bg-surface: light-dark(#ffffff, #141f2b);
-        --bg-subtle: light-dark(#eef2f6, #1b2938);
-        --border-default: light-dark(#d5dce6, #263648);
-        --text-primary: light-dark(#0f172a, #f1f5f9);
-        --text-secondary: light-dark(#334155, #cbd5e1);
-        --text-muted: light-dark(#64748b, #94a3b8);
+        /* Neutral & Gallery Surfaces */
+        --color-obsidian: #0f1011;
+        --color-abyss: #090a0b;
+        --color-graphite: #2e2e2e;
+        --color-steel: #3f4041;
+        --color-silver: #cacaca;
+        --color-fog: #6a6b6b;
+        --color-ash: #9f9fa0;
+        --color-cloud: #f5f5f7;
+        --color-pure: #ffffff;
+        --color-void: #000000;
 
-        accent-color: light-dark(var(--primora-purple-light), var(--primora-purple-dark));
-      }
+        /* Typography Families */
+        --font-lyon-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        --font-suisse-intl: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-suisse-intl-trial: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-roboto-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-      :root:has(> head > meta[name="color-scheme"][content="dark"]) {
-        color-scheme: dark;
-      }
-
-      :root:has(> head > meta[name="color-scheme"][content="light"]) {
-        color-scheme: light;
+        accent-color: var(--color-blue-gleam);
       }
 
       * {
@@ -56,33 +65,24 @@
       body {
         margin: 0;
         padding: 0;
-        background-color: var(--bg-canvas);
-        color: var(--text-primary);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--bg-canvas, #0f1011);
+        color: var(--text-primary, #ffffff);
+        font-family: var(--font-suisse-intl);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* ESTRITO FLAT DESIGN: Proibido sombras, chanfros, relevos ou desfoques */
-      *,
-      *::before,
-      *::after,
+      /* Elevação Flat por Camadas de Superfície (DESIGN.md: Sem drop-shadows em cards) */
       .ant-card,
-      .ant-btn,
       .ant-select-selector,
-      .ant-select-dropdown,
       .ant-table,
       .ant-tag,
-      .ant-alert,
-      .ant-drawer-content-wrapper,
-      .ant-popover-inner,
-      .ant-tooltip-inner {
+      .ant-alert {
         box-shadow: none !important;
         text-shadow: none !important;
-        backdrop-filter: none !important;
       }
 
-      /* Números Tabulares obrigatórios para métricas, tabelas e indicadores */
+      /* Números Tabulares para métricas, tabelas e indicadores */
       .tabular-nums,
       .ant-statistic-content,
       .ant-table-cell,
@@ -93,33 +93,34 @@
         font-feature-settings: "tnum" 1;
       }
 
-      /* Transições funcionais curtas (100-150ms) apenas em estados interativos */
+      /* Transições rápidas e contidas (DESIGN.md: 0.2s ease) */
       button,
+      a,
+      input,
       .flat-interactive,
       .ant-btn,
       .ant-select-selector,
       .ant-radio-button-wrapper {
-        transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease !important;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease !important;
       }
 
-      /* Tabela Responsiva com Sticky Headers e Container Queries */
+      /* Tabela Responsiva */
       .table-region-wrapper {
         overflow: auto;
         max-inline-size: 100%;
         container-type: inline-size;
         border: 1px solid var(--border-default);
-        border-radius: 4px;
+        border-radius: 16px;
         background-color: var(--bg-surface);
       }
 
       .table-region-wrapper:focus-visible {
-        outline: 2px solid light-dark(#684cb1, #8b6fd4);
-        outline-offset: 1px;
+        outline: 2px solid var(--color-blue-gleam);
+        outline-offset: 2px;
       }
 
-      /* Suporte a Forced Colors Mode (Acessibilidade de Alto Contraste) */
       @media (forced-colors: active) {
-        .flat-surface,
+        .flat-card,
         .ant-card,
         .table-region-wrapper {
           border: 1px solid CanvasText !important;
