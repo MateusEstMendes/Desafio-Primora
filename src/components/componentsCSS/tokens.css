@@ -1,0 +1,338 @@
+/* ==========================================================================
+   SISTEMA DE DESIGN TOKENS — ESTRITO FLAT DESIGN (PRIMORA & DISTRIBUIDORA VETOR)
+   Regras:
+   - Profundidade: box-shadow: none, sem chanfros, sem blur/glassmorphism, bordas 1px
+   - Cores: 100% sólidas, zero gradientes, blocos suaves/pastéis com alto contraste
+   - Geometria: Retângulos (4px), Círculos (status/pontos) e Triângulos (▲/▼ deltas)
+   - Tipografia: Inter + font-variant-numeric: tabular-nums
+   ========================================================================== */
+
+:root,
+[data-theme="light"] {
+  --bg-canvas: #F4F6F9;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #EEF2F6;
+  --bg-elevated: #F8FAFC;
+  --bg-header: #FFFFFF;
+  --bg-footer: #EEF2F6;
+
+  --border-default: #D5DCE6;
+  --border-subtle: #E2E8F0;
+  --border-strong: #64748B;
+  --border-focus: #684CB1;
+
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #475569; /* Slate-600: Contraste 7.0:1 no canvas e 7.5:1 na surface (WCAG AAA) */
+  --text-on-brand: #FFFFFF;
+
+  /* Identidade Primora (100% Sólida) */
+  --brand-primary: #684CB1;
+  --brand-primary-hover: #533898;
+  --brand-primary-soft: #F3F0FA;
+  --brand-primary-border: #D4C6F0;
+
+  --brand-cyan: #0891B2;
+  --brand-cyan-text: #0E7490;
+  --brand-cyan-soft: #ECFEFF;
+  --brand-cyan-border: #A5F3FC;
+
+  /* Cores Semânticas de Decisão (Fills Gráficos + Badges Pastéis + Textos Calibrados) */
+  --status-success: #059669;
+  --status-success-text: #047857; /* 5.2:1 no soft e 5.5:1 no white */
+  --status-success-soft: #ECFDF5;
+  --status-success-border: #6EE7B7;
+
+  --status-warning: #D97706;
+  --status-warning-text: #92400E; /* 6.8:1 no soft e 7.1:1 no white */
+  --status-warning-soft: #FFFBEB;
+  --status-warning-border: #FCD34D;
+
+  --status-risk: #EA580C;
+  --status-risk-text: #C2410C; /* 4.9:1 no soft e 5.2:1 no white */
+  --status-risk-soft: #FFF7ED;
+  --status-risk-border: #FDBA74;
+
+  --status-critical: #DC2626;
+  --status-critical-text: #B91C1C; /* 5.9:1 no soft e 6.5:1 no white */
+  --status-critical-soft: #FEF2F2;
+  --status-critical-border: #FCA5A5;
+
+  /* Paleta Categórica Neutra para Geografias (Desacoplada de Status de Alerta) */
+  --category-1: #684CB1; /* Roxo Primora (Sudeste) */
+  --category-2: #0891B2; /* Ciano Corporativo (Sul) */
+  --category-3: #2563EB; /* Azul Royal (Nordeste) */
+  --category-4: #4F46E5; /* Índigo Tecnológico (Centro-Oeste) */
+
+  --chart-grid: #E2E8F0;
+  --chart-axis: #64748B;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #0D151E;
+  --bg-surface: #141F2B;
+  --bg-subtle: #1B2938;
+  --bg-elevated: #1F2D3D;
+  --bg-header: #141F2B;
+  --bg-footer: #0D151E;
+
+  --border-default: #263648;
+  --border-subtle: #1E2C3B;
+  --border-strong: #47607E;
+  --border-focus: #8B6FD4;
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-on-brand: #FFFFFF;
+
+  /* Identidade Primora Dark (100% Sólida) */
+  --brand-primary: #8B6FD4;
+  --brand-primary-hover: #9F85E0;
+  --brand-primary-soft: #1E1A34;
+  --brand-primary-border: #43356E;
+
+  --brand-cyan: #0ED5FA;
+  --brand-cyan-text: #38BDF8;
+  --brand-cyan-soft: #102A37;
+  --brand-cyan-border: #164E63;
+
+  /* Cores Semânticas de Decisão Dark */
+  --status-success: #34D399;
+  --status-success-text: #34D399;
+  --status-success-soft: #0F2922;
+  --status-success-border: #065F46;
+
+  --status-warning: #FBBF24;
+  --status-warning-text: #FBBF24;
+  --status-warning-soft: #292011;
+  --status-warning-border: #78350F;
+
+  --status-risk: #FB923C;
+  --status-risk-text: #FB923C;
+  --status-risk-soft: #2C1A12;
+  --status-risk-border: #7C2D12;
+
+  --status-critical: #F87171;
+  --status-critical-text: #F87171;
+  --status-critical-soft: #2C1519;
+  --status-critical-border: #7F1D1D;
+
+  /* Paleta Categórica Neutra Dark */
+  --category-1: #8B6FD4;
+  --category-2: #0ED5FA;
+  --category-3: #60A5FA;
+  --category-4: #818CF8;
+
+  --chart-grid: #1E2C3B;
+  --chart-axis: #94A3B8;
+}
+
+/* Estrutura Geral da Aplicação */
+.app-shell {
+  min-height: 100dvh;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 28px 40px 28px;
+  flex: 1;
+}
+
+@media (max-width: 767px) {
+  .app-main-content {
+    padding: 12px 12px 80px 12px;
+  }
+}
+
+/* Blocos Superficiais Flat (1px solid, 4px radius, zero shadow) */
+.flat-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 16px 20px;
+}
+
+.flat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.flat-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flat-section-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* Foco e Acessibilidade (WCAG 2.1 AA) */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Transições Suaves & Motion (motion-design system) */
+button,
+a,
+input,
+select,
+.flat-action-btn,
+.compact-client-pill,
+.client-tab-item {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Formas Geométricas Básicas (Círculos, Retângulos, Triângulos) */
+.geo-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.geo-dot--critical {
+  background-color: var(--status-critical);
+}
+
+.geo-dot--warning {
+  background-color: var(--status-warning);
+}
+
+.geo-dot--risk {
+  background-color: var(--status-risk);
+}
+
+.geo-dot--success {
+  background-color: var(--status-success);
+}
+
+.geo-dot--brand {
+  background-color: var(--brand-primary);
+}
+
+.geo-dot--cyan {
+  background-color: var(--brand-cyan);
+}
+
+.geo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.geo-badge--critical {
+  background-color: var(--status-critical-soft);
+  color: var(--status-critical-text);
+  border-color: var(--status-critical-border);
+}
+
+.geo-badge--warning {
+  background-color: var(--status-warning-soft);
+  color: var(--status-warning-text);
+  border-color: var(--status-warning-border);
+}
+
+.geo-badge--risk {
+  background-color: var(--status-risk-soft);
+  color: var(--status-risk-text);
+  border-color: var(--status-risk-border);
+}
+
+.geo-badge--success {
+  background-color: var(--status-success-soft);
+  color: var(--status-success-text);
+  border-color: var(--status-success-border);
+}
+
+.geo-badge--brand {
+  background-color: var(--brand-primary-soft);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary-border);
+}
+
+.geo-badge--cyan {
+  background-color: var(--brand-cyan-soft);
+  color: var(--brand-cyan-text);
+  border-color: var(--brand-cyan-border);
+}
+
+.geo-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.geo-delta--positive {
+  color: var(--status-success-text);
+}
+
+.geo-delta--negative {
+  color: var(--status-critical-text);
+}
+
+.geo-delta--neutral {
+  color: var(--text-muted);
+}
+
+/* Rodapé Técnico Corporativo */
+.app-footer {
+  background-color: var(--bg-footer);
+  border-top: 1px solid var(--border-default);
+  padding: 20px 28px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.app-footer-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}

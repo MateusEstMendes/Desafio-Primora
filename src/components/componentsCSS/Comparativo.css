@@ -1,0 +1,140 @@
+/* ==========================================================================
+   COMPARATIVO REGIONAL — FUNILAMENTO ESTATÍSTICO & DONUT DE CONCENTRAÇÃO
+   ========================================================================== */
+
+.comparativo-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.comparativo-top-charts-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .comparativo-top-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.regional-donut-layout {
+  display: grid;
+  grid-template-columns: 185px 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (max-width: 575px) {
+  .regional-donut-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.regional-donut-box {
+  position: relative;
+  width: 185px;
+  height: 185px;
+}
+
+.regional-share-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.regional-share-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.regional-share-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.regional-share-table tr {
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.regional-share-table tr:hover {
+  background-color: var(--bg-subtle);
+}
+
+.regional-share-table tr:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.regional-share-table tr.regional-share-row-selected {
+  background-color: var(--brand-primary-soft);
+}
+
+.regional-share-table tr:last-child td {
+  border-bottom: none;
+}
+
+.regional-share-table .num-col {
+  text-align: right;
+}
+
+/* Destaque de Linha Selecionada na Tabela AntD */
+.comparativo-row-focused td {
+  background-color: var(--brand-primary-soft) !important;
+}
+
+/* Seção de Fundamentação Técnica Colapsável */
+.ux-rationale-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 12px;
+}
+
+@media (max-width: 767px) {
+  .ux-rationale-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ux-rationale-block {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ux-rationale-block h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ux-formula-code {
+  display: block;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: var(--brand-primary);
+  font-weight: 600;
+}

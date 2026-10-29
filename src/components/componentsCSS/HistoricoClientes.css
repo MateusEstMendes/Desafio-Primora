@@ -1,0 +1,206 @@
+/* ==========================================================================
+   JORNADA DE CLIENTES — DRILL-DOWN ANALÍTICO DE CONTA SEM "CARD-IN-CARD"
+   ========================================================================== */
+
+.clientes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Seletor Horizontal Enxuto de Contas */
+.client-tabs-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .client-tabs-bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.client-tab-item {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+}
+
+.client-tab-item:hover {
+  border-color: var(--brand-primary);
+}
+
+.client-tab-item:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.client-tab-item--active {
+  border-color: var(--brand-primary);
+  border-left: 3px solid var(--brand-primary);
+  background-color: var(--brand-primary-soft);
+}
+
+.client-tab-title-row {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.client-tab-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.client-tab-score {
+  font-size: 15px;
+  font-weight: 700;
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+.account-code-sub {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Faixa Contínua de Metadados Financeiros e Contratuais da Conta */
+.account-ledger-strip {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 1.6fr repeat(5, 1fr);
+}
+
+@media (max-width: 1100px) {
+  .account-ledger-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 575px) {
+  .account-ledger-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.account-ledger-cell {
+  padding: 12px 16px;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.account-ledger-cell:last-child {
+  border-right: none;
+}
+
+.account-ledger-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.account-ledger-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Grid Principal Lado a Lado: Curva de Score & Mix de Eventos (Esq) + Timeline (Dir) */
+.client-Workspace-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .client-Workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.client-left-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Linha do Tempo Limpa (Sem Caixas Pesadas) */
+.minimal-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.minimal-timeline-row {
+  display: grid;
+  grid-template-columns: 115px 1fr;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minimal-timeline-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (max-width: 575px) {
+  .minimal-timeline-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.minimal-timeline-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+.minimal-timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.minimal-timeline-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.minimal-timeline-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.minimal-timeline-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
