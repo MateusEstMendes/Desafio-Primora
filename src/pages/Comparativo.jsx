@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Table, Radio, Tooltip } from 'antd';
+import { Table, Radio, Tooltip, Typography } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   ResponsiveContainer,
@@ -530,13 +530,22 @@ export default function Comparativo({
         </section>
       </div>
 
-      {/* 2. TABELA MULTIDIMENSIONAL DE PRECISÃO ESTATÍSTICA */}
+      {/* 2. TABELA MULTIDIMENSIONAL DE PRECISÃO ESTATÍSTICA (ANT DESIGN TABLE - SPRINT 2) */}
       <section className="flat-card" aria-labelledby="comparativo-table-heading">
         <div className="flat-card-header">
-          <h2 id="comparativo-table-heading" className="flat-card-title">
-            Matriz Comparativa de Indicadores por Regional
-          </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div>
+            <span className="flat-section-eyebrow">ESTRUTURA DE TABELA COMPACTA · SPRINT 2</span>
+            <h2 id="comparativo-table-heading" className="flat-card-title">
+              Matriz Comparativa de Indicadores por Regional
+            </h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span className="geo-badge geo-badge--cyan">
+              Ant Design Table
+            </span>
+            <span className="geo-badge">
+              Dados Fictícios
+            </span>
             {selectedTenantId !== 'todos' && (
               <button
                 type="button"
@@ -547,7 +556,7 @@ export default function Comparativo({
               </button>
             )}
             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Clique nas colunas para ordenar ou em uma linha para focar
+              Clique nas colunas para ordenar
             </span>
           </div>
         </div>

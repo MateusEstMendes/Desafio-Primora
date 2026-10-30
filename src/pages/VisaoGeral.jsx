@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { Empty } from 'antd';
+import { Card, Statistic, Typography, Row, Col, Empty, Tooltip } from 'antd';
+import {
+  TeamOutlined,
+  AlertOutlined,
+  FunnelPlotOutlined,
+  RiseOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 import {
   ResponsiveContainer,
   LineChart,
@@ -20,9 +27,12 @@ import {
   formatarPercentual
 } from '../utils/metrics';
 import { getRiskSemanticTokens } from '../utils/themeTokens';
-import ExecutiveSummaryStrip from '../components/ExecutiveSummaryStrip';
+import UnidadeCard from '../components/UnidadeCard';
 import FlatFunnelHealth from '../components/FlatFunnelHealth';
+import ExecutiveSummaryStrip from '../components/ExecutiveSummaryStrip';
 import '../components/componentsCSS/VisaoGeral.css';
+
+const { Title, Text, Paragraph } = Typography;
 
 export default function VisaoGeral({
   dataset,
@@ -167,128 +177,162 @@ export default function VisaoGeral({
 
   return (
     <div className="visao-geral-container">
-      {/* BLOCO 1: FAIXA CONTÍNUA DE INDICADORES (LEDGER STRIP) */}
-      <section className="kpi-ledger-strip" aria-label="Indicadores executivos consolidados">
-        <div className="kpi-ledger-cell">
-          <div className="kpi-ledger-header">
-            <span className="kpi-ledger-label">Carteira Ativa</span>
-            {selectedTenant ? (
-              <button
-                type="button"
-                className="flat-action-btn"
-                onClick={() => onSelectTenant('todos')}
-              >
-                Ver Consolidado
-              </button>
-            ) : (
-              <span className="geo-badge">{estatisticasAgregadas.porte}</span>
-            )}
-          </div>
-          <div className="kpi-ledger-main">
-            <span className="kpi-ledger-number">
-              {formatarNumero(estatisticasAgregadas.carteiraTotal)}
-            </span>
-            <span className="kpi-unit-tag">CONTAS</span>
-          </div>
-          <div className="kpi-ledger-sub">
-            <span>{estatisticasAgregadas.nome}</span>
-          </div>
-        </div>
+      {/* BLOCO 1: FAIXA DE INDICADORES EXECUTIVOS CONSOLIDADOS (ANT DESIGN CARD + STATISTIC + TAG) */}
+      <section aria-label="Indicadores executivos consolidados">
+        <Row gutter={[16, 16]} className="kpi-ant-row" style={{ marginBottom: 20 }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="kpi-ant-card">
+              <Statistic
+                title={<span className="stat-label">Carteira Ativa</span>}
+                value={estatisticasAgregadas.carteiraTotal}
+                formatter={(val) => formatarNumero(val)}
+                suffix={<span className="stat-suffix">contas</span>}
+                prefix={<TeamOutlined style={{ color: 'var(--brand-primary)' }} />}
+              />
+              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 11 }}>{estatisticasAgregadas.nome}</Text>
+                {selectedTenant ? (
+                  <button type="button" className="flat-action-btn" onClick={() => onSelectTenant('todos')}>
+                    Ver Consolidado
+                  </button>
+                ) : (
+                  <span className="geo-badge">{estatisticasAgregadas.porte}</span>
+                )}
+              </div>
+            </Card>
+          </Col>
 
-        <div className="kpi-ledger-cell">
-          <div className="kpi-ledger-header">
-            <span className="kpi-ledger-label">Exposição a Risco</span>
-            <span
-              className={`geo-badge ${
-                estatisticasAgregadas.taxaRisco >= 20
-                  ? 'geo-badge--critical'
-                  : estatisticasAgregadas.taxaRisco >= 10
-                  ? 'geo-badge--warning'
-                  : 'geo-badge--success'
-              }`}
-            >
-              {estatisticasAgregadas.taxaRisco >= 20
-                ? '▲ Crítico'
-                : estatisticasAgregadas.taxaRisco >= 10
-                ? '▲ Atenção'
-                : '● Estável'}
-            </span>
-          </div>
-          <div className="kpi-ledger-main">
-            <span
-              className="kpi-ledger-number"
-              style={{
-                color:
-                  estatisticasAgregadas.taxaRisco >= 20
-                    ? 'var(--status-critical-text)'
-                    : estatisticasAgregadas.taxaRisco >= 10
-                    ? 'var(--status-warning-text)'
-                    : 'var(--status-success-text)'
-              }}
-            >
-              {formatarPercentual(estatisticasAgregadas.taxaRisco)}
-            </span>
-          </div>
-          <div className="kpi-ledger-sub">
-            <span>{formatarNumero(estatisticasAgregadas.riscoAbsoluto)} contas em risco/crítico</span>
-          </div>
-        </div>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="kpi-ant-card">
+              <Statistic
+                title={<span className="stat-label">Exposição a Risco</span>}
+                value={estatisticasAgregadas.taxaRisco}
+                precision={1}
+                suffix="%"
+                prefix={
+                  <AlertOutlined
+                    style={{
+                      color:
+                        estatisticasAgregadas.taxaRisco >= 20
+                          ? 'var(--status-critical-text)'
+                          : estatisticasAgregadas.taxaRisco >= 10
+                          ? 'var(--status-warning-text)'
+                          : 'var(--status-success-text)'
+                    }}
+                  />
+                }
+                valueStyle={{
+                  color:
+                    estatisticasAgregadas.taxaRisco >= 20
+                      ? 'var(--status-critical-text)'
+                      : estatisticasAgregadas.taxaRisco >= 10
+                      ? 'var(--status-warning-text)'
+                      : 'var(--status-success-text)'
+                }}
+              />
+              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  {formatarNumero(estatisticasAgregadas.riscoAbsoluto)} contas sob atenção/risco
+                </Text>
+                <span
+                  className={`geo-badge ${
+                    estatisticasAgregadas.taxaRisco >= 20
+                      ? 'geo-badge--critical'
+                      : estatisticasAgregadas.taxaRisco >= 10
+                      ? 'geo-badge--warning'
+                      : 'geo-badge--success'
+                  }`}
+                >
+                  {estatisticasAgregadas.taxaRisco >= 20 ? '▲ Crítico' : estatisticasAgregadas.taxaRisco >= 10 ? '▲ Atenção' : '● Estável'}
+                </span>
+              </div>
+            </Card>
+          </Col>
 
-        <div className="kpi-ledger-cell">
-          <div className="kpi-ledger-header">
-            <span className="kpi-ledger-label">Conversão Funil (90d)</span>
-            <span className="geo-badge geo-badge--cyan">
-              {formatarNumero(estatisticasAgregadas.funil.sucesso)}/
-              {formatarNumero(estatisticasAgregadas.funil.gerada)}
-            </span>
-          </div>
-          <div className="kpi-ledger-main">
-            <span className="kpi-ledger-number" style={{ color: 'var(--brand-primary)' }}>
-              {formatarPercentual(estatisticasAgregadas.taxaConversao)}
-            </span>
-          </div>
-          <div className="kpi-ledger-sub">
-            <span>Visualização: {formatarPercentual(estatisticasAgregadas.taxaVisualizacao)}</span>
-          </div>
-        </div>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="kpi-ant-card">
+              <Statistic
+                title={<span className="stat-label">Conversão Funil (90d)</span>}
+                value={estatisticasAgregadas.taxaConversao}
+                precision={1}
+                suffix="%"
+                prefix={<FunnelPlotOutlined style={{ color: 'var(--brand-primary)' }} />}
+                valueStyle={{ color: 'var(--brand-primary)' }}
+              />
+              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  Visualização: {formatarPercentual(estatisticasAgregadas.taxaVisualizacao)}
+                </Text>
+                <span className="geo-badge geo-badge--cyan">
+                  {formatarNumero(estatisticasAgregadas.funil.sucesso)}/{formatarNumero(estatisticasAgregadas.funil.gerada)}
+                </span>
+              </div>
+            </Card>
+          </Col>
 
-        <div className="kpi-ledger-cell">
-          <div className="kpi-ledger-header">
-            <span className="kpi-ledger-label">Engajamento Médio</span>
-            <span
-              className={`geo-delta ${
-                estatisticasAgregadas.deltaEngajamento >= 0
-                  ? 'geo-delta--positive'
-                  : 'geo-delta--negative'
-              }`}
-            >
-              {estatisticasAgregadas.deltaEngajamento >= 0
-                ? `▲ +${estatisticasAgregadas.deltaEngajamento}`
-                : `▼ ${estatisticasAgregadas.deltaEngajamento}`}{' '}
-              pts (6m)
-            </span>
-          </div>
-          <div className="kpi-ledger-main">
-            <span className="kpi-ledger-number" style={{ color: 'var(--brand-cyan)' }}>
-              {formatarPercentual(estatisticasAgregadas.engajamento)}
-            </span>
-          </div>
-          <div className="kpi-ledger-sub">
-            <span>Meta operacional: 75,0%</span>
-          </div>
-        </div>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="kpi-ant-card">
+              <Statistic
+                title={<span className="stat-label">Engajamento Médio</span>}
+                value={estatisticasAgregadas.engajamento}
+                precision={1}
+                suffix="%"
+                prefix={<RiseOutlined style={{ color: 'var(--brand-cyan)' }} />}
+                valueStyle={{ color: 'var(--brand-cyan)' }}
+              />
+              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  Meta operacional: 75%
+                </Text>
+                <span
+                  className={`geo-delta ${
+                    estatisticasAgregadas.deltaEngajamento >= 0
+                      ? 'geo-delta--positive'
+                      : 'geo-delta--negative'
+                  }`}
+                >
+                  {estatisticasAgregadas.deltaEngajamento >= 0 ? `▲ +${estatisticasAgregadas.deltaEngajamento}` : `▼ ${estatisticasAgregadas.deltaEngajamento}`} pts
+                </span>
+              </div>
+            </Card>
+          </Col>
+        </Row>
       </section>
 
-      {/* BLOCO 2: FEATURE CATEGORY CARDS & SILVER INVERTED CARD (DESIGN.md 3-Column Gallery) */}
-      <ExecutiveSummaryStrip
-        unidadesClassificadas={unidadesClassificadas}
-        clientes={clientes}
-        selectedTenantId={selectedTenantId}
-        onSelectTenant={onSelectTenant}
-        onNavigateTab={onNavigateTab}
-      />
+      {/* BLOCO 2: CARTÕES REUTILIZÁVEIS DAS QUATRO UNIDADES (ENTREGA OBRIGATÓRIA DA SPRINT 2) */}
+      <section className="unidades-grid-section" aria-labelledby="unidades-cards-heading" style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
+          <div>
+            <span className="flat-section-eyebrow">COMPONENTES REUTILIZÁVEIS REACT · SPRINT 2</span>
+            <Title level={4} id="unidades-cards-heading" style={{ margin: '2px 0 0', color: 'var(--text-primary)' }}>
+              Unidades Regionais (Dataset Fictício)
+            </Title>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Componentes reutilizáveis <Text code>UnidadeCard</Text> recebendo dados estáticos via props, integrados ao padrão Origin Gallery.
+            </Text>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <span className="geo-badge geo-badge--brand">
+              4 Unidades Ativas
+            </span>
+          </div>
+        </div>
 
-      {/* BLOCO 3: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
+        <Row gutter={[16, 16]}>
+          {tenants.map((u) => (
+            <Col xs={24} md={12} key={u.id}>
+              <UnidadeCard
+                unidade={u}
+                isSelected={selectedTenantId === u.id}
+                onSelect={onSelectTenant}
+                themeTokens={themeTokens}
+              />
+            </Col>
+          ))}
+        </Row>
+      </section>
+
+      {/* BLOCO 2: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
       <FlatFunnelHealth estatisticas={estatisticasAgregadas} themeTokens={themeTokens} />
 
       {/* BLOCO 4: QUADRO DIRETO DE UNIDADES (ATENÇÃO VS. BENCHMARK) + TENDÊNCIA SEMESTRAL */}
@@ -492,6 +536,15 @@ export default function VisaoGeral({
           </div>
         </section>
       </div>
+
+      {/* BLOCO FINAL: SÍNTESE EXECUTIVA & DIRETRIZES ESTRATÉGICAS (ARTICLES RESUMIDAS) */}
+      <ExecutiveSummaryStrip
+        unidadesClassificadas={unidadesClassificadas}
+        clientes={clientes}
+        selectedTenantId={selectedTenantId}
+        onSelectTenant={onSelectTenant}
+        onNavigateTab={onNavigateTab}
+      />
     </div>
   );
 }

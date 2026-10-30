@@ -23,37 +23,65 @@ function getInitialThemeMode() {
   return 'dark'; // DESIGN.md: Obsidian Dark Theme por padrão
 }
 
-const HERO_COPY_BY_TAB = {
-  'visao-geral': {
-    eyebrow: 'PAINEL EXECUTIVO MULTI-TENANT · 4 REGIONAIS MONITORADAS',
-    headlineItalic: 'Domine',
-    headlineRoman: ' a saúde comercial da sua carteira nacional.',
-    subhead:
-      'Diagnóstico instantâneo de exposição proporcional ao risco, conversão de funil em 90 dias e retenção de contas B2B.'
-  },
-  comparativo: {
-    eyebrow: 'AUDITORIA REGIONAL NORMALIZADA · VOLUME VS. PROPORÇÃO',
-    headlineItalic: 'Simplifique',
-    headlineRoman: ' a comparação entre unidades de portes distintos.',
-    subhead:
-      'Contraste imediato entre risco bruto absoluto e taxa proporcional para alocar recursos onde a operação realmente precisa.'
-  },
-  'historico-clientes': {
-    eyebrow: 'DRILL-DOWN DE RETENÇÃO · LINHA DO TEMPO AUDITÁVEL',
-    headlineItalic: 'Antecipe',
-    headlineRoman: ' sinais críticos na jornada de cada conta.',
-    subhead:
-      'Inspeção cronológica de interações comerciais, alertas de SLA e evolução semestral do score de saúde B2B.'
-  }
-};
+function getInitialClients() {
+  try {
+    const stored = localStorage.getItem('painel_vetor_clientes');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return datasetLocal.clientes || [];
+}
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('visao-geral');
   const [selectedTenantId, setSelectedTenantId] = useState('todos');
   const [themeMode, setThemeMode] = useState(getInitialThemeMode);
+  const [clientes, setClientes] = useState(getInitialClients);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [aiQuery, setAiQuery] = useState('');
-  const [aiInsight, setAiInsight] = useState(null);
+
+  // Operações de CRUD para Clientes (Create, Read, Update, Delete) com persistência
+  const handleAddCliente = (novoCliente) => {
+    setClientes((prev) => {
+      const updated = [novoCliente, ...prev];
+      try {
+        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
+
+  const handleUpdateCliente = (clienteAtualizado) => {
+    setClientes((prev) => {
+      const updated = prev.map((c) =>
+        c.id === clienteAtualizado.id ? { ...c, ...clienteAtualizado } : c
+      );
+      try {
+        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
+
+  const handleDeleteCliente = (clienteId) => {
+    setClientes((prev) => {
+      const updated = prev.filter((c) => c.id !== clienteId);
+      try {
+        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
+
+  const dynamicDataset = React.useMemo(() => {
+    return {
+      ...datasetLocal,
+      clientes
+    };
+  }, [clientes]);
 
   const screens = useBreakpoint();
   const isMobile = !screens.md;
@@ -84,43 +112,6 @@ export default function App() {
   const handleToggleTheme = () => {
     setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
-
-  const handleAiPromptSubmit = (customQuery) => {
-    const q = (customQuery ?? aiQuery).trim().toLowerCase();
-    if (!q) return;
-
-    if (q.includes('crític') || q.includes('centro-oeste') || q.includes('atenção') || q.includes('risco')) {
-      setSelectedTenantId('tenant-centro-oeste');
-      setCurrentTab('comparativo');
-      setAiInsight({
-        title: 'Unidade Centro-Oeste em Alerta Crítico (23,33%)',
-        text: 'Embora tenha apenas 35 contas em risco absoluto, representa 23,33% de sua carteira total (150 contas). Filtro aplicado.'
-      });
-    } else if (q.includes('benchmark') || q.includes('sul') || q.includes('sudeste') || q.includes('melhor')) {
-      setSelectedTenantId('tenant-sul');
-      setCurrentTab('visao-geral');
-      setAiInsight({
-        title: 'Benchmark Operacional: Unidade Sul (70,0% Conversão)',
-        text: 'Menor taxa de risco proporcional (7,78%) e maior eficiência de funil comercial em 90 dias. Escopo filtrado para Unidade Sul.'
-      });
-    } else if (q.includes('cliente') || q.includes('jornada') || q.includes('cerrado') || q.includes('conta')) {
-      setSelectedTenantId('todos');
-      setCurrentTab('historico-clientes');
-      setAiInsight({
-        title: 'Jornada de Clientes: Supermercados Cerrado (Score 34/100)',
-        text: 'Queda de 34 pontos em 6 meses após ruptura logística e atraso de SLA. Abrindo histórico cronológico.'
-      });
-    } else {
-      setSelectedTenantId('todos');
-      setCurrentTab('visao-geral');
-      setAiInsight({
-        title: 'Diagnóstico Consolidado Nacional (2.250 Contas)',
-        text: 'Exposição consolidada de 11,42% (257 contas em risco/crítico) e conversão média de funil de 60,79%.'
-      });
-    }
-  };
-
-  const heroCopy = HERO_COPY_BY_TAB[currentTab] || HERO_COPY_BY_TAB['visao-geral'];
 
   return (
     <ConfigProvider
@@ -177,147 +168,15 @@ export default function App() {
           onTabChange={setCurrentTab}
           selectedTenantId={selectedTenantId}
           onTenantChange={setSelectedTenantId}
-          tenants={datasetLocal.tenants}
+          tenants={dynamicDataset.tenants}
           themeMode={themeMode}
           onToggleTheme={handleToggleTheme}
-          isMobile={isMobile}
-          mobileDrawerOpen={mobileDrawerOpen}
-          setMobileDrawerOpen={setMobileDrawerOpen}
         />
-
-        {/* Atmospheric Hero Band (DESIGN.md) */}
-        <section className="origin-hero-band" aria-label="Cabeçalho executivo e assistente analítico">
-          <div className="origin-hero-inner">
-            <div className="promo-eyebrow-badge">
-              <span className="geo-dot geo-dot--cyan" aria-hidden="true" />
-              <span>{heroCopy.eyebrow}</span>
-            </div>
-
-            <h1 className="origin-display-headline">
-              <em>{heroCopy.headlineItalic}</em>
-              {heroCopy.headlineRoman}
-            </h1>
-
-            <p className="origin-section-subhead">{heroCopy.subhead}</p>
-
-            {/* AI Prompt Input (DESIGN.md Component) */}
-            <div className="origin-ai-prompt-wrap">
-              <form
-                className="origin-ai-prompt-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleAiPromptSubmit();
-                }}
-              >
-                <input
-                  type="text"
-                  className="origin-ai-prompt-input"
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  placeholder="Qual unidade exige intervenção prioritária neste mês?"
-                  aria-label="Consultar inteligência comercial da carteira"
-                />
-                <button
-                  type="submit"
-                  className="origin-ai-submit-btn"
-                  aria-label="Executar consulta executiva"
-                  title="Executar consulta"
-                >
-                  &rarr;
-                </button>
-              </form>
-
-              <div className="origin-ai-Quick-chips">
-                <button
-                  type="button"
-                  className="origin-ai-chip"
-                  onClick={() => {
-                    setAiQuery('Onde está o maior risco proporcional?');
-                    handleAiPromptSubmit('risco');
-                  }}
-                >
-                  Maior risco proporcional
-                </button>
-                <button
-                  type="button"
-                  className="origin-ai-chip"
-                  onClick={() => {
-                    setAiQuery('Qual regional é o benchmark de funil?');
-                    handleAiPromptSubmit('benchmark');
-                  }}
-                >
-                  Benchmark de conversão
-                </button>
-                <button
-                  type="button"
-                  className="origin-ai-chip"
-                  onClick={() => {
-                    setAiQuery('Auditar conta em estado crítico');
-                    handleAiPromptSubmit('cliente');
-                  }}
-                >
-                  Conta crítica B2B
-                </button>
-                {selectedTenantId !== 'todos' && (
-                  <button
-                    type="button"
-                    className="origin-ai-chip"
-                    onClick={() => {
-                      setSelectedTenantId('todos');
-                      setAiInsight(null);
-                    }}
-                  >
-                    Ver Consolidado Nacional &times;
-                  </button>
-                )}
-              </div>
-
-              {aiInsight && (
-                <div className="origin-ai-answer-box" role="status">
-                  <div>
-                    <strong style={{ color: 'var(--brand-cyan)', display: 'block', marginBottom: 2 }}>
-                      {aiInsight.title}
-                    </strong>
-                    <span>{aiInsight.text}</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="flat-action-btn"
-                    onClick={() => setAiInsight(null)}
-                  >
-                    Fechar
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Award Laurel Badges (DESIGN.md Social Proof Component) */}
-            <div className="origin-laurel-row" aria-label="Credenciais do ecossistema">
-              <div className="origin-laurel-badge">
-                <span aria-hidden="true" style={{ fontSize: 18, opacity: 0.7 }}>&#10087;</span>
-                <div>
-                  <span className="origin-laurel-title">Primora Soluções</span>
-                  <span className="origin-laurel-sub">ARQUITETURA MULTI-TENANT</span>
-                </div>
-                <span aria-hidden="true" style={{ fontSize: 18, opacity: 0.7 }}>&#10087;</span>
-              </div>
-
-              <div className="origin-laurel-badge">
-                <span aria-hidden="true" style={{ fontSize: 18, opacity: 0.7 }}>&#10087;</span>
-                <div>
-                  <span className="origin-laurel-title">Distribuidora Vetor</span>
-                  <span className="origin-laurel-sub">2.250 CONTAS ATIVAS</span>
-                </div>
-                <span aria-hidden="true" style={{ fontSize: 18, opacity: 0.7 }}>&#10087;</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <main className="app-main-content">
           {currentTab === 'visao-geral' && (
             <VisaoGeral
-              dataset={datasetLocal}
+              dataset={dynamicDataset}
               isMobile={isMobile}
               selectedTenantId={selectedTenantId}
               onSelectTenant={setSelectedTenantId}
@@ -328,7 +187,7 @@ export default function App() {
 
           {currentTab === 'comparativo' && (
             <Comparativo
-              dataset={datasetLocal}
+              dataset={dynamicDataset}
               isMobile={isMobile}
               selectedTenantId={selectedTenantId}
               onSelectTenant={setSelectedTenantId}
@@ -338,11 +197,14 @@ export default function App() {
 
           {currentTab === 'historico-clientes' && (
             <HistoricoClientes
-              dataset={datasetLocal}
+              dataset={dynamicDataset}
               isMobile={isMobile}
               selectedTenantId={selectedTenantId}
               onSelectTenant={setSelectedTenantId}
               themeTokens={activeTokens}
+              onAddCliente={handleAddCliente}
+              onUpdateCliente={handleUpdateCliente}
+              onDeleteCliente={handleDeleteCliente}
             />
           )}
         </main>
@@ -354,12 +216,13 @@ export default function App() {
             <div className="app-footer-row">
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <img
-                  src={themeMode === 'dark' ? '/primora-logo-white.webp' : '/primora-logo.png'}
+                  src="/primora-logo-white.webp"
                   alt="Primora"
+                  className="primora-brand-img"
                   style={{ height: 18, width: 'auto', display: 'block' }}
                 />
                 <span>·</span>
-                <strong style={{ color: 'var(--text-primary)', fontWeight: 400 }}>
+                <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
                   Distribuidora Vetor — Inteligência Comercial Multi-Tenant
                 </strong>
               </div>

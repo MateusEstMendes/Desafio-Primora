@@ -1,0 +1,189 @@
+/* ==========================================================================
+   ESTILOS DO COMPONENTE REUTILIZÁVEL UnidadeCard (Sprint 2)
+   ========================================================================== */
+
+.unidade-card {
+  border-radius: 16px !important;
+  border: 1px solid var(--border-default, #2e2e2e) !important;
+  background-color: var(--bg-surface, #181a1c) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.unidade-card .ant-card-body {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.unidade-card .ant-card-head {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--border-subtle, #222427) !important;
+  min-height: 52px;
+  background-color: var(--bg-elevated, #222427) !important;
+  border-top-left-radius: 16px !important;
+  border-top-right-radius: 16px !important;
+}
+
+.unidade-card:hover {
+  border-color: var(--brand-primary, #2970ff) !important;
+  transform: translateY(-2px);
+  background-color: var(--bg-subtle, #222427) !important;
+}
+
+.unidade-card--selected {
+  border-color: var(--brand-primary, #2970ff) !important;
+  outline: 2px solid var(--brand-primary, #2970ff);
+  background-color: var(--bg-subtle, #1c1e22) !important;
+}
+
+.unidade-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.unidade-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unidade-card-name {
+  font-family: var(--font-suisse-intl);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary, #ffffff) !important;
+}
+
+.unidade-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.geo-badge--region {
+  background-color: transparent !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-muted) !important;
+  padding: 2px 8px !important;
+  font-size: 10px !important;
+}
+
+.geo-badge--ficticio {
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  border-color: var(--border-subtle) !important;
+  background: var(--bg-subtle) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Estatísticas */
+.unidade-card-stats-row {
+  margin-bottom: 16px !important;
+}
+
+.unidade-stat-box {
+  background: var(--bg-canvas, #0f1011);
+  border: 1px solid var(--border-subtle, #222427);
+  border-radius: 6px;
+  padding: 10px 12px;
+  height: 100%;
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #9f9fa0);
+  font-weight: 500;
+}
+
+.stat-suffix {
+  font-size: 12px;
+  margin-left: 4px;
+  color: var(--text-muted, #6a6b6b);
+  font-weight: normal;
+}
+
+.stat-icon {
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.stat-icon--cyan {
+  color: var(--brand-cyan, #00b3dd);
+}
+
+.stat-icon--blue {
+  color: var(--brand-primary, #2970ff);
+}
+
+.stat-sub {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--text-muted, #6a6b6b);
+}
+
+/* Footer do Cartão */
+.unidade-card-footer {
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-subtle, #222427);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.unidade-funnel-stages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.stages-title {
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.stage-pill {
+  color: var(--text-secondary, #9f9fa0);
+  background: var(--bg-canvas, #0f1011);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle, #222427);
+}
+
+.stage-pill strong {
+  color: var(--text-primary, #ffffff);
+}
+
+.stage-pill--highlight {
+  border-color: var(--brand-primary-border, #1d4ed8);
+  background: var(--brand-primary-soft, #102347);
+  color: var(--brand-primary, #2970ff);
+}
+
+.stage-pill--highlight strong {
+  color: var(--brand-primary, #2970ff);
+}
+
+.stage-arrow {
+  color: var(--text-muted, #6a6b6b);
+  font-size: 10px;
+}
+
+.unidade-card-action-hint {
+  font-size: 11px;
+  color: var(--text-muted, #6a6b6b);
+}

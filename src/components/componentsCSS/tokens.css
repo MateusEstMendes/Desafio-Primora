@@ -227,6 +227,59 @@
 }
 
 /* ==========================================================================
+   ENHANCED LIGHT MODE TYPOGRAPHY WEIGHT & CONTRAST
+   - Increases font weights from 300/400 to 450/500/600 for high legibility
+   ========================================================================== */
+
+[data-theme="light"] {
+  font-weight: 450;
+}
+
+[data-theme="light"] body,
+[data-theme="light"] .app-shell {
+  font-weight: 450;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] .flat-card-title,
+[data-theme="light"] .kpi-ledger-number,
+[data-theme="light"] .units-table-unit-name,
+[data-theme="light"] .client-tab-title-row,
+[data-theme="light"] .account-ledger-val,
+[data-theme="light"] .minimal-timeline-title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] .exec-pillar-desc,
+[data-theme="light"] .minimal-timeline-desc,
+[data-theme="light"] .account-ledger-label,
+[data-theme="light"] .flat-section-eyebrow,
+[data-theme="light"] .kpi-ledger-label {
+  font-weight: 450;
+}
+
+[data-theme="light"] em {
+  font-weight: 500;
+}
+
+[data-theme="light"] th {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+[data-theme="light"] td {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* ==========================================================================
    APP SHELL & GALLERY CANVAS
    ========================================================================== */
 
@@ -238,6 +291,12 @@
   flex-direction: column;
 }
 
+@media (min-width: 1024px) {
+  .app-shell {
+    padding-left: 260px;
+  }
+}
+
 .app-main-content {
   width: 100%;
   max-width: var(--page-max-width);
@@ -246,9 +305,9 @@
   flex: 1;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .app-main-content {
-    padding: 16px 14px 88px 14px;
+    padding: 20px 16px 84px 16px;
   }
 }
 

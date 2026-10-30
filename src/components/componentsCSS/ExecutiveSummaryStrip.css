@@ -1,15 +1,96 @@
 /* ==========================================================================
-   FEATURE CATEGORY CARDS & SILVER INVERTED CARD (DESIGN.md)
-   - 3-column grid with 15px gap
-   - 30px border-radius, 32px padding on all sides
-   - Full-bleed Bright Blue (#2970ff), Deep Blue (#1d4ed8), and Silver Inverted (#cacaca)
-   - Lyon Display (Serif 300) 34-38px titles, tight line-height 0.95
+   SÍNTESE EXECUTIVA & DIRETRIZES OPERACIONAIS (RESUMO NO FINAL)
+   - Bloco consolidado no rodapé de Visão Geral
+   - 3-column grid com os 3 pilares resumidos (<article>)
+   - Assistente analítico integrado com prompt e chips rápidos
+   - Badges de credenciais sintetizadas no rodapé
    ========================================================================== */
 
+.exec-summary-section {
+  margin-top: 24px;
+  padding: 24px 28px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+@media (max-width: 767px) {
+  .exec-summary-section {
+    padding: 18px 16px;
+    border-radius: 16px;
+    gap: 18px;
+  }
+}
+
+.exec-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .exec-summary-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.exec-summary-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 560px;
+}
+
+.exec-summary-title {
+  font-family: var(--font-lyon-display);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin: 4px 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.exec-summary-title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--brand-primary);
+}
+
+.exec-summary-subhead {
+  font-family: var(--font-suisse-intl);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Assistente Analítico Compacto */
+.exec-ai-inline-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+}
+
+@media (max-width: 1024px) {
+  .exec-ai-inline-wrap {
+    max-width: 100%;
+  }
+}
+
+/* Grid dos 3 Pilares Resumidos */
 .exec-strip-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 14px;
 }
 
 @media (max-width: 1100px) {
@@ -19,22 +100,24 @@
 }
 
 .exec-pillar {
-  border-radius: 30px;
-  padding: 32px;
+  border-radius: 16px;
+  padding: 22px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   border: none;
+  min-height: 240px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767px) {
   .exec-pillar {
-    padding: 24px 22px;
+    padding: 18px 16px;
   }
 }
 
-/* Chromatic Full-Bleed Cards (Bright Blue & Deep Blue — No Purple) */
+/* Chromatic Full-Bleed Cards */
 .exec-pillar--blue-gleam {
   background-color: #2970ff;
   color: #ffffff;
@@ -45,10 +128,15 @@
   color: #ffffff;
 }
 
-/* Stat / Inverted Card (DESIGN.md: Silver #cacaca background, Black #000000 text) */
+/* Stat / Inverted Card (Silver Inverted) */
 .exec-pillar--silver-inverted {
   background-color: #cacaca;
   color: #000000;
+}
+
+.exec-pillar-card-top {
+  display: flex;
+  flex-direction: column;
 }
 
 .exec-pillar-top {
@@ -56,12 +144,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 
 .exec-eyebrow-mono {
   font-family: var(--font-roboto-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -74,11 +162,11 @@
 
 .exec-pill-tag {
   font-family: var(--font-roboto-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 4px 12px;
+  padding: 3px 9px;
   border-radius: 9999px;
   background-color: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -93,11 +181,11 @@
 
 .exec-pillar-question {
   font-family: var(--font-lyon-display);
-  font-size: 36px;
+  font-size: 20px;
   font-weight: 300;
-  line-height: 0.95;
+  line-height: 1.15;
   color: #ffffff;
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   letter-spacing: -0.01em;
 }
 
@@ -112,9 +200,9 @@
 
 .exec-pillar-desc {
   font-family: var(--font-suisse-intl);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 300;
-  line-height: 1.5;
+  line-height: 1.45;
   color: rgba(255, 255, 255, 0.86);
   margin: 0;
 }
@@ -127,17 +215,18 @@
 .exec-pillar-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .exec-item-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 11px 14px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: all 0.18s ease;
 }
 
 .exec-item-row--on-blue {
@@ -156,12 +245,12 @@
 }
 
 .exec-item-row--on-silver {
-  background-color: rgba(255, 255, 255, 0.48);
+  background-color: rgba(255, 255, 255, 0.52);
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .exec-item-row--on-silver:hover {
-  background-color: rgba(255, 255, 255, 0.72);
+  background-color: rgba(255, 255, 255, 0.78);
   border-color: rgba(0, 0, 0, 0.35);
 }
 
@@ -212,7 +301,7 @@
 
 .exec-item-metric-val {
   font-family: var(--font-suisse-intl);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #ffffff;
   font-variant-numeric: tabular-nums;
@@ -226,7 +315,7 @@
 
 .exec-item-delta {
   font-family: var(--font-roboto-mono);
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.85);
@@ -235,14 +324,14 @@
 
 .exec-item-delta--dark {
   color: #047857;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .exec-pillar-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 14px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
   font-family: var(--font-roboto-mono);
   font-size: 10px;
@@ -259,8 +348,8 @@
 .exec-action-link {
   background: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 6px;
+  padding: 5px 10px;
   color: #000000;
   font-family: var(--font-roboto-mono);
   font-size: 10px;
@@ -268,10 +357,12 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .exec-action-link:hover {
   background: #f5f5f7;
+  transform: translateY(-1px);
 }
 
 .exec-action-link--dark {
@@ -282,4 +373,27 @@
 .exec-action-link--dark:hover {
   background: #2970ff;
   color: #ffffff;
+}
+
+/* Credenciais do Ecossistema no Rodapé da Síntese */
+.exec-laurel-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.exec-laurel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-roboto-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
 }

@@ -52,26 +52,33 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
 
 ---
 
-## 📱 4. Descrição das Telas e Funcionalidades
+## 📱 4. Descrição das Telas e Componentes Implementados (Sprint 2)
 
-### Tela 1 — Visão Geral (RF01, RF02, RF03, RF04, RF10, RF11)
-- **Filtro de Unidade:** Permite alternar entre a visão de *Todas as Unidades (Consolidado)* ou selecionar uma unidade regional específica.
-- **Cartões de Indicadores:** Total de clientes na carteira, taxa média de engajamento, clientes em risco/crítico e conversão final do funil.
-- **Resumo das Quatro Unidades (RF01):** Cards interativos para cada tenant com nome, porte (Grande, Médio, Pequeno), clientes e taxa de conversão.
-- **Funil Comercial de Tarefas (RF02):** Acompanhamento das etapas `Geradas` $\to$ `Visualizadas` $\to$ `Sucesso (Convertidas)`, com cálculo percentual transparente.
-- **Distribuição de Saúde da Carteira (RF03):** Gráfico de pizza interativo e legendas detalhando as 4 categorias: *Saudável*, *Atenção*, *Risco* e *Crítico*.
-- **Tendência Histórica (RF10):** Gráfico de linhas com evolução dos últimos 6 meses de engajamento e taxa de sucesso do funil.
+### 🧩 Componentes React Reutilizáveis
+- **`UnidadeCard.jsx` (Componente de Unidade com Props):**
+  - Implementado para apresentar os cartões das quatro unidades do dataset (`Unidade Sudeste`, `Unidade Sul`, `Unidade Nordeste`, `Unidade Centro-Oeste`).
+  - Recebe os dados da unidade via props (`unidade`, `isSelected`, `onSelect`, `themeTokens`).
+  - Utiliza os componentes Ant Design: `<Card>`, `<Statistic>` (Carteira, Engajamento, Funil), `<Tag>` (Porte, Status de Risco, "Dado Fictício"), `<Typography>`, `<Row>` e `<Col>`.
+  - Suporta seleção interativa com foco de teclado (`Enter`/`Espaço`) e navegação acessível.
 
-### Tela 2 — Comparativo entre Unidades (RF05, RF06, RF09, RF12)
-- **Tabela Comparativa Multidimensional:** Exibição das unidades com ordenação dinâmica (`sorters`) em todas as colunas numéricas e filtros por porte (`filters`).
-- **Ranking de Criticidade (RF06):** Classificação automática baseada na taxa proporcional de risco, destacando as unidades mais vulneráveis.
-- **Gráficos Comparativos (RF09):** Gráfico composto com eixos duplos mostrando lado a lado a discrepância entre escala absoluta (número de clientes) e taxa percentual de risco.
+### Tela 1 — Visão Geral (Sprint 2)
+- **Cards de Indicadores Executivos (Ant Design):** Total de clientes na carteira, taxa proporcional de risco, conversão do funil de 90 dias e engajamento médio implementados com `<Card>`, `<Statistic>`, `<Tag>` e `<Row/Col>`.
+- **Grade das Quatro Unidades Regionais:** Grid de `<Row gutter={[16, 16]}>` com os componentes reutilizáveis `<UnidadeCard />` apresentando nome, porte, carteira, engajamento e funil com dados estáticos do dataset.
+- **Funil Comercial e Distribuição de Saúde:** Painel analítico de conversão com indicadores e gráficos informativos.
+- **Identificação do Protótipo:** Banner e tags visuais indicando explicitamente dados estáticos e fictícios.
 
-### Tela 3 — Histórico de Clientes (RF07, RF08, RF10, RF11)
-- **Seletor de Clientes (RF07):** Seleção rápida dos clientes fictícios com identificação imediata de sua unidade vinculada.
-- **Ficha do Cliente:** Dados cadastrais, segmento, tempo de contrato, ticket médio e score de saúde atual.
-- **Evolução do Score de Saúde (RF10):** Gráfico de área demonstrando o histórico recente de pontuação de saúde.
-- **Linha do Tempo de Eventos (RF08):** `Timeline` cronológica com diferenciação visual por cores e ícones para cada categoria (*Comercial*, *Operacional*, *Sucesso*, *Alerta*, *Crítico*), com data e descrição detalhada.
+### Tela 2 — Comparativo entre Unidades (Sprint 2)
+- **Tabela Comparativa Ant Design (`<Table>`):** Estrutura de tabela completa com unidades, carteira total, taxas ilustrativas, ordenação dinâmica (`sorters`) e filtros por porte.
+- **Ranking de Criticidade e Espaço para Gráficos:** Classificação por criticidade e gráficos comparativos de barras e linha dupla ilustrando volumes absolutos vs. taxas proporcionais.
+
+### Tela 3 — Histórico e Gestão de Clientes (CRUD Completo)
+- **Operações de CRUD Integradas (Create, Read, Update, Delete):**
+  - **Create (Adicionar):** Modal com formulário reativo para cadastrar novas contas B2B vinculadas a uma regional, com definição de segmento, tempo de contrato, ticket médio e score inicial.
+  - **Read (Leitura):** Seletor em abas de todas as contas da carteira, ficha cadastral completa com ticket médio, tempo de contrato, variação semestral e gráfico de score.
+  - **Update (Editar):** Modal de edição pré-populado para alterar dados cadastrais, porte, regional vinculada e score de saúde com registro automático de auditoria na timeline.
+  - **Delete (Excluir):** Exclusão assistida com `<Popconfirm>` de confirmação do Ant Design, feedback imediato e seleção automática da próxima conta disponível.
+- **Linha do Tempo Oficial Ant Design (`<Timeline>`):** Implementação via `<Timeline items={...} />` do Ant Design v5 com diferenciação visual por cores (`green`, `red`, `orange`, `cyan`) e ícones temáticos para cada categoria (*Sucesso*, *Crítico*, *Alerta*, *Comercial*), com data e descrição detalhada.
+- **Persistência de Dados Local:** Armazenamento automático via `localStorage` garantindo que novos cadastros, edições e remoções permaneçam salvos entre recarregamentos de página.
 
 ---
 
@@ -98,24 +105,30 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
 ## 📂 6. Estrutura de Pastas do Código
 
 ```
-proje/
+Desafio-Primora/
 ├── index.html
 ├── package.json
 ├── vite.config.js
+├── test-metrics.js                           # Suite de testes de validação das fórmulas
 ├── README.md
 └── src/
-    ├── main.jsx
-    ├── App.jsx
+    ├── main.jsx                              # Ponto de entrada React 18
+    ├── App.jsx                               # Shell da aplicação com ConfigProvider Ant Design
     ├── data/
     │   └── dataset_painel_multitenant.json   # Dataset oficial com 4 tenants e 3 clientes
     ├── utils/
-    │   └── metrics.js                        # Fórmulas de risco, funil e ranking
+    │   ├── metrics.js                        # Funções de cálculo estatístico e formatação
+    │   └── themeTokens.js                    # Design tokens Dark/Light e semântica de risco
     ├── components/
-    │   └── AcademicBanner.jsx                # Aviso de protótipo acadêmico
+    │   ├── UnidadeCard.jsx                   # Componente reutilizável com AntD Card, Statistic e Tag
+    │   ├── TopBar.jsx                        # Barra de navegação entre as 3 telas e alternador de tema
+    │   ├── AcademicBanner.jsx                # Banner identificador de protótipo acadêmico
+    │   ├── FlatFunnelHealth.jsx              # Componente de funil e saúde da carteira
+    │   └── componentsCSS/                    # Folhas de estilo modularizadas
     └── pages/
-        ├── VisaoGeral.jsx                    # Tela 1: Indicadores, Funil e Saúde
-        ├── Comparativo.jsx                   # Tela 2: Tabela, Gráficos e Ranking
-        └── HistoricoClientes.jsx             # Tela 3: Seleção, Timeline e Score
+        ├── VisaoGeral.jsx                    # Tela 1: Indicadores consolidados e Grid de UnidadeCard
+        ├── Comparativo.jsx                   # Tela 2: Tabela Ant Design e Gráficos Comparativos
+        └── HistoricoClientes.jsx             # Tela 3: Ficha de Cliente e Timeline Ant Design
 ```
 
 ---

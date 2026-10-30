@@ -1,282 +1,335 @@
 /* ==========================================================================
-   TOPBAR EXECUTIVA — GLASSMORPHIC STICKY BAR (DESIGN.md)
-   - Backdrop-filter blur(24px) sobre o canvas Obsidian (#0f1011)
-   - Nav Glass Buttons (8px radius, 9px/12px padding)
-   - Primary CTA Button (White #ffffff fill, Black #000000 text, 8px radius, right arrow)
+   NAVIGATION STYLES — RESPONSIVE SIDEBAR (>= 1024px) & BOTTOM NAV (< 1024px)
    ========================================================================== */
 
-.topbar-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
-  background-color: var(--bg-header);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="light"] .topbar-header {
-  border-bottom: 1px solid var(--border-default);
-}
-
-.topbar-inner {
-  max-width: var(--page-max-width);
-  margin: 0 auto;
-  padding: 0 24px;
-  min-height: 74px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-@media (max-width: 991px) {
-  .topbar-inner {
-    padding: 12px 16px;
-    flex-wrap: wrap;
-  }
-}
-
-.topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-
-.topbar-logo {
-  height: 26px;
-  width: auto;
-  object-fit: contain;
+/* Imagem da logo: no modo escuro é branca natural; no modo claro aplica filtro para ficar preta nítida */
+.primora-brand-img {
   display: block;
+  object-fit: contain;
+  transition: filter 0.2s ease;
 }
 
-.topbar-brand-divider {
-  width: 1px;
-  height: 26px;
-  background-color: rgba(255, 255, 255, 0.16);
+[data-theme="light"] .primora-brand-img {
+  filter: brightness(0);
 }
 
-[data-theme="light"] .topbar-brand-divider {
-  background-color: var(--border-default);
-}
-
-.topbar-brand-titles {
+/* ==========================================================================
+   1. DESKTOP SIDEBAR (>= 1024px)
+   ========================================================================== */
+.desktop-sidebar {
   display: flex;
   flex-direction: column;
-  line-height: 1.15;
+  justify-content: space-between;
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-default);
+  padding: 24px 18px 20px 18px;
+  box-sizing: border-box;
 }
 
-.topbar-company-name {
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebar-logo {
+  height: 28px;
+  width: auto;
+  align-self: flex-start;
+}
+
+.sidebar-brand-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-company-name {
   font-family: var(--font-lyon-display);
   font-size: 20px;
   font-weight: 300;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  line-height: 1.1;
 }
 
-.topbar-system-label {
+[data-theme="light"] .sidebar-company-name {
+  font-weight: 600;
+}
+
+.sidebar-system-label {
+  font-family: var(--font-roboto-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--brand-cyan);
+  text-transform: uppercase;
+}
+
+/* Escopo Operacional */
+.sidebar-tenant-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-section-label {
   font-family: var(--font-roboto-mono);
   font-size: 10px;
-  font-weight: 500;
-  color: var(--brand-cyan);
-  letter-spacing: 0.14em;
+  font-weight: 600;
   text-transform: uppercase;
-  margin-top: 2px;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
 }
 
-/* Navegação Central de Módulos — Nav Glass Buttons (DESIGN.md) */
-.topbar-nav {
+.sidebar-tenant-select {
+  width: 100%;
+}
+
+/* Menu de Módulos Vertical */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.topbar-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background-color: rgba(255, 255, 255, 0.05);
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background-color: transparent;
   color: var(--text-secondary);
   font-family: var(--font-suisse-intl);
   font-size: 14px;
-  font-weight: 400;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-[data-theme="light"] .topbar-nav-btn {
-  border-color: var(--border-default);
-  background-color: rgba(15, 16, 17, 0.03);
-}
-
-.topbar-nav-btn:hover {
-  color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.35);
-}
-
-[data-theme="light"] .topbar-nav-btn:hover {
-  background-color: var(--bg-subtle);
-  border-color: var(--brand-primary);
-}
-
-.topbar-nav-btn--active {
-  background-color: var(--brand-primary);
-  color: #ffffff;
-  border-color: var(--brand-primary);
-}
-
-.topbar-nav-btn--active:hover {
-  background-color: var(--brand-primary-hover);
-  border-color: var(--brand-primary-hover);
-  color: #ffffff;
-}
-
-.topbar-nav-step {
-  font-family: var(--font-roboto-mono);
-  font-size: 10px;
   font-weight: 500;
-  opacity: 0.85;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
-/* Controles Globais Direitos */
-.topbar-controls {
+.sidebar-nav-item:hover {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.sidebar-nav-item--active {
+  background-color: var(--brand-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.sidebar-item-icon {
+  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-shrink: 0;
 }
 
-.topbar-tenant-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.sidebar-item-label {
+  flex: 1;
+  font-size: 13px;
 }
 
-.topbar-control-label {
+.sidebar-item-step {
   font-family: var(--font-roboto-mono);
   font-size: 10px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
+  opacity: 0.75;
 }
 
-.topbar-theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  font-family: var(--font-roboto-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-[data-theme="light"] .topbar-theme-toggle {
-  border-color: var(--border-default);
-  background-color: var(--bg-surface);
-}
-
-.topbar-theme-toggle:hover {
-  border-color: var(--brand-primary);
-}
-
-/* Primary CTA Button (DESIGN.md: White fill #ffffff, Black text #000000, 8px radius, 12px/18px padding) */
-.topbar-primary-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 18px;
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #ffffff;
-  border-radius: 8px;
-  font-family: var(--font-suisse-intl);
-  font-size: 14px;
-  font-weight: 400;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-[data-theme="light"] .topbar-primary-cta {
-  background-color: #0f1011;
-  color: #ffffff;
-  border-color: #0f1011;
-}
-
-.topbar-primary-cta:hover {
-  background-color: var(--color-blue-gleam);
-  border-color: var(--color-blue-gleam);
-  color: #ffffff;
-}
-
-/* Barra Secundária Mobile */
-.topbar-mobile-subbar {
-  width: 100%;
-  padding-top: 8px;
-  margin-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* Navegação Inferior Mobile */
-.mobile-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  background-color: var(--bg-header);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  display: flex;
-  justify-content: space-around;
-  align-items: stretch;
-  height: 58px;
-}
-
-.mobile-bottom-nav-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-top: 2px solid transparent;
-  color: var(--text-secondary);
-  font-family: var(--font-suisse-intl);
-  font-size: 11px;
-  font-weight: 400;
+/* Rodapé da Sidebar */
+.sidebar-footer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  cursor: pointer;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.mobile-bottom-nav-btn--active {
-  color: var(--brand-primary);
-  border-top-color: var(--brand-primary);
-  background-color: rgba(41, 112, 255, 0.12);
+.sidebar-theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-family: var(--font-suisse-intl);
+  font-size: 12px;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.sidebar-theme-btn:hover {
+  border-color: var(--brand-primary);
+  background-color: var(--bg-subtle);
+}
+
+.sidebar-system-info {
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: center;
+  letter-spacing: 0.08em;
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   2. MOBILE & TABLET COMPACT TOP HEADER (< 1024px)
+   ========================================================================== */
+.mobile-top-bar {
+  display: none;
+}
+
+/* ==========================================================================
+   3. MOBILE & TABLET BOTTOM NAVIGATION BAR (< 1024px)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINT SWITCH (< 1024px)
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    gap: 12px;
+  }
+
+  .mobile-top-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .mobile-top-logo {
+    height: 22px;
+    width: auto;
+  }
+
+  .mobile-top-brand-text {
+    font-family: var(--font-lyon-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .mobile-top-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .mobile-tenant-select {
+    max-width: 190px;
+    width: 100%;
+  }
+
+  .mobile-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--bg-surface);
+    border-top: 1px solid var(--border-default);
+    padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .bottom-nav-item--active {
+    color: var(--brand-primary);
+    font-weight: 600;
+  }
+
+  .bottom-nav-icon {
+    font-size: 18px;
+  }
+
+  .bottom-nav-label {
+    font-family: var(--font-suisse-intl);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
 }

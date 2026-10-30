@@ -256,3 +256,35 @@
   border-color: var(--brand-primary);
   background-color: var(--brand-primary-soft);
 }
+
+/* ==========================================================================
+   ESTILOS ANT DESIGN CARDS & KPI ROW (Sprint 2)
+   ========================================================================== */
+
+.kpi-ant-card {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-cards, 16px) !important;
+  height: 100%;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: none !important;
+}
+
+.kpi-ant-card .ant-card-body {
+  padding: 20px 24px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.kpi-ant-card:hover {
+  border-color: var(--brand-primary) !important;
+  background-color: var(--bg-subtle) !important;
+  transform: translateY(-2px);
+}
+
+.unidades-grid-section {
+  background-color: transparent;
+}
+
