@@ -1,0 +1,142 @@
+/* ==========================================================================
+   COMPARATIVO REGIONAL — FUNILAMENTO ESTATÍSTICO & DONUT DE CONCENTRAÇÃO (DESIGN.md)
+   ========================================================================== */
+
+.comparativo-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.comparativo-top-charts-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .comparativo-top-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.regional-donut-layout {
+  display: grid;
+  grid-template-columns: 185px 1fr;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (max-width: 575px) {
+  .regional-donut-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.regional-donut-box {
+  position: relative;
+  width: 185px;
+  height: 185px;
+}
+
+.regional-share-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.regional-share-table th {
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.regional-share-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.regional-share-table tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.regional-share-table tr:hover {
+  background-color: var(--bg-elevated);
+}
+
+.regional-share-table tr:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.regional-share-table tr.regional-share-row-selected {
+  background-color: var(--brand-primary-soft);
+}
+
+.regional-share-table tr:last-child td {
+  border-bottom: none;
+}
+
+.regional-share-table .num-col {
+  text-align: right;
+}
+
+/* Destaque de Linha Selecionada na Tabela AntD */
+.comparativo-row-focused td {
+  background-color: var(--brand-primary-soft) !important;
+}
+
+/* Seção de Fundamentação Técnica Colapsável */
+.ux-rationale-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 14px;
+}
+
+@media (max-width: 767px) {
+  .ux-rationale-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ux-rationale-block {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 20px 24px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.ux-rationale-block h4 {
+  margin: 0 0 10px 0;
+  font-family: var(--font-lyon-display);
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text-primary);
+}
+
+.ux-formula-code {
+  display: block;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-family: var(--font-roboto-mono);
+  font-size: 11px;
+  color: var(--brand-cyan);
+  font-weight: 500;
+}

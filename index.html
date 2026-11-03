@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('color-scheme') || 'dark';
+        document.documentElement.dataset.theme = savedTheme;
+        document.querySelector('meta[name="color-scheme"]').content = savedTheme;
+      } catch (e) {}
+    </script>
+    <link rel="icon" type="image/png" href="/primora-logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Executivo Multi-Tenant — Distribuidora Vetor | Primora</title>
+    <!-- Tipografia em Três Vozes (DESIGN.md):
+         1. Serif Display (Weight 300 Editorial): Cormorant Garamond / Playfair Display
+         2. Neo-Grotesque Sans (UI & Subheads): Inter (Weights 300, 400, 500, 600)
+         3. Technical Monospace (Uppercase Labels & Data): Roboto Mono (Weights 400, 500) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+
+        /* DESIGN.md Tokens — Blue & Bright Blue Edition (No Purple) */
+        --color-blue-gleam: #2970ff;
+        --color-bright-blue: #3b82f6;
+        --color-cyan-signal: #00b3dd;
+        --color-pale-blue: #bae6fd;
+        --color-deep-blue: #1d4ed8;
+        --color-sky-bloom: #38bdf8;
+        --color-periwinkle: #90b8f0;
+
+        /* Neutral & Gallery Surfaces */
+        --color-obsidian: #0f1011;
+        --color-abyss: #090a0b;
+        --color-graphite: #2e2e2e;
+        --color-steel: #3f4041;
+        --color-silver: #cacaca;
+        --color-fog: #6a6b6b;
+        --color-ash: #9f9fa0;
+        --color-cloud: #f5f5f7;
+        --color-pure: #ffffff;
+        --color-void: #000000;
+
+        /* Typography Families */
+        --font-lyon-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        --font-suisse-intl: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-suisse-intl-trial: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-roboto-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+        accent-color: var(--color-blue-gleam);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-canvas, #0f1011);
+        color: var(--text-primary, #ffffff);
+        font-family: var(--font-suisse-intl);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Elevação Flat por Camadas de Superfície (DESIGN.md: Sem drop-shadows em cards) */
+      .ant-card,
+      .ant-select-selector,
+      .ant-table,
+      .ant-tag,
+      .ant-alert {
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+
+      /* Números Tabulares para métricas, tabelas e indicadores */
+      .tabular-nums,
+      .ant-statistic-content,
+      .ant-table-cell,
+      table td,
+      table th,
+      .metric-value {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: "tnum" 1;
+      }
+
+      /* Transições rápidas e contidas (DESIGN.md: 0.2s ease) */
+      button,
+      a,
+      input,
+      .flat-interactive,
+      .ant-btn,
+      .ant-select-selector,
+      .ant-radio-button-wrapper {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease !important;
+      }
+
+      /* Tabela Responsiva */
+      .table-region-wrapper {
+        overflow: auto;
+        max-inline-size: 100%;
+        container-type: inline-size;
+        border: 1px solid var(--border-default);
+        border-radius: 16px;
+        background-color: var(--bg-surface);
+      }
+
+      .table-region-wrapper:focus-visible {
+        outline: 2px solid var(--color-blue-gleam);
+        outline-offset: 2px;
+      }
+
+      @media (forced-colors: active) {
+        .flat-card,
+        .ant-card,
+        .table-region-wrapper {
+          border: 1px solid CanvasText !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
