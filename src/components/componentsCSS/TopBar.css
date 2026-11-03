@@ -49,10 +49,10 @@
 }
 
 .sidebar-logo {
-  height: 48px;
-  max-height: 52px;
+  height: 68px;
+  max-height: 74px;
   width: auto;
-  max-width: 190px;
+  max-width: 225px;
   object-fit: contain;
   align-self: flex-start;
 }
@@ -233,7 +233,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 10px;
-    height: 52px;
+    height: 56px;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -260,10 +260,10 @@
   }
 
   .mobile-top-logo {
-    height: 28px;
-    max-height: 32px;
+    height: 40px;
+    max-height: 46px;
     width: auto;
-    max-width: 110px;
+    max-width: 155px;
     object-fit: contain;
   }
 

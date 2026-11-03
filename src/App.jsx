@@ -245,7 +245,7 @@ export default function App() {
                   src="/primora-logo-white.webp"
                   alt="Primora"
                   className="primora-brand-img footer-primora-logo"
-                  style={{ height: 32, width: 'auto', display: 'block' }}
+                  style={{ height: 46, width: 'auto', display: 'block' }}
                 />
                 <span>·</span>
                 <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
