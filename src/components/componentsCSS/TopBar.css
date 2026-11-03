@@ -2,15 +2,10 @@
    NAVIGATION STYLES — RESPONSIVE SIDEBAR (>= 1024px) & BOTTOM NAV (< 1024px)
    ========================================================================== */
 
-/* Imagem da logo: no modo escuro é branca natural; no modo claro aplica filtro para ficar preta nítida */
+/* Imagem da logo Primora: preserva a coloração vetorial autêntica em ambos os temas */
 .primora-brand-img {
   display: block;
   object-fit: contain;
-  transition: filter 0.2s ease;
-}
-
-[data-theme="light"] .primora-brand-img {
-  filter: brightness(0);
 }
 
 /* ==========================================================================

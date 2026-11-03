@@ -242,7 +242,7 @@ export default function App() {
             <div className="app-footer-row">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <img
-                  src="/primora-logo-white.webp"
+                  src={themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png'}
                   alt="Primora"
                   className="primora-brand-img footer-primora-logo"
                   style={{ height: 46, width: 'auto', display: 'block' }}

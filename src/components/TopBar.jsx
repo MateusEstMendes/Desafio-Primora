@@ -18,6 +18,8 @@ export default function NavigationBar({
   themeMode,
   onToggleTheme
 }) {
+  const logoSrc = themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png';
+
   const navItems = [
     {
       key: 'visao-geral',
@@ -81,7 +83,7 @@ export default function NavigationBar({
             className="sidebar-brand"
           >
             <img
-              src="/primora-logo-white.webp"
+              src={logoSrc}
               alt="Primora Soluções"
               className="sidebar-logo primora-brand-img"
             />
@@ -160,7 +162,7 @@ export default function NavigationBar({
           className="mobile-top-brand"
         >
           <img
-            src="/primora-logo-white.webp"
+            src={logoSrc}
             alt="Primora"
             className="mobile-top-logo primora-brand-img"
           />
