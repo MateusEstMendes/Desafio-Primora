@@ -270,3 +270,4 @@ classDiagram
 
 *Distribuidora Vetor — Simulação Acadêmica para o Projeto Integrador (Bolsa Futuro Digital).*
 
+# Desafio-Primora ss
