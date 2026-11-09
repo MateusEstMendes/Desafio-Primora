@@ -18,26 +18,116 @@ export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTe
       className="primora-brand-img sidebar-brand-logo"
     />
   );
-  const scope = <Select aria-label="Filtrar por unidade regional" value={selectedTenantId} onChange={onTenantChange}
-    options={[{ value: 'todos', label: 'Todas as regionais' }, ...tenants.map(t => ({ value: t.id, label: t.regiao || t.nome }))]}
-    popupMatchSelectWidth={false} className="reference-scope" />;
-  const themeButton = <button type="button" className="reference-theme" onClick={onToggleTheme} aria-label={themeMode === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'}>
-    {themeMode === 'light' ? <MoonOutlined /> : <SunOutlined />}<span>{themeMode === 'light' ? 'Claro' : 'Escuro'}</span>
-  </button>;
-  return <>
-    <aside className="reference-sidebar" aria-label="Navegação principal">
-      <div><a className="reference-brand" href="#" onClick={e => { e.preventDefault(); onTabChange('visao-geral'); }}>{brand}</a>
-        <p className="reference-company">Distribuidora Vetor</p>
-        <nav className="reference-desktop-nav">{navItems.map((item, i) => <button type="button" key={item.key} onClick={() => onTabChange(item.key)} aria-current={currentTab === item.key ? 'page' : undefined}>
-          <span>{String(i + 1).padStart(2, '0')}</span>{item.label}
-        </button>)}</nav>
-      </div>
-      <div className="reference-sidebar-bottom"><label className="scope-label">Unidade regional</label>{scope}{themeButton}</div>
-    </aside>
-    <header className="reference-mobile-header"><a className="reference-brand" href="#" onClick={e => { e.preventDefault(); onTabChange('visao-geral'); }}>{brand}</a>{themeButton}</header>
-    <div className="reference-mobile-scope">{scope}</div>
-    <nav className="reference-bottom-nav" aria-label="Navegação principal mobile">{navItems.map(item => <button type="button" key={item.key} onClick={() => onTabChange(item.key)} aria-current={currentTab === item.key ? 'page' : undefined}>
-      {item.icon}<span>{item.short}</span>
-    </button>)}</nav>
-  </>;
+
+  const themeButton = (
+    <button
+      type="button"
+      className="reference-theme"
+      onClick={onToggleTheme}
+      aria-label={themeMode === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'}
+    >
+      {themeMode === 'light' ? <MoonOutlined /> : <SunOutlined />}
+      <span>{themeMode === 'light' ? 'Claro' : 'Escuro'}</span>
+    </button>
+  );
+
+  const tenantOptions = [
+    { value: 'todos', label: 'Todas as regionais' },
+    ...tenants.map(t => ({ value: t.id, label: t.regiao || t.nome }))
+  ];
+
+  return (
+    <>
+      {/* 1. SIDEBAR DESKTOP (>= 1024px) */}
+      <aside className="reference-sidebar" aria-label="Navegação principal">
+        <div className="reference-sidebar-top">
+          <a
+            className="reference-brand"
+            href="#"
+            onClick={e => {
+              e.preventDefault();
+              onTabChange('visao-geral');
+            }}
+          >
+            {brand}
+          </a>
+          <p className="reference-company">Distribuidora Vetor</p>
+
+          {/* Seletor de Escopo Regional no Topo (Acessível, Rápido e Sem Quebra) */}
+          <div className="reference-sidebar-scope-box">
+            <label className="scope-label" htmlFor="desktop-sidebar-scope-select">
+              Unidade Regional
+            </label>
+            <Select
+              id="desktop-sidebar-scope-select"
+              aria-label="Filtrar por unidade regional"
+              value={selectedTenantId}
+              onChange={onTenantChange}
+              options={tenantOptions}
+              className="reference-scope"
+            />
+          </div>
+
+          <nav className="reference-desktop-nav">
+            {navItems.map((item, i) => (
+              <button
+                type="button"
+                key={item.key}
+                onClick={() => onTabChange(item.key)}
+                aria-current={currentTab === item.key ? 'page' : undefined}
+              >
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <div className="reference-sidebar-bottom">
+          {themeButton}
+        </div>
+      </aside>
+
+      {/* 2. HEADER MOBILE / TABLET (< 1024px) */}
+      <header className="reference-mobile-header">
+        <a
+          className="reference-brand"
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            onTabChange('visao-geral');
+          }}
+        >
+          {brand}
+        </a>
+        <div className="mobile-header-controls" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Select
+            aria-label="Filtrar por unidade regional mobile"
+            value={selectedTenantId}
+            onChange={onTenantChange}
+            options={tenantOptions}
+            size="middle"
+            style={{ width: 175 }}
+            popupMatchSelectWidth={false}
+          />
+          {themeButton}
+        </div>
+      </header>
+
+      {/* 3. NAVEGAÇÃO INFERIOR MOBILE (< 1024px) */}
+      <nav className="reference-bottom-nav" aria-label="Navegação principal mobile">
+        {navItems.map(item => (
+          <button
+            type="button"
+            key={item.key}
+            onClick={() => onTabChange(item.key)}
+            aria-current={currentTab === item.key ? 'page' : undefined}
+          >
+            {item.icon}
+            <span>{item.short}</span>
+          </button>
+        ))}
+      </nav>
+    </>
+  );
 }

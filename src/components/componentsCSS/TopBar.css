@@ -1,4 +1,4 @@
-﻿/* Mobile-first navigation, based on the supplied Primora references. */
+/* Mobile-first navigation, based on the supplied Primora references. */
 .sidebar-brand-logo {
   height: 48px;
   max-height: 52px;
@@ -17,9 +17,37 @@
 .reference-theme { display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; font: inherit; }
 .reference-theme .anticon { font-size: 24px; }
 .reference-mobile-header .reference-theme span:not(.anticon) { display: none; }
-.reference-mobile-scope { display: flex; justify-content: flex-end; margin: 10px 16px 0; }
 .reference-scope { width: 100%; }
-.reference-mobile-scope .reference-scope { width: 200px; }
+
+.reference-sidebar-scope-box {
+  margin: 0 4px 18px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reference-sidebar-scope-box .scope-label {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  font-family: var(--font-roboto-mono);
+}
+
+.reference-sidebar-scope-box .reference-scope .ant-select-selector {
+  border-radius: 8px !important;
+  border-color: var(--border-default) !important;
+  background-color: var(--bg-elevated) !important;
+  min-height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.mobile-header-controls .ant-select-selector {
+  border-radius: 8px !important;
+  background-color: var(--bg-elevated) !important;
+}
 .reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-surface); border-top: 1px solid var(--border-default); }
 .reference-bottom-nav button { display: flex; position: relative; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 62px; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }
 .reference-bottom-nav .anticon { font-size: 25px; }
@@ -50,7 +78,10 @@
   .reference-desktop-nav button[aria-current] { background: var(--brand-primary); color: #fff; }
   .reference-desktop-nav button:hover:not([aria-current]) { background: var(--bg-subtle); }
   .reference-desktop-nav button > span { font-size: 12px; }
-  .reference-sidebar-bottom { display: grid; gap: 9px; border-top: 1px solid var(--border-default); padding: 18px 6px 0; }
-  .scope-label { color: var(--text-secondary); text-transform: uppercase; font-size: 10px; letter-spacing: .1em; }
-  .reference-sidebar-bottom .reference-theme { margin-top: 8px; }
+  .reference-sidebar-bottom {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--border-default);
+    padding: 12px 6px 0;
+  }
 }
