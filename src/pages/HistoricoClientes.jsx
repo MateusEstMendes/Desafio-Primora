@@ -59,6 +59,7 @@ function extrairNumeroTicket(ticketStr) {
 }
 
 export default function HistoricoClientes({
+  initialClientId,
   dataset,
   isMobile = false,
   selectedTenantId = 'todos',
@@ -80,7 +81,7 @@ export default function HistoricoClientes({
     return todosClientes.filter((c) => c.tenantId === selectedTenantId);
   }, [todosClientes, selectedTenantId]);
 
-  const [selectedClienteId, setSelectedClienteId] = useState(todosClientes[0]?.id || null);
+  const [selectedClienteId, setSelectedClienteId] = useState(initialClientId || todosClientes[0]?.id || null);
   const [filtroCategoriaEvento, setFiltroCategoriaEvento] = useState('todos');
 
   useEffect(() => {

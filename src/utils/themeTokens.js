@@ -33,12 +33,12 @@ export const THEME_TOKENS = {
     textOnBrand: '#FFFFFF',
 
     // Acento Cromático Principal: Bright Blue & Cyan Signal (Substituindo qualquer roxo)
-    brandPrimary: '#2970FF',
+    brandPrimary: '#0074FF',
     brandPrimaryHover: '#3B82F6',
     brandPrimarySoft: '#102347',
     brandPrimaryBorder: '#1D4ED8',
 
-    brandCyan: '#00B3DD',
+    brandCyan: '#00CDE5',
     brandCyanText: '#38BDF8',
     brandCyanSoft: '#092832',
     brandCyanBorder: '#0086A8',
@@ -66,7 +66,7 @@ export const THEME_TOKENS = {
 
     // Paleta Categórica Azul & Ciano (Zero Roxo)
     category1: '#2970FF', // Bright Blue Gleam (Sudeste)
-    category2: '#00B3DD', // Cyan Signal (Sul)
+    category2: '#00CDE5', // Cyan Signal (Sul)
     category3: '#90B8F0', // Periwinkle Blue (Nordeste)
     category4: '#1D4ED8', // Deep Royal Blue (Centro-Oeste)
 
@@ -92,25 +92,25 @@ export const THEME_TOKENS = {
     bgFooter: '#EAECEF',
 
     // Bordas
-    borderDefault: '#D4D8E0',
+    borderDefault: '#CDD5E4',
     borderSubtle: '#E4E7EC',
     borderStrong: '#6A6B6B',
     borderFocus: '#2563EB',
 
     // Tipografia
-    textPrimary: '#0F1011',
+    textPrimary: '#0B1835',
     textCloud: '#090A0B',
-    textSecondary: '#4A4B4D',
+    textSecondary: '#53607B',
     textMuted: '#6A6B6B',
     textOnBrand: '#FFFFFF',
 
     // Identidade Azul Brilhante (Sem Roxo)
-    brandPrimary: '#2563EB',
+    brandPrimary: '#0074FF',
     brandPrimaryHover: '#1D4ED8',
     brandPrimarySoft: '#EFF6FF',
     brandPrimaryBorder: '#BFDBFE',
 
-    brandCyan: '#0095B8',
+    brandCyan: '#00CDE5',
     brandCyanText: '#007794',
     brandCyanSoft: '#ECFEFF',
     brandCyanBorder: '#A5F3FC',
@@ -137,10 +137,10 @@ export const THEME_TOKENS = {
     statusCriticalBorder: '#FCA5A5',
 
     // Paleta Categórica Azul & Ciano (Sem Roxo)
-    category1: '#2563EB', // Bright Royal Blue (Sudeste)
-    category2: '#00B3DD', // Cyan Signal (Sul)
-    category3: '#3B82F6', // Electric Sky Blue (Nordeste)
-    category4: '#1E40AF', // Deep Sapphire Blue (Centro-Oeste)
+    category1: '#0074FF', // Bright Royal Blue (Sudeste)
+    category2: '#00CDE5', // Cyan Signal (Sul)
+    category3: '#FFBD00', // Electric Sky Blue (Nordeste)
+    category4: '#FF5864', // Deep Sapphire Blue (Centro-Oeste)
 
     // Gráficos
     chartGrid: '#E2E8F0',

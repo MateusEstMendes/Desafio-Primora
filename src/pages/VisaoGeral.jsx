@@ -1,590 +1,81 @@
-import React, { useMemo } from 'react';
-import { Card, Statistic, Typography, Row, Col, Empty, Tooltip } from 'antd';
-import {
-  TeamOutlined,
-  AlertOutlined,
-  FunnelPlotOutlined,
-  RiseOutlined,
-  CheckCircleOutlined
-} from '@ant-design/icons';
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  Legend
-} from 'recharts';
-import {
-  calcularRiscoAbsoluto,
-  calcularTaxaRiscoProporcional,
-  calcularTaxaConversaoFunil,
-  calcularTaxaVisualizacaoFunil,
-  classificarUnidadesPorRisco,
-  formatarNumero,
-  formatarPercentual
-} from '../utils/metrics';
-import { getRiskSemanticTokens } from '../utils/themeTokens';
-import FlatFunnelHealth from '../components/FlatFunnelHealth';
-import ExecutiveSummaryStrip from '../components/ExecutiveSummaryStrip';
+﻿import React, { useId, useState } from 'react';
+import { Empty } from 'antd';
+import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
+import { getRegionalColors } from '../utils/themeTokens';
 import '../components/componentsCSS/VisaoGeral.css';
 
-const { Title, Text, Paragraph } = Typography;
+function Sparkline({ data, dataKey, color, label, full = false, themeTokens }) {
+  const gradient = useId().replace(/:/g, '');
+  return <div className={full ? 'focus-chart' : 'reference-spark'} role="img" aria-label={label}>
+    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+      <AreaChart data={data} margin={full ? { top: 12, right: 16, left: -25, bottom: 0 } : { top: 7, right: 3, left: 3, bottom: 1 }}>
+        <defs><linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
+        {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
+        {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />}
+        <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />
+        <Tooltip contentStyle={{ background: themeTokens.chartTooltipBg, borderColor: themeTokens.chartTooltipBorder, borderRadius: 10, color: themeTokens.textPrimary }} formatter={v => [full ? v : formatarPercentual(v), label]} labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''} />
+        <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={false} dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>;
+}
 
-export default function VisaoGeral({
-  dataset,
-  isMobile = false,
-  selectedTenantId = 'todos',
-  onSelectTenant,
-  onNavigateTab,
-  themeTokens
-}) {
+export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSelectTenant, onNavigateTab, themeTokens, onOpenClient }) {
+  const [period, setPeriod] = useState(3);
   const tenants = dataset?.tenants || [];
-  const clientes = dataset?.clientes || [];
-
-  const unidadesClassificadas = useMemo(
-    () => classificarUnidadesPorRisco(tenants),
-    [tenants]
-  );
-
-  const contasPrioritarias = useMemo(() => {
-    const criticasOuRisco = clientes.filter(
-      (c) => c.statusSaude === 'Crítico' || c.statusSaude === 'Risco'
-    );
-    return criticasOuRisco.length > 0 ? criticasOuRisco.slice(0, 5) : clientes.slice(0, 5);
-  }, [clientes]);
-
-  const selectedTenant = useMemo(() => {
-    if (selectedTenantId === 'todos') return null;
-    return tenants.find((t) => t.id === selectedTenantId) || null;
-  }, [selectedTenantId, tenants]);
-
-  const estatisticasAgregadas = useMemo(() => {
-    if (!tenants.length) return null;
-
-    if (selectedTenant) {
-      const riscoAbsoluto = calcularRiscoAbsoluto(selectedTenant.saudeCarteira);
-      const taxaRisco = calcularTaxaRiscoProporcional(
-        selectedTenant.saudeCarteira,
-        selectedTenant.carteiraTotalClientes
-      );
-      const taxaConversao = calcularTaxaConversaoFunil(selectedTenant.funnel90d);
-      const taxaVisualizacao = calcularTaxaVisualizacaoFunil(selectedTenant.funnel90d);
-      const hist = selectedTenant.historicoTendencia || [];
-      const deltaEngajamento =
-        hist.length >= 2
-          ? Number((hist[hist.length - 1].engajamento - hist[0].engajamento).toFixed(1))
-          : 0;
-
-      return {
-        nome: selectedTenant.nome,
-        porte: `Porte ${selectedTenant.porte}`,
-        carteiraTotal: selectedTenant.carteiraTotalClientes,
-        engajamento: selectedTenant.engajamentoMedio,
-        deltaEngajamento,
-        riscoAbsoluto,
-        taxaRisco,
-        saude: selectedTenant.saudeCarteira,
-        funil: selectedTenant.funnel90d,
-        taxaConversao,
-        taxaVisualizacao,
-        tendencias: hist
-      };
-    }
-
-    const totalClientes = tenants.reduce((acc, t) => acc + (t.carteiraTotalClientes || 0), 0);
-    const mediaEngajamento =
-      tenants.reduce((acc, t) => acc + (t.engajamentoMedio || 0), 0) / tenants.length;
-
-    const saudeConsolidada = tenants.reduce(
-      (acc, t) => ({
-        saudavel: acc.saudavel + (t.saudeCarteira?.saudavel || 0),
-        atencao: acc.atencao + (t.saudeCarteira?.atencao || 0),
-        risco: acc.risco + (t.saudeCarteira?.risco || 0),
-        critico: acc.critico + (t.saudeCarteira?.critico || 0)
-      }),
-      { saudavel: 0, atencao: 0, risco: 0, critico: 0 }
-    );
-
-    const funilConsolidado = tenants.reduce(
-      (acc, t) => ({
-        gerada: acc.gerada + (t.funnel90d?.gerada || 0),
-        vista: acc.vista + (t.funnel90d?.vista || 0),
-        sucesso: acc.sucesso + (t.funnel90d?.sucesso || 0)
-      }),
-      { gerada: 0, vista: 0, sucesso: 0 }
-    );
-
-    const riscoAbsoluto = calcularRiscoAbsoluto(saudeConsolidada);
-    const taxaRisco = calcularTaxaRiscoProporcional(saudeConsolidada, totalClientes);
-    const taxaConversao = calcularTaxaConversaoFunil(funilConsolidado);
-    const taxaVisualizacao = calcularTaxaVisualizacaoFunil(funilConsolidado);
-
-    const meses = tenants[0]?.historicoTendencia?.map((h) => h.mes) || [];
-    const tendenciasConsolidadas = meses.map((mes, idx) => {
-      let somaEng = 0;
-      let somaSucesso = 0;
-      tenants.forEach((t) => {
-        const item = t.historicoTendencia?.[idx];
-        if (item) {
-          somaEng += item.engajamento;
-          somaSucesso += item.sucessoFunil;
-        }
-      });
-      return {
-        mes,
-        engajamento: Number((somaEng / tenants.length).toFixed(1)),
-        sucessoFunil: Number((somaSucesso / tenants.length).toFixed(1))
-      };
-    });
-
-    const deltaEngajamento =
-      tendenciasConsolidadas.length >= 2
-        ? Number(
-            (
-              tendenciasConsolidadas[tendenciasConsolidadas.length - 1].engajamento -
-              tendenciasConsolidadas[0].engajamento
-            ).toFixed(1)
-          )
-        : 0;
-
-    return {
-      nome: 'Consolidado Nacional',
-      porte: '4 Regionais',
-      carteiraTotal: totalClientes,
-      engajamento: Number(mediaEngajamento.toFixed(1)),
-      deltaEngajamento,
-      riscoAbsoluto,
-      taxaRisco,
-      saude: saudeConsolidada,
-      funil: funilConsolidado,
-      taxaConversao,
-      taxaVisualizacao,
-      tendencias: tendenciasConsolidadas
-    };
-  }, [tenants, selectedTenant]);
-
-  if (!tenants.length || !estatisticasAgregadas) {
-    return (
-      <div className="flat-card">
-        <Empty description="Nenhuma unidade regional encontrada no dataset." />
-      </div>
-    );
-  }
-
-  return (
-    <div className="visao-geral-container">
-      {/* BLOCO 1: FAIXA DE INDICADORES EXECUTIVOS CONSOLIDADOS (ANT DESIGN CARD + STATISTIC + TAG) */}
-      <section aria-label="Indicadores executivos consolidados">
-        <Row gutter={[16, 16]} className="kpi-ant-row" style={{ marginBottom: 20 }}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="kpi-ant-card">
-              <Statistic
-                title={<span className="stat-label">Carteira Ativa</span>}
-                value={estatisticasAgregadas.carteiraTotal}
-                formatter={(val) => formatarNumero(val)}
-                suffix={<span className="stat-suffix">contas</span>}
-                prefix={<TeamOutlined style={{ color: 'var(--brand-primary)' }} />}
-              />
-              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 11 }}>{estatisticasAgregadas.nome}</Text>
-                {selectedTenant ? (
-                  <button type="button" className="flat-action-btn" onClick={() => onSelectTenant('todos')}>
-                    Ver Consolidado
-                  </button>
-                ) : (
-                  <span className="geo-badge">{estatisticasAgregadas.porte}</span>
-                )}
-              </div>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="kpi-ant-card">
-              <Statistic
-                title={<span className="stat-label">Exposição a Risco</span>}
-                value={estatisticasAgregadas.taxaRisco}
-                precision={1}
-                suffix="%"
-                prefix={
-                  <AlertOutlined
-                    style={{
-                      color:
-                        estatisticasAgregadas.taxaRisco >= 20
-                          ? 'var(--status-critical-text)'
-                          : estatisticasAgregadas.taxaRisco >= 10
-                          ? 'var(--status-warning-text)'
-                          : 'var(--status-success-text)'
-                    }}
-                  />
-                }
-                valueStyle={{
-                  color:
-                    estatisticasAgregadas.taxaRisco >= 20
-                      ? 'var(--status-critical-text)'
-                      : estatisticasAgregadas.taxaRisco >= 10
-                      ? 'var(--status-warning-text)'
-                      : 'var(--status-success-text)'
-                }}
-              />
-              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  {formatarNumero(estatisticasAgregadas.riscoAbsoluto)} contas sob atenção/risco
-                </Text>
-                <span
-                  className={`geo-badge ${
-                    estatisticasAgregadas.taxaRisco >= 20
-                      ? 'geo-badge--critical'
-                      : estatisticasAgregadas.taxaRisco >= 10
-                      ? 'geo-badge--warning'
-                      : 'geo-badge--success'
-                  }`}
-                >
-                  {estatisticasAgregadas.taxaRisco >= 20 ? '▲ Crítico' : estatisticasAgregadas.taxaRisco >= 10 ? '▲ Atenção' : '● Estável'}
-                </span>
-              </div>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="kpi-ant-card">
-              <Statistic
-                title={<span className="stat-label">Conversão Funil (90d)</span>}
-                value={estatisticasAgregadas.taxaConversao}
-                precision={1}
-                suffix="%"
-                prefix={<FunnelPlotOutlined style={{ color: 'var(--brand-primary)' }} />}
-                valueStyle={{ color: 'var(--brand-primary)' }}
-              />
-              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  Visualização: {formatarPercentual(estatisticasAgregadas.taxaVisualizacao)}
-                </Text>
-                <span className="geo-badge geo-badge--cyan">
-                  {formatarNumero(estatisticasAgregadas.funil.sucesso)}/{formatarNumero(estatisticasAgregadas.funil.gerada)}
-                </span>
-              </div>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="kpi-ant-card">
-              <Statistic
-                title={<span className="stat-label">Engajamento Médio</span>}
-                value={estatisticasAgregadas.engajamento}
-                precision={1}
-                suffix="%"
-                prefix={<RiseOutlined style={{ color: 'var(--brand-cyan)' }} />}
-                valueStyle={{ color: 'var(--brand-cyan)' }}
-              />
-              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  Meta operacional: 75%
-                </Text>
-                <span
-                  className={`geo-delta ${
-                    estatisticasAgregadas.deltaEngajamento >= 0
-                      ? 'geo-delta--positive'
-                      : 'geo-delta--negative'
-                  }`}
-                >
-                  {estatisticasAgregadas.deltaEngajamento >= 0 ? `▲ +${estatisticasAgregadas.deltaEngajamento}` : `▼ ${estatisticasAgregadas.deltaEngajamento}`} pts
-                </span>
-              </div>
-            </Card>
-          </Col>
-        </Row>
+  const selected = tenants.filter(t => selectedTenantId === 'todos' || t.id === selectedTenantId);
+  if (!selected.length) return <Empty description="Nenhuma unidade encontrada." />;
+  const total = selected.reduce((sum, t) => sum + t.carteiraTotalClientes, 0);
+  const risk = selected.reduce((sum, t) => sum + calcularRiscoAbsoluto(t.saudeCarteira), 0);
+  const funnel = selected.reduce((sum, t) => ({ gerada: sum.gerada + t.funnel90d.gerada, vista: sum.vista + t.funnel90d.vista, sucesso: sum.sucesso + t.funnel90d.sucesso }), { gerada: 0, vista: 0, sucesso: 0 });
+  const conversion = calcularTaxaConversaoFunil(funnel);
+  const engagement = selected.reduce((sum, t) => sum + t.engajamentoMedio, 0) / selected.length;
+  // O dataset contém amostras mensais; para 30 dias, comparamos os dois últimos meses.
+  const history = (selected[0].historicoTendencia || []).map((h, i) => ({ mes: h.mes,
+    engajamento: selected.reduce((sum, t) => sum + (t.historicoTendencia?.[i]?.engajamento || 0), 0) / selected.length,
+    sucessoFunil: selected.reduce((sum, t) => sum + (t.historicoTendencia?.[i]?.sucessoFunil || 0), 0) / selected.length
+  }));
+  const series = history.slice(-Math.max(2, period));
+  const delta = series.length > 1 ? series.at(-1).engajamento - series[0].engajamento : 0;
+  const colors = getRegionalColors(themeTokens);
+  const regions = tenants.map(t => ({ ...t, value: t.carteiraTotalClientes, color: colors[t.id] }));
+  const nationalTotal = regions.reduce((sum, t) => sum + t.value, 0);
+  const changes = selected.map(t => {
+    const points = (t.historicoTendencia || []).slice(-Math.max(2, period));
+    return { ...t, points, change: points.length > 1 ? points.at(-1).engajamento - points[0].engajamento : 0 };
+  }).sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 3);
+  const client = (dataset.clientes || []).find(c => selectedTenantId === 'todos' || c.tenantId === selectedTenantId);
+  const events = [...(client?.eventos || [])].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 3);
+  const openClient = () => { if (onOpenClient) onOpenClient(client); else { onSelectTenant(client.tenantId); onNavigateTab('historico-clientes'); } };
+  const metrics = [
+    { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: themeTokens.brandPrimary },
+    { title: 'Exposição a risco', value: formatarPercentual(total ? risk / total * 100 : 0), note: formatarNumero(risk) + ' contas', color: themeTokens.brandCyan },
+    { title: 'Conversão do funil', value: formatarPercentual(conversion), note: '90 dias', color: themeTokens.brandPrimary },
+    { title: 'Engajamento médio', value: formatarPercentual(engagement), note: (delta >= 0 ? '+' : '') + delta.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: delta, color: themeTokens.brandCyan }
+  ];
+  return <div className="executive-dashboard">
+    <header className="executive-heading"><div><span className="executive-eyebrow">Distribuidora Vetor</span><h1>Visão Executiva</h1><p>Sua operação, em perspectiva.</p></div>
+      <div className="period-control" role="group" aria-label="Período das tendências">{[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => <button type="button" key={p.value} aria-pressed={period === p.value} onClick={() => setPeriod(p.value)}>{p.label}</button>)}</div>
+    </header>
+    <section className="reference-kpis" aria-label="Indicadores executivos">{metrics.map(m => <article key={m.title} className="reference-kpi" style={{ '--metric-accent': m.color }}><h2>{m.title}</h2><div className="reference-kpi-bottom"><strong>{m.value}</strong><span className={'metric-note ' + (m.trend !== undefined ? m.trend >= 0 ? 'is-positive' : 'is-negative' : '')}>{m.trend !== undefined && (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}{m.note}</span></div></article>)}</section>
+    <section className="reference-panel pulse-panel" aria-labelledby="pulse-title"><h2 id="pulse-title">Pulso da <em>operação</em></h2>
+      {[{ key: 'engajamento', label: 'Engajamento', value: engagement, color: themeTokens.brandPrimary }, { key: 'sucessoFunil', label: 'Conversão', value: series.at(-1)?.sucessoFunil || 0, color: themeTokens.brandCyan }].map(row => <div className="pulse-row" key={row.key} style={{ '--metric-accent': row.color }}><span className="signal-label">{row.label}</span><strong>{formatarPercentual(row.value)}</strong><Sparkline data={series} dataKey={row.key} color={row.color} label={row.label} themeTokens={themeTokens} /></div>)}
+      <p className="chart-context">{period === 1 ? 'Último mês vs. mês anterior' : 'Últimas ' + period + ' amostras mensais'} · {series[0]?.mes} a {series.at(-1)?.mes}. Funil consolidado: 90 dias.</p>
+    </section>
+    <div className="reference-middle-grid">
+      <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">
+        <div className="reference-donut" role="img" aria-label={'Distribuição da carteira: ' + formatarNumero(nationalTotal) + ' contas'}><ResponsiveContainer width="100%" height="100%" minWidth={0}><PieChart><Pie data={regions} dataKey="value" nameKey="regiao" innerRadius="71%" outerRadius="98%" startAngle={90} endAngle={-270} stroke="none" isAnimationActive={false} onClick={entry => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}>{regions.map(t => <Cell key={t.id} fill={t.color} cursor="pointer" opacity={selectedTenantId === 'todos' || selectedTenantId === t.id ? 1 : 0.3} />)}</Pie><Tooltip formatter={value => [formatarNumero(value), 'Contas']} contentStyle={{ background: themeTokens.chartTooltipBg, borderColor: themeTokens.chartTooltipBorder, borderRadius: 10, color: themeTokens.textPrimary }} /></PieChart></ResponsiveContainer><div className="reference-donut-label"><strong>{formatarNumero(nationalTotal)}</strong><span>Contas</span></div></div>
+        <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
+      </div><p className="chart-context">Participação na carteira · toque em uma regional para filtrar.</p></section>
+      <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores <em>mudanças</em></h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
+        {changes.map(t => <div className="change-row" key={t.id} style={{ '--metric-accent': t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan }}><button type="button" className="signal-label" onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}>{t.regiao}</button><Sparkline data={t.points} dataKey="engajamento" color={t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan} label={t.regiao + ': engajamento'} themeTokens={themeTokens} /><strong className={t.change >= 0 ? 'is-positive' : 'is-negative'}>{t.change >= 0 ? '+' : ''}{t.change.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}<small> p.p.</small></strong></div>)}
+        <p className="chart-context">Variação do engajamento no período.</p>
       </section>
-
-      {/* BLOCO 2: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
-      <FlatFunnelHealth estatisticas={estatisticasAgregadas} themeTokens={themeTokens} />
-
-      {/* BLOCO 4: QUADRO DIRETO DE UNIDADES (ATENÇÃO VS. BENCHMARK) + TENDÊNCIA SEMESTRAL */}
-      <div className="bottom-summary-grid">
-        {/* Esquerda: Resumo Direto das 4 Unidades Regionais */}
-        <section className="flat-card" aria-labelledby="units-summary-heading">
-          <div className="flat-card-header">
-            <div>
-              <span className="flat-section-eyebrow">MATRIZ DE UNIDADES</span>
-              <h2 id="units-summary-heading" className="flat-card-title">
-                Desempenho por Regional
-              </h2>
-            </div>
-            <button
-              type="button"
-              className="flat-action-btn"
-              onClick={() => onNavigateTab('comparativo')}
-            >
-              Análise Comparativa &rarr;
-            </button>
-          </div>
-
-          {/* TABELA DESKTOP (>= 768px): Estrutura clássica de 6 colunas */}
-          <div className="table-responsive-wrapper desktop-only-table" tabIndex={0} role="region" aria-label="Tabela de Desempenho por Regional">
-            <table className="minimal-units-table">
-              <thead>
-                <tr>
-                  <th>Unidade</th>
-                  <th>Porte</th>
-                  <th className="num-col">Carteira</th>
-                  <th className="num-col">Risco Prop.</th>
-                  <th className="num-col">Funil</th>
-                  <th className="num-col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {unidadesClassificadas.map((u) => {
-                  const active = selectedTenantId === u.id;
-                  const sem = getRiskSemanticTokens(u.taxaRiscoProporcional, themeTokens);
-                  return (
-                    <tr
-                      key={u.id}
-                      className={active ? 'row-selected' : ''}
-                      tabIndex={0}
-                      role="button"
-                      aria-pressed={active}
-                      onClick={() => onSelectTenant(active ? 'todos' : u.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onSelectTenant(active ? 'todos' : u.id);
-                        }
-                      }}
-                      title="Clique ou pressione Enter para filtrar esta unidade"
-                    >
-                      <td>
-                        <span className="units-table-unit-name">
-                          {u.nome.replace('Unidade ', '')}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="units-table-unit-porte">{u.porte}</span>
-                      </td>
-                      <td className="num-col">{formatarNumero(u.carteiraTotalClientes)}</td>
-                      <td className="num-col" style={{ fontWeight: 600, color: sem.color }}>
-                        {formatarPercentual(u.taxaRiscoProporcional)}
-                        <span className="units-table-risk-sub">
-                          ({u.riscoAbsolutoCalculado})
-                        </span>
-                      </td>
-                      <td className="num-col">{formatarPercentual(u.taxaConversaoFunil)}</td>
-                      <td className="num-col">
-                        <span
-                          className={`geo-badge ${
-                            u.taxaRiscoProporcional >= 20
-                              ? 'geo-badge--critical'
-                              : u.taxaRiscoProporcional >= 10
-                              ? 'geo-badge--warning'
-                              : 'geo-badge--success'
-                          }`}
-                        >
-                          {sem.symbol} {sem.level}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* VISÃO MOBILE (< 768px): CARDS ESTRUTURADOS COM 100% DAS INFORMAÇÕES VISÍVEIS SEM NENHUM CORTE */}
-          <div className="mobile-units-list mobile-only-cards" role="region" aria-label="Desempenho por Regional Mobile">
-            {unidadesClassificadas.map((u) => {
-              const active = selectedTenantId === u.id;
-              const sem = getRiskSemanticTokens(u.taxaRiscoProporcional, themeTokens);
-              return (
-                <div
-                  key={u.id}
-                  className={`mobile-unit-card ${active ? 'mobile-unit-card--active' : ''}`}
-                  onClick={() => onSelectTenant(active ? 'todos' : u.id)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onSelectTenant(active ? 'todos' : u.id);
-                    }
-                  }}
-                  title="Toque para filtrar esta unidade"
-                >
-                  <div className="mobile-unit-card-header">
-                    <div className="mobile-unit-title-group">
-                      <span className="mobile-unit-name">
-                        {u.nome.replace('Unidade ', '')}
-                      </span>
-                      {u.isMatriz && (
-                        <span className="mobile-unit-matriz-tag">Matriz</span>
-                      )}
-                      <span className="mobile-unit-porte-badge">{u.porte}</span>
-                    </div>
-                    <span
-                      className={`geo-badge ${
-                        u.taxaRiscoProporcional >= 20
-                          ? 'geo-badge--critical'
-                          : u.taxaRiscoProporcional >= 10
-                          ? 'geo-badge--warning'
-                          : 'geo-badge--success'
-                      }`}
-                    >
-                      {sem.symbol} {sem.level}
-                    </span>
-                  </div>
-
-                  <div className="mobile-unit-metrics-row">
-                    <div className="mobile-unit-metric-box">
-                      <span className="mobile-unit-metric-label">CARTEIRA</span>
-                      <span className="mobile-unit-metric-num">{formatarNumero(u.carteiraTotalClientes)}</span>
-                    </div>
-                    <div className="mobile-unit-metric-box">
-                      <span className="mobile-unit-metric-label">RISCO PROP.</span>
-                      <span className="mobile-unit-metric-num" style={{ color: sem.color, fontWeight: 700 }}>
-                        {formatarPercentual(u.taxaRiscoProporcional)}
-                        <span className="mobile-unit-metric-sub"> ({u.riscoAbsolutoCalculado})</span>
-                      </span>
-                    </div>
-                    <div className="mobile-unit-metric-box">
-                      <span className="mobile-unit-metric-label">FUNIL</span>
-                      <span className="mobile-unit-metric-num">{formatarPercentual(u.taxaConversaoFunil)}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Atalho Rápido para Contas Prioritárias (Jornada de Clientes) */}
-          <div className="compact-clients-strip">
-            <span className="clients-strip-label">
-              Contas Prioritárias:
-            </span>
-            <div className="clients-strip-pills">
-              {contasPrioritarias.map((c) => {
-                const isCrit = c.statusSaude === 'Crítico';
-                const isRisk = c.statusSaude === 'Risco';
-                const dotCls = isCrit
-                  ? 'geo-dot--critical'
-                  : isRisk
-                  ? 'geo-dot--risk'
-                  : 'geo-dot--success';
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className="compact-client-pill"
-                    onClick={() => {
-                      onSelectTenant(c.tenantId);
-                      onNavigateTab('historico-clientes');
-                    }}
-                    title={`Ver histórico de ${c.nome}`}
-                  >
-                    <span className={`geo-dot ${dotCls}`} aria-hidden="true" />
-                    <span>{c.nome.split(' ')[0]}</span>
-                    <strong>{c.scoreSaudeAtual} pts</strong>
-                  </button>
-                );
-              })}
-              <button
-                type="button"
-                className="flat-action-btn"
-                onClick={() => onNavigateTab('historico-clientes')}
-              >
-                Ver todas ({clientes.length}) &rarr;
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Direita: Série Temporal Semestral — Cyan Signal (#00b3dd) + Bright Blue (#2970ff) */}
-        <section className="flat-card" aria-labelledby="trend-chart-heading">
-          <div className="flat-card-header">
-            <div>
-              <span className="flat-section-eyebrow">SINAIS DE TENDÊNCIA</span>
-              <h2 id="trend-chart-heading" className="flat-card-title">
-                Evolução Semestral (6m)
-              </h2>
-            </div>
-            <span className="chart-card-subtitle">
-              {selectedTenant ? selectedTenant.nome : 'Média Nacional'}
-            </span>
-          </div>
-
-          <div className="chart-container-responsive" style={{ height: isMobile ? 220 : 250 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={estatisticasAgregadas.tendencias}
-                margin={{ top: 8, right: isMobile ? 8 : 16, left: isMobile ? -24 : -20, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
-                <XAxis
-                  dataKey="mes"
-                  stroke={themeTokens.chartAxis}
-                  tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  unit="%"
-                  stroke={themeTokens.chartAxis}
-                  tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
-                />
-                <RechartsTooltip
-                  contentStyle={{
-                    backgroundColor: themeTokens.chartTooltipBg,
-                    border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                    borderRadius: 8,
-                    boxShadow: 'none',
-                    color: themeTokens.textPrimary,
-                    fontSize: 12
-                  }}
-                  formatter={(val, name) => [`${val}%`, name]}
-                />
-                <Legend
-                  itemSorter={null}
-                  verticalAlign="top"
-                  height={isMobile ? 34 : 28}
-                  wrapperStyle={{
-                    fontSize: isMobile ? 10 : 11,
-                    fontWeight: 500,
-                    fontFamily: 'var(--font-roboto-mono)',
-                    paddingBottom: 4
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="engajamento"
-                  name={isMobile ? 'Engajamento' : 'Engajamento (%)'}
-                  stroke={themeTokens.brandPrimary}
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: themeTokens.brandPrimary, strokeWidth: 0 }}
-                  isAnimationActive={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="sucessoFunil"
-                  name={isMobile ? 'Funil' : 'Sucesso Funil (%)'}
-                  stroke={themeTokens.brandCyan}
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: themeTokens.brandCyan, strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: themeTokens.brandCyan, strokeWidth: 0 }}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      </div>
-
-      {/* BLOCO FINAL: SÍNTESE EXECUTIVA & DIRETRIZES ESTRATÉGICAS (ARTICLES RESUMIDAS) */}
-      <ExecutiveSummaryStrip
-        unidadesClassificadas={unidadesClassificadas}
-        clientes={clientes}
-        selectedTenantId={selectedTenantId}
-        onSelectTenant={onSelectTenant}
-        onNavigateTab={onNavigateTab}
-      />
     </div>
-  );
+    {client && <section className="reference-panel company-panel" aria-labelledby="company-title"><button type="button" className="company-heading" onClick={openClient}><div><h2 id="company-title">Empresa em foco</h2><p>{client.nome}<span className="company-region">{tenants.find(t => t.id === client.tenantId)?.regiao}</span></p></div><span className={'mobile-focus-score ' + (client.scoreSaudeAtual >= 70 ? 'is-positive' : 'is-negative')}>{client.scoreSaudeAtual}/100</span><RightOutlined /></button>
+      <div className="company-details"><Sparkline data={client.historicoScore || []} dataKey="score" color={themeTokens.brandPrimary} label="Score de saúde" full themeTokens={themeTokens} /><div className="company-facts"><div className="company-metrics"><div className="score-ring" style={{ '--score': Math.min(100, Math.max(0, client.scoreSaudeAtual)) + '%' }}><strong>{client.scoreSaudeAtual}</strong></div><div><span>Score da conta</span><strong>{client.scoreSaudeAtual}/100</strong></div><div><span>Ticket médio</span><strong>{client.ticketMedioMensal}</strong></div></div><ul>{events.map(e => <li key={e.id}><span className="territory-dot" style={{ background: e.categoria === 'sucesso' ? themeTokens.statusSuccess : themeTokens.brandCyan }} /><span>{e.tipo}</span><time dateTime={e.data}>{new Date(e.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</time></li>)}</ul></div></div>
+    </section>}
+  </div>;
 }

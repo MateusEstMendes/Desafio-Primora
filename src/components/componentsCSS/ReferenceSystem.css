@@ -1,0 +1,27 @@
+﻿/* Shared visual language for all three modules. */
+:root, [data-theme='dark'], [data-theme='light'] { --brand-primary: #0074ff; --brand-primary-hover: #0064de; --brand-cyan: #00cde5; --radius-cards: 12px; --font-lyon-display: Georgia, 'Times New Roman', serif; }
+[data-theme='light'] { --bg-canvas: #f4f5f7; --bg-surface: #ffffff; --bg-subtle: #eef0f4; --bg-elevated: #f8f9fc; --text-primary: #0b1835; --text-cloud: #0b1835; --text-secondary: #53607b; --text-muted: #65718a; --border-default: #cdd5e4; --border-subtle: #e3e7ef; --status-success-text: #08772a; --status-success-soft: #d8fbe1; --status-critical-text: #d93f4e; --status-critical-soft: #ffedf0; --category-1: #0074ff; --category-2: #00cde5; --category-3: #ffbd00; --category-4: #ff5864; }
+.app-shell { padding-left: 0; }
+.app-main-content { min-width: 0; max-width: 1600px; padding: 10px 16px calc(100px + env(safe-area-inset-bottom, 0px)) !important; overflow-x: visible !important; }
+.module-heading { margin-bottom: 22px; }
+.module-heading > span { color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: .14em; }
+.module-heading h1 { font: 400 clamp(30px, 7vw, 44px)/1.1 Georgia, 'Times New Roman', serif; letter-spacing: -.035em; margin: 6px 0; }
+.module-heading p { color: var(--text-secondary); margin: 0; font-size: 13px; }
+.app-main-content .flat-card { padding: 16px !important; border-radius: 12px !important; }
+.app-main-content .flat-card-title { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: clamp(22px, 5vw, 28px); letter-spacing: -.025em; color: var(--text-primary); line-height: 1.15; }
+.flat-card-header { margin-bottom: 14px; padding-bottom: 12px; gap: 10px; }
+.flat-section-eyebrow { font-family: var(--font-suisse-intl); font-size: 9px; letter-spacing: .12em; margin-bottom: 5px; }
+.app-main-content .geo-badge { font-family: var(--font-suisse-intl); font-size: 10px; letter-spacing: 0; text-transform: none; padding: 4px 9px; }
+.flat-action-btn { min-height: 40px; height: auto; padding: 7px 12px; font-family: var(--font-suisse-intl); text-transform: none; letter-spacing: 0; }
+.app-main-content .client-tab-item { border-radius: 12px; }
+.app-main-content .client-tab-item--active { border-color: var(--brand-primary); background: var(--brand-primary-soft); }
+.app-main-content .regional-share-table { font-size: 12px; }
+.comparativo-container, .clientes-container { min-width: 0; }
+.comparativo-top-charts-grid > *, .clientes-container > *, .bottom-summary-grid > * { min-width: 0; }
+@media (min-width: 600px) { .app-main-content { padding-inline: 24px !important; } }
+@media (min-width: 1024px) {
+  .app-shell { padding-left: 242px; }
+  .app-main-content { padding: 24px 24px 32px !important; }
+  .app-main-content .flat-card { padding: 20px !important; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

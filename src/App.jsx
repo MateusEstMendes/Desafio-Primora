@@ -9,6 +9,7 @@ import TopBar from './components/TopBar';
 import VisaoGeral from './pages/VisaoGeral';
 import Comparativo from './pages/Comparativo';
 import HistoricoClientes from './pages/HistoricoClientes';
+import './components/componentsCSS/ReferenceSystem.css';
 
 const { useBreakpoint } = Grid;
 
@@ -19,7 +20,7 @@ function getInitialThemeMode() {
       return stored;
     }
   } catch (e) {}
-  return 'dark'; // DESIGN.md: Obsidian Dark Theme por padrão
+  return 'light';
 }
 
 function getInitialClients() {
@@ -40,7 +41,7 @@ export default function App() {
   const [selectedTenantId, setSelectedTenantId] = useState('todos');
   const [themeMode, setThemeMode] = useState(getInitialThemeMode);
   const [clientes, setClientes] = useState(getInitialClients);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [focusedClientId, setFocusedClientId] = useState(null);
 
   // Operações de CRUD para Clientes (Create, Read, Update, Delete) com persistência
   const handleAddCliente = (novoCliente) => {
@@ -198,6 +199,7 @@ export default function App() {
         />
 
         <main className="app-main-content">
+          {currentTab !== 'visao-geral' && <header className="module-heading"><span>Distribuidora Vetor</span><h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1><p>{currentTab === 'comparativo' ? 'Cada território, uma perspectiva.' : 'Relacionamentos que movem a operação.'}</p></header>}
           {currentTab === 'visao-geral' && (
             <VisaoGeral
               dataset={dynamicDataset}
@@ -206,6 +208,11 @@ export default function App() {
               onSelectTenant={setSelectedTenantId}
               onNavigateTab={setCurrentTab}
               themeTokens={activeTokens}
+              onOpenClient={(client) => {
+                setFocusedClientId(client.id);
+                setSelectedTenantId(client.tenantId);
+                setCurrentTab('historico-clientes');
+              }}
             />
           )}
 
@@ -225,6 +232,7 @@ export default function App() {
 
           {currentTab === 'historico-clientes' && (
             <HistoricoClientes
+              initialClientId={focusedClientId}
               dataset={dynamicDataset}
               isMobile={isMobile}
               selectedTenantId={selectedTenantId}
@@ -237,36 +245,6 @@ export default function App() {
           )}
         </main>
 
-        <footer className="app-footer">
-          <div className="app-footer-inner">
-            <div className="app-footer-row">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img
-                  src={themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png'}
-                  alt="Primora"
-                  className="primora-brand-img footer-primora-logo"
-                  style={{ height: 46, width: 'auto', display: 'block' }}
-                />
-                <span>·</span>
-                <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                  Distribuidora Vetor — Inteligência Comercial Multi-Tenant
-                </strong>
-              </div>
-
-              <span
-                className="tabular-nums"
-                style={{
-                  fontFamily: 'var(--font-roboto-mono)',
-                  fontSize: 11,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em'
-                }}
-              >
-                STYLE SYSTEM: {activeTokens.label} · BLUE &amp; CYAN SIGNAL EDITION
-              </span>
-            </div>
-          </div>
-        </footer>
       </div>
     </ConfigProvider>
   );

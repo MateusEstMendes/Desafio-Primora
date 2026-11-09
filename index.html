@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="dark light" />
     <script>
       try {
-        const savedTheme = localStorage.getItem('color-scheme') || 'dark';
+        const savedTheme = localStorage.getItem('color-scheme') || 'light';
         document.documentElement.dataset.theme = savedTheme;
         document.querySelector('meta[name="color-scheme"]').content = savedTheme;
       } catch (e) {}
     </script>
     <link rel="icon" type="image/png" href="/primora-logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Painel Executivo Multi-Tenant — Distribuidora Vetor | Primora</title>
     <!-- Tipografia em Três Vozes (DESIGN.md):
          1. Serif Display (Weight 300 Editorial): Cormorant Garamond / Playfair Display
