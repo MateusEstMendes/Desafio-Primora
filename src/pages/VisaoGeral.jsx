@@ -63,10 +63,10 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     ? (selected[0].historicoTendencia.at(-1)?.engajamento || 0) - (selected[0].historicoTendencia[0]?.engajamento || 0)
     : 0;
   const metrics = [
-    { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: themeTokens.brandPrimary },
-    { title: 'Exposição a risco', value: formatarPercentual(total ? risk / total * 100 : 0), note: formatarNumero(risk) + ' contas', color: themeTokens.brandCyan },
-    { title: 'Conversão do funil', value: formatarPercentual(conversion), note: '90 dias', color: themeTokens.brandPrimary },
-    { title: 'Engajamento médio', value: formatarPercentual(engagement), note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: themeTokens.brandCyan }
+    { title: 'Exposição a risco', value: formatarPercentual(total ? risk / total * 100 : 0), note: formatarNumero(risk) + ' contas sob risco', color: '#EF4444' },
+    { title: 'Conversão do funil', value: formatarPercentual(conversion), note: '90 dias · tarefas', color: '#00CDE5' },
+    { title: 'Engajamento médio', value: formatarPercentual(engagement), note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: '#0074FF' },
+    { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
   ];
   return <div className="executive-dashboard">
     <header className="executive-heading"><div><span className="executive-eyebrow">Distribuidora Vetor</span><h1>Visão Executiva</h1><p>Sua operação, em perspectiva.</p></div>
@@ -75,12 +75,12 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     <section className="reference-kpis" aria-label="Indicadores executivos">{metrics.map(m => <article key={m.title} className="reference-kpi" style={{ '--metric-accent': m.color }}><h2>{m.title}</h2><div className="reference-kpi-bottom"><strong>{m.value}</strong><span className={'metric-note ' + (m.trend !== undefined ? m.trend >= 0 ? 'is-positive' : 'is-negative' : '')}>{m.trend !== undefined && (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}{m.note}</span></div></article>)}</section>
     <section className="reference-panel pulse-panel" aria-labelledby="pulse-title"><h2 id="pulse-title">Pulso da <em>operação</em></h2>
       {[
-        { key: 'carteiraTotal', label: 'Carteira Ativa', value: formatarNumero(total), isPercent: false, color: themeTokens.brandPrimary },
-        { key: 'taxaRisco', label: 'Exposição a Risco', value: formatarPercentual(total ? (risk / total) * 100 : 0), isPercent: true, color: themeTokens.brandCyan }
+        { key: 'taxaRisco', label: 'Exposição a Risco', value: formatarPercentual(total ? (risk / total) * 100 : 0), isPercent: true, color: '#EF4444' },
+        { key: 'carteiraTotal', label: 'Carteira Ativa', value: formatarNumero(total), isPercent: false, color: '#0074FF' }
       ].map(row => (
         <div className="pulse-row" key={row.key} style={{ '--metric-accent': row.color }}>
           <span className="signal-label">{row.label}</span>
-          <strong>{row.value}</strong>
+          <strong style={{ color: row.color === '#EF4444' ? 'var(--status-critical-text, #F87171)' : 'inherit' }}>{row.value}</strong>
           <Sparkline data={series} dataKey={row.key} color={row.color} label={row.label} isPercent={row.isPercent} themeTokens={themeTokens} />
         </div>
       ))}

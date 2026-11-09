@@ -397,6 +397,14 @@ export default function Comparativo({
                   margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
                 >
                   <CartesianGrid yAxisId="left" strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                  <ReferenceLine
+                    yAxisId="right"
+                    y={15}
+                    stroke="var(--status-critical, #EF4444)"
+                    strokeDasharray="4 4"
+                    strokeWidth={1.5}
+                    label={{ value: 'Alerta Crítico (≥15%)', position: 'insideTopRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
+                  />
                   <XAxis
                     dataKey="nome"
                     stroke={themeTokens.chartAxis}
@@ -437,17 +445,18 @@ export default function Comparativo({
                     name="Risco Bruto (Contas)"
                     fill={themeTokens.brandPrimary}
                     barSize={isMobile ? 22 : 34}
-                    radius={[2, 2, 0, 0]}
+                    radius={[4, 4, 0, 0]}
                     isAnimationActive={false}
                   />
                   <Line
                     yAxisId="right"
-                    type="linear"
+                    type="monotone"
                     dataKey="taxaRiscoProporcional"
                     name="Taxa Proporcional (%)"
-                    stroke={themeTokens.statusCritical}
-                    strokeWidth={2}
-                    dot={{ r: 4, fill: themeTokens.statusCritical, strokeWidth: 0 }}
+                    stroke="#EF4444"
+                    strokeWidth={3}
+                    dot={{ r: 5, fill: '#EF4444', strokeWidth: 2, stroke: '#FFFFFF' }}
+                    activeDot={{ r: 7, fill: '#EF4444' }}
                     isAnimationActive={false}
                   />
                 </ComposedChart>
@@ -457,6 +466,13 @@ export default function Comparativo({
                   margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                  <ReferenceLine
+                    y={15}
+                    stroke="var(--status-critical, #EF4444)"
+                    strokeDasharray="4 4"
+                    strokeWidth={1.5}
+                    label={{ value: 'Limite Seguro (15%)', position: 'insideTopRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
+                  />
                   <XAxis
                     dataKey="nome"
                     stroke={themeTokens.chartAxis}

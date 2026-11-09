@@ -763,8 +763,17 @@ export default function HistoricoClientes({
                       />
                       <ReferenceLine
                         y={70}
-                        stroke={themeTokens.statusSuccess}
+                        stroke="#10B981"
+                        strokeDasharray="4 4"
+                        strokeWidth={1.5}
+                        label={{ value: 'Saudável (≥70)', position: 'insideTopRight', fill: '#10B981', fontSize: 10, fontWeight: 600 }}
+                      />
+                      <ReferenceLine
+                        y={40}
+                        stroke="#EF4444"
                         strokeDasharray="3 3"
+                        strokeWidth={1.5}
+                        label={{ value: 'Crítico (<40)', position: 'insideBottomRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
                       />
                       <RechartsTooltip
                         contentStyle={{
@@ -778,13 +787,13 @@ export default function HistoricoClientes({
                         formatter={(val) => [`${val} pts`, 'Score']}
                       />
                       <Line
-                        type="linear"
+                        type="monotone"
                         dataKey="score"
                         name="Score"
                         stroke={statusMeta.color}
-                        strokeWidth={2}
-                        dot={{ r: 4, fill: statusMeta.color, strokeWidth: 0 }}
-                        activeDot={{ r: 6, fill: statusMeta.color, strokeWidth: 0 }}
+                        strokeWidth={2.5}
+                        dot={{ r: 5, fill: statusMeta.color, strokeWidth: 2, stroke: '#FFFFFF' }}
+                        activeDot={{ r: 7, fill: statusMeta.color }}
                         isAnimationActive={false}
                       />
                     </LineChart>
