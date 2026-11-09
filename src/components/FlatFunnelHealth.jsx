@@ -94,7 +94,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
 
         <div className="donut-split-layout">
           <div className="donut-chart-box">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={categoriasSaude}

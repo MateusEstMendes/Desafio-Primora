@@ -14,7 +14,8 @@ import {
   Line,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  ReferenceLine
 } from 'recharts';
 import {
   classificarUnidadesPorRisco,
@@ -390,7 +391,7 @@ export default function Comparativo({
           </div>
 
           <div style={{ height: isMobile ? 220 : 250, width: '100%' }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               {tipoGrafico === 'composto' ? (
                 <ComposedChart
                   data={dadosGrafico}
@@ -540,7 +541,7 @@ export default function Comparativo({
 
           <div className="regional-donut-layout">
             <div className="regional-donut-box">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie
                     data={donutRegionalData.slices}

@@ -745,7 +745,7 @@ export default function HistoricoClientes({
                 </div>
 
                 <div style={{ height: isMobile ? 190 : 210, width: '100%' }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <LineChart
                       data={histScore}
                       margin={{ top: 8, right: 16, left: -22, bottom: 0 }}
@@ -814,7 +814,7 @@ export default function HistoricoClientes({
 
                 <div className="regional-donut-layout">
                   <div className="regional-donut-box" style={{ width: 150, height: 150 }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={mixEventosDonut}

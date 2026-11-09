@@ -13,6 +13,51 @@ import './components/componentsCSS/ReferenceSystem.css';
 
 const { useBreakpoint } = Grid;
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary capturou erro:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 32, textAlign: 'center', background: 'var(--bg-surface)', borderRadius: 12, border: '1px solid var(--border-subtle)', margin: 24 }}>
+          <h3 style={{ color: 'var(--status-critical, #EF4444)', marginBottom: 8 }}>Ops, ocorreu um erro ao carregar esta visualização</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 16, fontSize: 13 }}>{this.state.error?.message || 'Erro inesperado no componente.'}</p>
+          <button
+            type="button"
+            style={{
+              padding: '8px 16px',
+              borderRadius: 6,
+              border: 'none',
+              background: 'var(--brand-primary, #0074FF)',
+              color: '#FFFFFF',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              this.setState({ hasError: false, error: null });
+              if (this.props.onReset) this.props.onReset();
+            }}
+          >
+            Recarregar visualização
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function getInitialThemeMode() {
   try {
     const stored = localStorage.getItem('color-scheme');
@@ -199,50 +244,52 @@ export default function App() {
         />
 
         <main className="app-main-content">
-          {currentTab !== 'visao-geral' && <header className="module-heading"><span>Distribuidora Vetor</span><h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1><p>{currentTab === 'comparativo' ? 'Cada território, uma perspectiva.' : 'Relacionamentos que movem a operação.'}</p></header>}
-          {currentTab === 'visao-geral' && (
-            <VisaoGeral
-              dataset={dynamicDataset}
-              isMobile={isMobile}
-              selectedTenantId={selectedTenantId}
-              onSelectTenant={setSelectedTenantId}
-              onNavigateTab={setCurrentTab}
-              themeTokens={activeTokens}
-              onOpenClient={(client) => {
-                setFocusedClientId(client.id);
-                setSelectedTenantId(client.tenantId);
-                setCurrentTab('historico-clientes');
-              }}
-            />
-          )}
+          <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
+            {currentTab !== 'visao-geral' && <header className="module-heading"><span>Distribuidora Vetor</span><h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1><p>{currentTab === 'comparativo' ? 'Cada território, uma perspectiva.' : 'Relacionamentos que movem a operação.'}</p></header>}
+            {currentTab === 'visao-geral' && (
+              <VisaoGeral
+                dataset={dynamicDataset}
+                isMobile={isMobile}
+                selectedTenantId={selectedTenantId}
+                onSelectTenant={setSelectedTenantId}
+                onNavigateTab={setCurrentTab}
+                themeTokens={activeTokens}
+                onOpenClient={(client) => {
+                  setFocusedClientId(client.id);
+                  setSelectedTenantId(client.tenantId);
+                  setCurrentTab('historico-clientes');
+                }}
+              />
+            )}
 
-          {currentTab === 'comparativo' && (
-            <Comparativo
-              dataset={dynamicDataset}
-              isMobile={isMobile}
-              selectedTenantId={selectedTenantId}
-              onSelectTenant={setSelectedTenantId}
-              themeTokens={activeTokens}
-              onNavigateTab={setCurrentTab}
-              onAddCliente={handleAddCliente}
-              onUpdateCliente={handleUpdateCliente}
-              onDeleteCliente={handleDeleteCliente}
-            />
-          )}
+            {currentTab === 'comparativo' && (
+              <Comparativo
+                dataset={dynamicDataset}
+                isMobile={isMobile}
+                selectedTenantId={selectedTenantId}
+                onSelectTenant={setSelectedTenantId}
+                themeTokens={activeTokens}
+                onNavigateTab={setCurrentTab}
+                onAddCliente={handleAddCliente}
+                onUpdateCliente={handleUpdateCliente}
+                onDeleteCliente={handleDeleteCliente}
+              />
+            )}
 
-          {currentTab === 'historico-clientes' && (
-            <HistoricoClientes
-              initialClientId={focusedClientId}
-              dataset={dynamicDataset}
-              isMobile={isMobile}
-              selectedTenantId={selectedTenantId}
-              onSelectTenant={setSelectedTenantId}
-              themeTokens={activeTokens}
-              onAddCliente={handleAddCliente}
-              onUpdateCliente={handleUpdateCliente}
-              onDeleteCliente={handleDeleteCliente}
-            />
-          )}
+            {currentTab === 'historico-clientes' && (
+              <HistoricoClientes
+                initialClientId={focusedClientId}
+                dataset={dynamicDataset}
+                isMobile={isMobile}
+                selectedTenantId={selectedTenantId}
+                onSelectTenant={setSelectedTenantId}
+                themeTokens={activeTokens}
+                onAddCliente={handleAddCliente}
+                onUpdateCliente={handleUpdateCliente}
+                onDeleteCliente={handleDeleteCliente}
+              />
+            )}
+          </ErrorBoundary>
         </main>
 
       </div>

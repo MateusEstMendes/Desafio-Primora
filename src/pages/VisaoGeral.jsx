@@ -9,7 +9,7 @@ import '../components/componentsCSS/VisaoGeral.css';
 function Sparkline({ data, dataKey, color, label, isPercent = false, full = false, themeTokens }) {
   const gradient = useId().replace(/:/g, '');
   return <div className={full ? 'focus-chart' : 'reference-spark'} role="img" aria-label={label}>
-    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
       <AreaChart data={data} margin={full ? { top: 12, right: 16, left: -25, bottom: 0 } : { top: 7, right: 3, left: 3, bottom: 1 }}>
         <defs><linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
         {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
@@ -89,7 +89,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     <div className="reference-middle-grid">
       <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">
         <div className="reference-donut" role="img" aria-label={'Distribuição da carteira: ' + formatarNumero(nationalTotal) + ' contas'}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <PieChart>
               <Pie
                 data={regions}
