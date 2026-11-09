@@ -18,7 +18,8 @@
 .metric-note.is-negative, .mobile-focus-score.is-negative { background: var(--status-critical-soft); }
 .is-positive { color: var(--status-success-text); }
 .is-negative { color: var(--status-critical-text); }
-.reference-panel { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 12px; min-width: 0; }
+.reference-panel { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 12px; min-width: 0; overflow: visible; }
+.territories-panel { overflow: visible !important; position: relative; }
 .reference-panel h2 { font: 400 clamp(23px, 5.8vw, 29px)/1.13 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; margin: 0 0 10px; color: var(--text-primary); }
 .reference-panel h2 em { font-weight: 400; }
 .reference-panel-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 5px; }
@@ -30,10 +31,14 @@
 .reference-spark { min-width: 0; width: 100%; height: 42px; }
 .pulse-row .reference-spark { grid-column: 1 / -1; height: 38px; }
 .chart-context { color: var(--text-muted); font-size: 9px; line-height: 1.5; margin: 5px 0 0; }
-.reference-middle-grid { display: grid; gap: 12px; min-width: 0; }
-.reference-territories { display: grid; grid-template-columns: minmax(110px, .85fr) minmax(0, 1.35fr); align-items: center; gap: 12px; }
-.reference-donut { position: relative; width: 100%; aspect-ratio: 1; max-width: 190px; justify-self: center; }
-.reference-donut-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.reference-middle-grid { display: grid; gap: 12px; min-width: 0; overflow: visible; }
+.reference-territories { display: grid; grid-template-columns: minmax(110px, .85fr) minmax(0, 1.35fr); align-items: center; gap: 12px; overflow: visible; }
+.reference-donut { position: relative; width: 100%; aspect-ratio: 1; max-width: 190px; justify-self: center; overflow: visible; }
+.reference-donut .recharts-responsive-container { overflow: visible !important; }
+.reference-donut .recharts-wrapper { overflow: visible !important; z-index: 5; }
+.reference-donut .recharts-surface { overflow: visible !important; }
+.reference-donut .recharts-tooltip-wrapper { z-index: 100 !important; pointer-events: none; }
+.reference-donut-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 1; }
 .reference-donut-label strong { font-size: clamp(23px, 6vw, 34px); letter-spacing: -.04em; line-height: 1.2; }
 .reference-donut-label span { font-size: 9px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .14em; }
 .territory-list { min-width: 0; }

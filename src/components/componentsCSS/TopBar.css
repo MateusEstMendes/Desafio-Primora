@@ -1,10 +1,19 @@
 ﻿/* Mobile-first navigation, based on the supplied Primora references. */
+.sidebar-brand-logo {
+  height: 48px;
+  max-height: 52px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+}
 .reference-sidebar { display: none; }
 .reference-brand { display: inline-flex; align-items: center; gap: 9px; color: var(--text-primary); text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 3px; background: var(--brand-primary); }
 .brand-mark svg { width: 33px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .brand-word { font: 500 33px/1 Georgia, 'Times New Roman', serif; letter-spacing: -1.5px; }
 .reference-mobile-header { height: 66px; display: flex; align-items: center; justify-content: space-between; margin: 0 16px; border-bottom: 1px solid var(--border-default); padding-top: env(safe-area-inset-top, 0px); }
+.reference-mobile-header .sidebar-brand-logo { height: 38px; max-height: 40px; max-width: 135px; }
 .reference-theme { display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; font: inherit; }
 .reference-theme .anticon { font-size: 24px; }
 .reference-mobile-header .reference-theme span:not(.anticon) { display: none; }

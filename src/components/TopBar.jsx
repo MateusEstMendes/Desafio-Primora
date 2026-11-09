@@ -10,7 +10,14 @@ const navItems = [
 ];
 
 export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTenantChange, tenants = [], themeMode, onToggleTheme }) {
-  const brand = <><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M7 31 17 21 23 24 35 8M16 21l-3-8M23 24l3-10" /></svg></span><span className="brand-word">Primora</span></>;
+  const logoSrc = themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png';
+  const brand = (
+    <img
+      src={logoSrc}
+      alt="Primora"
+      className="primora-brand-img sidebar-brand-logo"
+    />
+  );
   const scope = <Select aria-label="Filtrar por unidade regional" value={selectedTenantId} onChange={onTenantChange}
     options={[{ value: 'todos', label: 'Todas as regionais' }, ...tenants.map(t => ({ value: t.id, label: t.regiao || t.nome }))]}
     popupMatchSelectWidth={false} className="reference-scope" />;
