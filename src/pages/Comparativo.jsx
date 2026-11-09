@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Table, Radio, Tooltip, Typography, Button, Modal, Form, Input, InputNumber, Select, Tag, Empty, message } from 'antd';
-import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import {
   ResponsiveContainer,
   BarChart,
@@ -42,7 +42,21 @@ export default function Comparativo({
   const [modalNovoClienteOpen, setModalNovoClienteOpen] = useState(false);
   const [filtroTipoClientes, setFiltroTipoClientes] = useState('todos'); // 'todos', 'novos', 'risco'
   const [buscaCliente, setBuscaCliente] = useState('');
+  const [expandedCardIds, setExpandedCardIds] = useState(() => new Set());
   const [form] = Form.useForm();
+
+  const toggleCardExpanded = (id, e) => {
+    if (e) e.stopPropagation();
+    setExpandedCardIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const tenants = dataset?.tenants || [];
   const todosClientes = dataset?.clientes || [];
@@ -643,7 +657,7 @@ export default function Comparativo({
         </section>
       </div>
 
-      {/* 2. TABELA MULTIDIMENSIONAL DE PRECISÃO ESTATÍSTICA (ANT DESIGN TABLE - SPRINT 2) */}
+      {/* 2. TABELA MULTIDIMENSIONAL / MOBILE CARDS DE PRECISÃO ESTATÍSTICA (OPÇÃO A) */}
       <section className="flat-card" aria-labelledby="comparativo-table-heading">
         <div className="flat-card-header">
           <div>
@@ -662,35 +676,200 @@ export default function Comparativo({
               </button>
             )}
             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Clique nas colunas para ordenar
+              {isMobile
+                ? 'Toque para focar regional • Sem rolagem lateral'
+                : 'Clique nas colunas para ordenar'}
             </span>
           </div>
         </div>
 
-        <div
-          tabIndex={0}
-          role="region"
-          aria-labelledby="comparativo-table-heading"
-          className="table-region-wrapper"
-        >
-          <Table
-            columns={columns}
-            dataSource={dadosClassificados}
-            rowKey="id"
-            pagination={false}
-            scroll={{ x: 960 }}
-            bordered
-            size="small"
-            rowClassName={(record) =>
-              record.id === selectedTenantId ? 'comparativo-row-focused' : ''
-            }
-            onRow={(record) => ({
-              onClick: () =>
-                onSelectTenant(selectedTenantId === record.id ? 'todos' : record.id),
-              style: { cursor: 'pointer' }
+        {isMobile ? (
+          <div
+            className="mobile-comparativo-cards-list"
+            role="region"
+            aria-labelledby="comparativo-table-heading"
+          >
+            {dadosClassificados.map((record) => {
+              const isCrit = record.taxaRiscoProporcional >= 20;
+              const isWarn = record.taxaRiscoProporcional >= 10 && !isCrit;
+              const rankCls = isCrit
+                ? 'geo-badge--critical'
+                : isWarn
+                ? 'geo-badge--warning'
+                : 'geo-badge--success';
+              const sem = getRiskSemanticTokens(record.taxaRiscoProporcional, themeTokens);
+              const isFocused = selectedTenantId === record.id;
+              const isExpanded = expandedCardIds.has(record.id);
+
+              return (
+                <article
+                  key={record.id}
+                  className={`mobile-comparativo-card ${
+                    isFocused ? 'mobile-comparativo-card--focused' : ''
+                  }`}
+                  onClick={() =>
+                    onSelectTenant(selectedTenantId === record.id ? 'todos' : record.id)
+                  }
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={isFocused}
+                  aria-label={`Regional ${record.nome}, rank ${record.posicaoRankingRisco}, taxa de risco ${record.taxaRiscoProporcional}%. Toque para focar.`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelectTenant(selectedTenantId === record.id ? 'todos' : record.id);
+                    }
+                  }}
+                >
+                  {/* Cabeçalho do Card */}
+                  <div className="mobile-card-header">
+                    <div className="mobile-card-title-group">
+                      <span className={`geo-badge ${rankCls}`}>
+                        #{record.posicaoRankingRisco}º
+                      </span>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                          <strong className="mobile-card-name">{record.nome}</strong>
+                          {isFocused && (
+                            <span className="geo-badge geo-badge--brand">Em Foco</span>
+                          )}
+                        </div>
+                        <span className="mobile-card-sub">
+                          Região {record.regiao} • Porte {record.porte}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className={`geo-badge ${rankCls}`}>
+                      {sem.symbol} {sem.actionLabel}
+                    </span>
+                  </div>
+
+                  {/* Grid dos 3 KPIs Críticos (Nível 1 - Sempre Visível) */}
+                  <div className="mobile-card-kpi-grid">
+                    <div className="mobile-kpi-cell">
+                      <span className="mobile-kpi-label">Taxa de Risco</span>
+                      <span
+                        className="mobile-kpi-val tabular-nums"
+                        style={{ color: sem.color }}
+                      >
+                        {sem.symbol} {formatarPercentual(record.taxaRiscoProporcional)}
+                      </span>
+                      <span className="mobile-kpi-sub">
+                        {isCrit ? 'Ação Crítica' : isWarn ? 'Atenção' : 'Estável'}
+                      </span>
+                    </div>
+
+                    <div className="mobile-kpi-cell">
+                      <span className="mobile-kpi-label">Carteira Total</span>
+                      <span className="mobile-kpi-val tabular-nums">
+                        {formatarNumero(record.carteiraTotalClientes)}
+                      </span>
+                      <span className="mobile-kpi-sub">contas ativas</span>
+                    </div>
+
+                    <div className="mobile-kpi-cell">
+                      <span className="mobile-kpi-label">Risco Bruto</span>
+                      <span
+                        className="mobile-kpi-val tabular-nums"
+                        style={{ color: 'var(--status-critical-text)' }}
+                      >
+                        {formatarNumero(record.riscoAbsolutoCalculado)}
+                      </span>
+                      <span className="mobile-kpi-sub">
+                        {record.saudeCarteira?.risco}R + {record.saudeCarteira?.critico}C
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Botão de Expansão (Progressive Disclosure) */}
+                  <div className="mobile-card-footer">
+                    <button
+                      type="button"
+                      className="mobile-card-expand-btn"
+                      onClick={(e) => toggleCardExpanded(record.id, e)}
+                      aria-expanded={isExpanded}
+                      aria-controls={`mobile-card-details-${record.id}`}
+                    >
+                      <span>
+                        {isExpanded
+                          ? 'Ocultar indicadores complementares'
+                          : 'Ver funil, saúde e engajamento'}
+                      </span>
+                      {isExpanded ? <UpOutlined /> : <DownOutlined />}
+                    </button>
+                  </div>
+
+                  {/* Seção Expansível (Nível 2) */}
+                  {isExpanded && (
+                    <div
+                      id={`mobile-card-details-${record.id}`}
+                      className="mobile-card-details"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="mobile-details-row">
+                        <span className="mobile-details-label">Funil Comercial (90d):</span>
+                        <span className="mobile-details-val tabular-nums">
+                          <strong style={{ color: 'var(--brand-primary)' }}>
+                            {formatarPercentual(record.taxaConversaoFunil)}
+                          </strong>{' '}
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                            ({record.funnel90d?.sucesso} de {record.funnel90d?.gerada} tarefas)
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="mobile-details-row">
+                        <span className="mobile-details-label">Saúde da Carteira:</span>
+                        <span className="mobile-details-val tabular-nums">
+                          <span style={{ color: 'var(--status-success-text)' }}>
+                            {formatarNumero(record.saudeCarteira?.saudavel)} Saudáveis
+                          </span>{' '}
+                          /{' '}
+                          <span style={{ color: 'var(--status-warning-text)' }}>
+                            {formatarNumero(record.saudeCarteira?.atencao)} Atenção
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="mobile-details-row">
+                        <span className="mobile-details-label">Engajamento Médio:</span>
+                        <span className="mobile-details-val tabular-nums">
+                          <strong>{formatarPercentual(record.engajamentoMedio)}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
             })}
-          />
-        </div>
+          </div>
+        ) : (
+          <div
+            tabIndex={0}
+            role="region"
+            aria-labelledby="comparativo-table-heading"
+            className="table-region-wrapper"
+          >
+            <Table
+              columns={columns}
+              dataSource={dadosClassificados}
+              rowKey="id"
+              pagination={false}
+              scroll={{ x: 960 }}
+              bordered
+              size="small"
+              rowClassName={(record) =>
+                record.id === selectedTenantId ? 'comparativo-row-focused' : ''
+              }
+              onRow={(record) => ({
+                onClick: () =>
+                  onSelectTenant(selectedTenantId === record.id ? 'todos' : record.id),
+                style: { cursor: 'pointer' }
+              })}
+            />
+          </div>
+        )}
       </section>
 
       {/* 3. CARTEIRA DE CLIENTES REGIONAL & NOVOS CLIENTES ADICIONADOS (INTEGRAÇÃO EM TEMPO REAL) */}
