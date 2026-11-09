@@ -23,7 +23,6 @@ import {
   UserAddOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined,
   PlusOutlined,
   CheckCircleOutlined,
   AlertOutlined,
@@ -596,90 +595,108 @@ export default function HistoricoClientes({
         </div>
       </div>
 
-      {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS */}
-      <div className="client-tabs-bar" role="tablist" aria-label="Contas monitoradas">
-        {todosClientes.map((c, idx) => {
-          const active = c.id === clienteSelecionado?.id;
-          const st = getStatusTokens(c.statusSaude);
-          const h = c.historicoScore || [];
-          const d = h.length >= 2 ? h[h.length - 1].score - h[0].score : 0;
+      {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS (MOBILE-FIRST) */}
+      {isMobile ? (
+        <div className="mobile-client-selector-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span className="mobile-client-selector-label">CONTA EM MONITORAMENTO</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              {todosClientes.length} cadastradas
+            </span>
+          </div>
+          <Select
+            value={clienteSelecionado?.id}
+            onChange={(val) => {
+              setSelectedClienteId(val);
+              const found = todosClientes.find((c) => c.id === val);
+              if (found && selectedTenantId !== 'todos' && selectedTenantId !== found.tenantId) {
+                onSelectTenant(found.tenantId);
+              }
+            }}
+            style={{ width: '100%' }}
+            size="large"
+            className="mobile-client-select"
+            options={todosClientes.map((c) => {
+              const st = getStatusTokens(c.statusSaude);
+              return {
+                value: c.id,
+                label: (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
+                      <strong style={{ fontSize: 13 }}>{c.nome}</strong>
+                    </div>
+                    <span style={{ fontSize: 11, color: st.color, fontWeight: 700, flexShrink: 0 }}>
+                      {c.scoreSaudeAtual} pts ({c.statusSaude})
+                    </span>
+                  </div>
+                )
+              };
+            })}
+          />
+        </div>
+      ) : (
+        <div className="client-tabs-bar" role="tablist" aria-label="Contas monitoradas">
+          {todosClientes.map((c, idx) => {
+            const active = c.id === clienteSelecionado?.id;
+            const st = getStatusTokens(c.statusSaude);
+            const h = c.historicoScore || [];
+            const d = h.length >= 2 ? h[h.length - 1].score - h[0].score : 0;
 
-          return (
-            <button
-              key={c.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              tabIndex={active ? 0 : -1}
-              onClick={() => {
-                setSelectedClienteId(c.id);
-                if (selectedTenantId !== 'todos' && selectedTenantId !== c.tenantId) {
-                  onSelectTenant(c.tenantId);
-                }
-              }}
-              onKeyDown={(e) => handleTabKeyDown(e, idx)}
-              className={`client-tab-item ${active ? 'client-tab-item--active' : ''}`}
-            >
-              <div>
-                <div className="client-tab-title-row">
-                  <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
-                  <span>{c.nome}</span>
-                  {(c.isNovo || !['CLI-001', 'CLI-002', 'CLI-003'].includes(c.id)) && (
-                    <span className="badge-novo-cliente" style={{ fontSize: 9, padding: '1px 6px' }}>✨ Novo</span>
-                  )}
+            return (
+              <button
+                key={c.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                tabIndex={active ? 0 : -1}
+                onClick={() => {
+                  setSelectedClienteId(c.id);
+                  if (selectedTenantId !== 'todos' && selectedTenantId !== c.tenantId) {
+                    onSelectTenant(c.tenantId);
+                  }
+                }}
+                onKeyDown={(e) => handleTabKeyDown(e, idx)}
+                className={`client-tab-item ${active ? 'client-tab-item--active' : ''}`}
+              >
+                <div>
+                  <div className="client-tab-title-row">
+                    <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
+                    <span>{c.nome}</span>
+                    {(c.isNovo || !['CLI-001', 'CLI-002', 'CLI-003'].includes(c.id)) && (
+                      <span className="badge-novo-cliente" style={{ fontSize: 9, padding: '1px 6px' }}>✨ Novo</span>
+                    )}
+                  </div>
+                  <span className="client-tab-subtitle">
+                    {c.unidadeNome.replace('Unidade ', '')} · {c.segmento}
+                  </span>
                 </div>
-                <span className="client-tab-subtitle">
-                  {c.unidadeNome.replace('Unidade ', '')} · {c.segmento}
-                </span>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span
-                  className="client-tab-score"
-                  style={{ color: st.color }}
-                >
-                  {c.scoreSaudeAtual}/100
-                </span>
-                <span
-                  className={`geo-delta ${
-                    d >= 0 ? 'geo-delta--positive' : 'geo-delta--negative'
-                  }`}
-                >
-                  {d >= 0 ? `▲ +${d}` : `▼ ${d}`} pts
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span
+                    className="client-tab-score"
+                    style={{ color: st.color }}
+                  >
+                    {c.scoreSaudeAtual}/100
+                  </span>
+                  <span
+                    className={`geo-delta ${
+                      d >= 0 ? 'geo-delta--positive' : 'geo-delta--negative'
+                    }`}
+                  >
+                    {d >= 0 ? `▲ +${d}` : `▼ ${d}`} pts
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {clienteSelecionado && (
         <>
-          {/* BARRA DE AÇÕES CRUD DO CLIENTE SELECIONADO (READ / UPDATE / DELETE) */}
-          <div className="client-crud-bar">
-            <div className="client-crud-status">
-              <span className="geo-badge geo-badge--brand">
-                <EyeOutlined style={{ marginRight: 4 }} /> Modo Consulta
-              </span>
-              <Typography.Text strong style={{ color: 'var(--text-primary)', fontSize: 14 }}>
-                {clienteSelecionado.nome}
-              </Typography.Text>
-              <span
-                className={`geo-badge ${
-                  clienteSelecionado.statusSaude === 'Saudável'
-                    ? 'geo-badge--success'
-                    : clienteSelecionado.statusSaude === 'Atenção'
-                    ? 'geo-badge--warning'
-                    : 'geo-badge--critical'
-                }`}
-              >
-                {clienteSelecionado.statusSaude} ({clienteSelecionado.scoreSaudeAtual} pts)
-              </span>
-            </div>
-          </div>
-
-          {/* 2. FAIXA CONTÍNUA DE DADOS CONTRATUAIS E FINANCEIROS DA CONTA */}
+          {/* 2. FAIXA CONTÍNUA / GRID DE DADOS CONTRATUAIS E FINANCEIROS DA CONTA */}
           <section className="account-ledger-strip" aria-label="Indicadores contratuais da conta">
-            <div className="account-ledger-cell">
+            <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-primary, #0074FF)' }}>
               <span className="account-ledger-label">Razão Social · Código</span>
               <span className="account-ledger-val">
                 {clienteSelecionado.nome}{' '}
@@ -689,40 +706,46 @@ export default function HistoricoClientes({
               </span>
             </div>
 
-            <div className="account-ledger-cell">
+            <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-cyan, #00CDE5)' }}>
               <span className="account-ledger-label">Unidade Vinculada</span>
               <span className="account-ledger-val">
                 {clienteSelecionado.unidadeNome.replace('Unidade ', '')}
               </span>
             </div>
 
-            <div className="account-ledger-cell">
+            <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-primary, #0074FF)' }}>
               <span className="account-ledger-label">Ticket Médio Mensal</span>
-              <span className="account-ledger-val" style={{ color: 'var(--brand-primary)' }}>
+              <span className="account-ledger-val" style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>
                 {clienteSelecionado.ticketMedioMensal}
               </span>
             </div>
 
-            <div className="account-ledger-cell">
+            <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-cyan, #00CDE5)' }}>
               <span className="account-ledger-label">Tempo de Contrato</span>
               <span className="account-ledger-val">
                 {clienteSelecionado.tempoContratoMeses} meses
               </span>
             </div>
 
-            <div className="account-ledger-cell">
+            <div className="account-ledger-cell" style={{ '--cell-accent': statusMeta.color }}>
               <span className="account-ledger-label">Score de Saúde</span>
-              <span className="account-ledger-val" style={{ color: statusMeta.color }}>
+              <span className="account-ledger-val" style={{ color: statusMeta.color, fontWeight: 700 }}>
                 {statusMeta.symbol} {clienteSelecionado.scoreSaudeAtual} / 100 ({clienteSelecionado.statusSaude})
               </span>
             </div>
 
-            <div className="account-ledger-cell">
+            <div
+              className="account-ledger-cell"
+              style={{
+                '--cell-accent': deltaScore >= 0 ? 'var(--status-success-text)' : 'var(--status-critical-text)'
+              }}
+            >
               <span className="account-ledger-label">Variação (6m)</span>
               <span
                 className="account-ledger-val"
                 style={{
-                  color: deltaScore >= 0 ? 'var(--status-success-text)' : 'var(--status-critical-text)'
+                  color: deltaScore >= 0 ? 'var(--status-success-text)' : 'var(--status-critical-text)',
+                  fontWeight: 700
                 }}
               >
                 {deltaScore >= 0 ? `▲ +${deltaScore} pts` : `▼ ${deltaScore} pts`}

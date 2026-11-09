@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Table, Radio, Tooltip, Typography, Button, Modal, Form, Input, InputNumber, Select, Tag, Empty, message } from 'antd';
-import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import {
   ResponsiveContainer,
   BarChart,
@@ -743,6 +743,13 @@ export default function Comparativo({
                   className={`mobile-comparativo-card ${
                     isFocused ? 'mobile-comparativo-card--focused' : ''
                   }`}
+                  style={{
+                    '--card-accent': isCrit
+                      ? 'var(--status-critical, #EF4444)'
+                      : isWarn
+                      ? 'var(--status-warning, #F59E0B)'
+                      : 'var(--status-success, #10B981)'
+                  }}
                   onClick={() =>
                     onSelectTenant(selectedTenantId === record.id ? 'todos' : record.id)
                   }

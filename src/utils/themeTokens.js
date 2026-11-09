@@ -64,11 +64,11 @@ export const THEME_TOKENS = {
     statusCriticalSoft: '#2A1417',
     statusCriticalBorder: '#7F1D1D',
 
-    // Paleta Categórica Azul & Ciano (Zero Roxo)
-    category1: '#2970FF', // Bright Blue Gleam (Sudeste)
-    category2: '#00CDE5', // Cyan Signal (Sul)
-    category3: '#90B8F0', // Periwinkle Blue (Nordeste)
-    category4: '#1D4ED8', // Deep Royal Blue (Centro-Oeste)
+    // Paleta Categórica Vibrante e Distinta (Cores do Modo Claro preservadas no Modo Escuro)
+    category1: '#0074FF', // Bright Royal Blue / Sudeste
+    category2: '#00CDE5', // Cyan Signal / Sul
+    category3: '#FFBD00', // Amber Gold / Nordeste
+    category4: '#FF5864', // Coral Red / Centro-Oeste
 
     // Gráficos
     chartGrid: '#262729',

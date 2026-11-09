@@ -98,6 +98,32 @@
   font-size: 11px;
 }
 
+/* ==========================================================================
+   SELETOR MOBILE-FIRST DE CLIENTES & ACCOUNT LEDGER STRIP (IMAGENS EXAMPLE)
+   ========================================================================== */
+.mobile-client-selector-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.mobile-client-selector-label {
+  font-family: var(--font-roboto-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.mobile-client-select .ant-select-selector {
+  border-radius: 8px !important;
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-default) !important;
+}
+
 /* Faixa Contínua de Metadados Financeiros e Contratuais da Conta */
 .account-ledger-strip {
   background-color: var(--bg-surface);
@@ -114,23 +140,42 @@
   }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 767px) {
   .account-ledger-strip {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
   }
   .account-ledger-cell {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default) !important;
+    border-radius: 12px !important;
+    padding: 12px 12px 12px 20px !important;
   }
 }
 
 .account-ledger-cell {
-  padding: 18px 20px;
+  position: relative;
+  padding: 16px 16px 16px 22px;
   border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 6px;
+}
+
+.account-ledger-cell::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--cell-accent, var(--brand-primary));
 }
 
 .account-ledger-cell:last-child {
@@ -298,43 +343,6 @@
   color: var(--text-secondary) !important;
   line-height: 1.5 !important;
   margin: 0 !important;
-}
-
-/* ==========================================================================
-   BARRA DE OPERAÇÕES CRUD DE CLIENTES (CREATE, READ, UPDATE, DELETE)
-   ========================================================================== */
-
-.client-crud-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 12px 16px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.client-crud-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .client-crud-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .client-crud-status {
-    justify-content: space-between;
-  }
 }
 
 /* ==========================================================================

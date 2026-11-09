@@ -90,11 +90,11 @@
   --status-critical-soft: #2a1417;
   --status-critical-border: #7f1d1d;
 
-  /* Regional Categorical Palette (100% Blue Spectrum) */
-  --category-1: #2970ff;
-  --category-2: #00b3dd;
-  --category-3: #90b8f0;
-  --category-4: #1d4ed8;
+  /* Regional Categorical Palette (Preservada do Modo Claro para Alto Contraste) */
+  --category-1: #0074ff;
+  --category-2: #00cde5;
+  --category-3: #ffbd00;
+  --category-4: #ff5864;
 
   --chart-grid: #262729;
   --chart-axis: #9f9fa0;
