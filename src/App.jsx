@@ -154,7 +154,7 @@ export default function App() {
   }, [clientes]);
 
   const screens = useBreakpoint();
-  const isMobile = !screens.md;
+  const isMobile = !screens.lg;
 
   const activeTokens = THEME_TOKENS[themeMode] || THEME_TOKENS.dark;
 

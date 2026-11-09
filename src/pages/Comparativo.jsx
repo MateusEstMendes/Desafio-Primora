@@ -882,7 +882,7 @@ export default function Comparativo({
               dataSource={dadosClassificados}
               rowKey="id"
               pagination={false}
-              scroll={{ x: 960 }}
+              scroll={{ x: 1200 }}
               bordered
               size="small"
               rowClassName={(record) =>

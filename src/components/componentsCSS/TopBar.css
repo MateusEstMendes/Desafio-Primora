@@ -28,7 +28,20 @@
 .reference-bottom-nav button[aria-current]::after { content: ''; height: 3px; background: var(--brand-primary); border-radius: 9px; position: absolute; bottom: -3px; left: 16%; right: 16%; }
 @media (min-width: 1024px) {
   .reference-mobile-header, .reference-mobile-scope, .reference-bottom-nav { display: none; }
-  .reference-sidebar { display: flex; flex-direction: column; justify-content: space-between; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 242px; padding: 24px 14px; background: var(--bg-surface); border-right: 1px solid var(--border-default); }
+  .reference-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 100;
+    width: 242px;
+    padding: 24px 14px;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-default);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .reference-sidebar .reference-brand { margin: 0 10px; }
   .reference-sidebar .brand-word { font-size: 35px; }
   .reference-company { margin: 18px 10px 24px; padding-bottom: 25px; border-bottom: 1px solid var(--border-default); color: var(--text-secondary); font-size: 10px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
