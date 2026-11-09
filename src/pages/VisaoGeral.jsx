@@ -4,26 +4,42 @@ import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/i
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
 import { getRegionalColors } from '../utils/themeTokens';
+import { useChartAutoReset } from '../utils/useChartAutoReset';
 import '../components/componentsCSS/VisaoGeral.css';
 
 function Sparkline({ data, dataKey, color, label, isPercent = false, full = false, themeTokens }) {
   const gradient = useId().replace(/:/g, '');
-  return <div className={full ? 'focus-chart' : 'reference-spark'} role="img" aria-label={label}>
-    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-      <AreaChart data={data} margin={full ? { top: 12, right: 16, left: -25, bottom: 0 } : { top: 7, right: 3, left: 3, bottom: 1 }}>
-        <defs><linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
-        {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
-        {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />}
-        <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />
-        <Tooltip contentStyle={{ background: themeTokens.chartTooltipBg, borderColor: themeTokens.chartTooltipBorder, borderRadius: 10, color: themeTokens.textPrimary }} formatter={v => [isPercent ? formatarPercentual(v) : formatarNumero(v), label]} labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''} />
-        <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={false} dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
-      </AreaChart>
-    </ResponsiveContainer>
-  </div>;
+  const { chartKey, containerRef, interactionProps } = useChartAutoReset(3000);
+  return (
+    <div
+      ref={containerRef}
+      className={full ? 'focus-chart' : 'reference-spark'}
+      role="img"
+      aria-label={label}
+      {...interactionProps}
+    >
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <AreaChart
+          key={chartKey}
+          accessibilityLayer={false}
+          data={data}
+          margin={full ? { top: 12, right: 16, left: -25, bottom: 0 } : { top: 7, right: 3, left: 3, bottom: 1 }}
+        >
+          <defs><linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
+          {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
+          {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />}
+          <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />
+          <Tooltip contentStyle={{ background: themeTokens.chartTooltipBg, borderColor: themeTokens.chartTooltipBorder, borderRadius: 10, color: themeTokens.textPrimary }} formatter={v => [isPercent ? formatarPercentual(v) : formatarNumero(v), label]} labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''} />
+          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={false} dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSelectTenant, onNavigateTab, themeTokens, onOpenClient }) {
   const [period, setPeriod] = useState(3);
+  const donutReset = useChartAutoReset(3000);
   const tenants = dataset?.tenants || [];
   const selected = tenants.filter(t => selectedTenantId === 'todos' || t.id === selectedTenantId);
   if (!selected.length) return <Empty description="Nenhuma unidade encontrada." />;
@@ -88,9 +104,15 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     </section>
     <div className="reference-middle-grid">
       <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">
-        <div className="reference-donut" role="img" aria-label={'Distribuição da carteira: ' + formatarNumero(nationalTotal) + ' contas'}>
+        <div
+          ref={donutReset.containerRef}
+          className="reference-donut"
+          role="img"
+          aria-label={'Distribuição da carteira: ' + formatarNumero(nationalTotal) + ' contas'}
+          {...donutReset.interactionProps}
+        >
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <PieChart>
+            <PieChart key={donutReset.chartKey} accessibilityLayer={false}>
               <Pie
                 data={regions}
                 dataKey="value"

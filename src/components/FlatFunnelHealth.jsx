@@ -7,9 +7,11 @@ import {
   Tooltip as RechartsTooltip
 } from 'recharts';
 import { formatarNumero, formatarPercentual } from '../utils/metrics';
+import { useChartAutoReset } from '../utils/useChartAutoReset';
 import './componentsCSS/FlatFunnelHealth.css';
 
 export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
+  const healthDonutReset = useChartAutoReset(3000);
   if (!estatisticas) return null;
 
   const {
@@ -93,9 +95,13 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
         </div>
 
         <div className="donut-split-layout">
-          <div className="donut-chart-box">
+          <div
+            ref={healthDonutReset.containerRef}
+            className="donut-chart-box"
+            {...healthDonutReset.interactionProps}
+          >
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-              <PieChart>
+              <PieChart key={healthDonutReset.chartKey} accessibilityLayer={false}>
                 <Pie
                   data={categoriasSaude}
                   dataKey="value"

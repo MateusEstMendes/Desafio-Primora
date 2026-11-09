@@ -23,6 +23,7 @@ import {
   formatarPercentual
 } from '../utils/metrics';
 import { getRiskSemanticTokens, getRegionalColors } from '../utils/themeTokens';
+import { useChartAutoReset } from '../utils/useChartAutoReset';
 import '../components/componentsCSS/Comparativo.css';
 
 export default function Comparativo({
@@ -36,6 +37,8 @@ export default function Comparativo({
   onUpdateCliente,
   onDeleteCliente
 }) {
+  const mainChartReset = useChartAutoReset(3000);
+  const donutReset = useChartAutoReset(3000);
   const [tipoGrafico, setTipoGrafico] = useState('composto');
   const [modoDonut, setModoDonut] = useState('risco'); // 'risco' ou 'carteira'
   const [showRationale, setShowRationale] = useState(false);
@@ -404,10 +407,16 @@ export default function Comparativo({
             </Radio.Group>
           </div>
 
-          <div style={{ height: isMobile ? 220 : 250, width: '100%' }}>
+          <div
+            ref={mainChartReset.containerRef}
+            style={{ height: isMobile ? 220 : 250, width: '100%' }}
+            {...mainChartReset.interactionProps}
+          >
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               {tipoGrafico === 'composto' ? (
                 <ComposedChart
+                  key={mainChartReset.chartKey}
+                  accessibilityLayer={false}
                   data={dadosGrafico}
                   margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
                 >
@@ -477,6 +486,8 @@ export default function Comparativo({
                 </ComposedChart>
               ) : (
                 <BarChart
+                  key={mainChartReset.chartKey}
+                  accessibilityLayer={false}
                   data={dadosGrafico}
                   margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
                 >
@@ -554,38 +565,42 @@ export default function Comparativo({
           </div>
 
           <div className="regional-donut-layout">
-            <div className="regional-donut-box">
+            <div
+              ref={donutReset.containerRef}
+              className="regional-donut-box reference-donut"
+              role="img"
+              aria-label={`Distribuição por regional: ${formatarNumero(donutRegionalData.total)} contas`}
+              {...donutReset.interactionProps}
+            >
               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                <PieChart>
+                <PieChart key={donutReset.chartKey} accessibilityLayer={false}>
                   <Pie
                     data={donutRegionalData.slices}
                     dataKey="value"
                     nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={54}
-                    outerRadius={80}
+                    innerRadius="71%"
+                    outerRadius="98%"
                     startAngle={90}
                     endAngle={-270}
-                    paddingAngle={1}
-                    stroke={themeTokens.bgSurface}
-                    strokeWidth={2}
+                    stroke="none"
                     isAnimationActive={false}
+                    onClick={(entry) => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
                   >
                     {donutRegionalData.slices.map((s) => (
                       <Cell
                         key={s.id}
                         fill={s.color}
                         cursor="pointer"
-                        onClick={() => onSelectTenant(selectedTenantId === s.id ? 'todos' : s.id)}
+                        opacity={selectedTenantId === 'todos' || selectedTenantId === s.id ? 1 : 0.3}
                       />
                     ))}
                   </Pie>
                   <RechartsTooltip
+                    wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                     contentStyle={{
                       backgroundColor: themeTokens.chartTooltipBg,
                       border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                      borderRadius: 4,
+                      borderRadius: 10,
                       boxShadow: 'none',
                       color: themeTokens.textPrimary,
                       fontSize: 12
@@ -597,48 +612,12 @@ export default function Comparativo({
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div
-                className="donut-center-label"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'none',
-                  textAlign: 'center',
-                  width: 100,
-                  zIndex: 2
-                }}
-              >
-                <span
-                  className="donut-center-value tabular-nums"
-                  style={{
-                    fontFamily: 'var(--font-suisse-intl)',
-                    fontSize: 26,
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    lineHeight: 1
-                  }}
-                >
+              <div className="donut-center-label reference-donut-label">
+                <span className="donut-center-value">
                   {formatarNumero(donutRegionalData.total)}
                 </span>
-                <span
-                  className="donut-center-sub"
-                  style={{
-                    fontFamily: 'var(--font-roboto-mono)',
-                    fontSize: 10,
-                    fontWeight: 500,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: 'var(--text-secondary)',
-                    marginTop: 4
-                  }}
-                >
-                  {modoDonut === 'risco' ? 'Em Risco' : 'Carteira'}
+                <span className="donut-center-sub">
+                  {modoDonut === 'risco' ? 'Em Risco' : 'Contas'}
                 </span>
               </div>
             </div>
@@ -669,6 +648,7 @@ export default function Comparativo({
                         }
                       }}
                       title="Clique ou pressione Enter para filtrar esta regional"
+                      style={{ opacity: selectedTenantId === 'todos' || isSelected ? 1 : 0.6 }}
                     >
                       <td>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
@@ -690,6 +670,9 @@ export default function Comparativo({
               </tbody>
             </table>
           </div>
+          <p className="chart-context" style={{ marginTop: 8 }}>
+            Participação por regional ({modoDonut === 'risco' ? 'contas sob risco' : 'carteira ativa'}) · toque em uma fatia ou regional para filtrar.
+          </p>
         </section>
       </div>
 

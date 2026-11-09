@@ -47,6 +47,7 @@ import {
 import dayjs from 'dayjs';
 import { formatarPercentual } from '../utils/metrics';
 import { getRiskSemanticTokens } from '../utils/themeTokens';
+import { useChartAutoReset } from '../utils/useChartAutoReset';
 import '../components/componentsCSS/HistoricoClientes.css';
 
 function extrairNumeroTicket(ticketStr) {
@@ -68,6 +69,8 @@ export default function HistoricoClientes({
   onUpdateCliente,
   onDeleteCliente
 }) {
+  const scoreChartReset = useChartAutoReset(3000);
+  const eventosDonutReset = useChartAutoReset(3000);
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -767,9 +770,15 @@ export default function HistoricoClientes({
                   </span>
                 </div>
 
-                <div style={{ height: isMobile ? 190 : 210, width: '100%' }}>
+                <div
+                  ref={scoreChartReset.containerRef}
+                  style={{ height: isMobile ? 190 : 210, width: '100%' }}
+                  {...scoreChartReset.interactionProps}
+                >
                   <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <LineChart
+                      key={scoreChartReset.chartKey}
+                      accessibilityLayer={false}
                       data={histScore}
                       margin={{ top: 8, right: 16, left: -22, bottom: 0 }}
                     >
@@ -836,9 +845,14 @@ export default function HistoricoClientes({
                 </div>
 
                 <div className="regional-donut-layout">
-                  <div className="regional-donut-box" style={{ width: 150, height: 150 }}>
+                  <div
+                    ref={eventosDonutReset.containerRef}
+                    className="regional-donut-box"
+                    style={{ width: 150, height: 150 }}
+                    {...eventosDonutReset.interactionProps}
+                  >
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <PieChart>
+                      <PieChart key={eventosDonutReset.chartKey} accessibilityLayer={false}>
                         <Pie
                           data={mixEventosDonut}
                           dataKey="value"

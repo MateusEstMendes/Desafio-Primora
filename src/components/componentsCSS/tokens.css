@@ -885,3 +885,44 @@
     gap: 10px;
   }
 }
+
+/* ==========================================================================
+   RECHARTS FOCUS, OUTLINE & SELECTION RESET
+   Elimina qualquer outline, borda de foco, tap-highlight e seleção acidental
+   ao clicar ou tocar nos gráficos Recharts (desktop, mobile e touchscreens)
+   ========================================================================== */
+.recharts-responsive-container,
+.recharts-responsive-container *,
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface,
+.recharts-surface *,
+.recharts-layer,
+.recharts-layer * {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-wrapper:focus-within,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+svg.recharts-surface:focus,
+svg.recharts-surface:focus-visible,
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg:focus-visible,
+.recharts-wrapper path:focus,
+.recharts-wrapper path:focus-visible,
+svg:focus,
+svg:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
