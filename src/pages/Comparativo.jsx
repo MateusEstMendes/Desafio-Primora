@@ -612,11 +612,11 @@ export default function Comparativo({
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="donut-center-label reference-donut-label">
-                <span className="donut-center-value">
+              <div className="reference-donut-label">
+                <strong>
                   {formatarNumero(donutRegionalData.total)}
-                </span>
-                <span className="donut-center-sub">
+                </strong>
+                <span>
                   {modoDonut === 'risco' ? 'Em Risco' : 'Contas'}
                 </span>
               </div>
