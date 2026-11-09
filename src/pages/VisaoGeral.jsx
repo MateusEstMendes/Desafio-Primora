@@ -27,7 +27,6 @@ import {
   formatarPercentual
 } from '../utils/metrics';
 import { getRiskSemanticTokens } from '../utils/themeTokens';
-import UnidadeCard from '../components/UnidadeCard';
 import FlatFunnelHealth from '../components/FlatFunnelHealth';
 import ExecutiveSummaryStrip from '../components/ExecutiveSummaryStrip';
 import '../components/componentsCSS/VisaoGeral.css';
@@ -299,35 +298,6 @@ export default function VisaoGeral({
         </Row>
       </section>
 
-      {/* BLOCO 2: CARTÕES REUTILIZÁVEIS DAS QUATRO UNIDADES (ENTREGA OBRIGATÓRIA DA SPRINT 2) */}
-      <section className="unidades-grid-section" aria-labelledby="unidades-cards-heading" style={{ marginBottom: 24 }}>
-        <div style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <div>
-            <Title level={4} id="unidades-cards-heading" style={{ margin: 0, color: 'var(--text-primary)' }}>
-              Unidades Regionais
-            </Title>
-          </div>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <span className="geo-badge geo-badge--brand">
-              4 Unidades Ativas
-            </span>
-          </div>
-        </div>
-
-        <Row gutter={[16, 16]}>
-          {tenants.map((u) => (
-            <Col xs={24} md={12} key={u.id}>
-              <UnidadeCard
-                unidade={u}
-                isSelected={selectedTenantId === u.id}
-                onSelect={onSelectTenant}
-                themeTokens={themeTokens}
-              />
-            </Col>
-          ))}
-        </Row>
-      </section>
-
       {/* BLOCO 2: GRÁFICO DE PIZZA (DONUT FINANCEIRO) DE SAÚDE + FUNIL COMERCIAL */}
       <FlatFunnelHealth estatisticas={estatisticasAgregadas} themeTokens={themeTokens} />
 
@@ -571,6 +541,7 @@ export default function VisaoGeral({
                   formatter={(val, name) => [`${val}%`, name]}
                 />
                 <Legend
+                  itemSorter={null}
                   verticalAlign="top"
                   height={isMobile ? 34 : 28}
                   wrapperStyle={{

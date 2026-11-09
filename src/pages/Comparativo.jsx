@@ -396,7 +396,7 @@ export default function Comparativo({
                   data={dadosGrafico}
                   margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                  <CartesianGrid yAxisId="left" strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
                   <XAxis
                     dataKey="nome"
                     stroke={themeTokens.chartAxis}
@@ -426,6 +426,7 @@ export default function Comparativo({
                     }}
                   />
                   <Legend
+                    itemSorter={null}
                     verticalAlign="top"
                     height={28}
                     wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
@@ -478,6 +479,7 @@ export default function Comparativo({
                     }}
                   />
                   <Legend
+                    itemSorter={null}
                     verticalAlign="top"
                     height={28}
                     wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
