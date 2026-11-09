@@ -1,18 +1,22 @@
 # Painel de Inteligência Multi-tenant — Distribuidora Vetor
 
 > **Projeto Integrador — Bolsa Futuro Digital**  
-> **Desafio 2:** Painel de Inteligência Multi-tenant em ReactJS e Ant Design (AntD)  
-> **Status:** Protótipo Acadêmico Funcional com Dados Fictícios
+> **Parceira:** PRIMORA | **Desafio:** Painel de Inteligência Multi-tenant  
+> **Etapa:** Sprint 4 de 7 — Estados e Interatividade (`ReactJS`, `Vite` e `Ant Design`)  
+> **Status:** Protótipo Acadêmico Funcional e Interativo com Dados do JSON Local
 
 ---
 
-## 📌 1. Visão Geral do Projeto
+## 📌 1. Visão Geral do Projeto (Sprint 4: Estados e Interatividade)
 
-A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que possuem carteiras de clientes de portes bastante variados. Este painel foi desenvolvido para atender às seguintes necessidades de negócio:
+A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que possuem carteiras de clientes e operações distintas. Na **Sprint 4**, a aplicação evoluiu tornando interativos os componentes já construídos através do gerenciamento de estado (`useState`) e eventos (`onChange`), permitindo que as escolhas do usuário atualizem dinamicamente os dados exibidos **sem recarregar a página**.
 
-1. **Visão Gerencial Unificada:** Acompanhamento de indicadores de engajamento, funil comercial de tarefas e distribuição de saúde da carteira de clientes.
-2. **Comparativo Justo entre Unidades:** Avaliação de desempenho e criticidade normalizada por porte, evitando a distorção gerada por comparações puramente absolutas.
-3. **Acompanhamento da Jornada do Cliente:** Consulta cronológica de eventos com diferenciação visual e monitoramento da evolução do score de saúde.
+### 🎯 Objetivos Centrais Atendidos na Sprint 4:
+1. **Preservação e Continuidade:** Mantidas as três telas, o layout visual responsivo e a navegação da aplicação.
+2. **Gerenciamento de Estado (`useState`):** Armazenamento das escolhas do usuário (unidade selecionada e cliente selecionado) no componente adequado.
+3. **Controles Ant Design (`Select`):** Uso de componentes `<Select>` do Ant Design com eventos `onChange` funcionais tanto no computador quanto no celular.
+4. **Atualização Dinâmica Reativa:** Ao alterar a seleção, os componentes correspondentes (cartões de indicadores, gráficos, detalhes do cliente e `Timeline`) recalculam e renderizam em tempo real.
+5. **Fidelidade aos Dados:** Localização dos registros diretamente no `dataset_painel_multitenant.json` e transmissão via `props`, sem métricas inventadas.
 
 ---
 
@@ -45,14 +49,40 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
    ```
    A aplicação estará acessível em: `http://localhost:5173`
 
-3. **Gerar build de produção:**
+3. **Executar os testes unitários de cálculo:**
+   ```bash
+   npm test
+   ```
+
+4. **Gerar build de produção:**
    ```bash
    npm run build
    ```
 
 ---
 
-## 📱 4. Descrição das Telas e Componentes Implementados (Sprint 2)
+## 🎮 4. Guia Rápido de Demonstração das Interações (Sprint 4)
+
+Para comprovar que as ações do usuário alteram o estado React e atualizam os dados renderizados sem recarregar a página, execute os seguintes passos:
+
+### Interação 1 — Visão Geral (Seleção de Unidade Regional):
+1. Acesse a aba **"Visão Executiva"**.
+2. No cabeçalho da página (ou na barra superior), localize o componente **`<Select>` de Unidade Regional**.
+3. Alterne entre as 4 unidades (`Unidade Sudeste`, `Unidade Sul`, `Unidade Nordeste`, `Unidade Centro-Oeste`) ou `Todas as unidades`.
+4. **Resultado Imediato:** Os 4 cartões de indicadores executivos (*Exposição a Risco*, *Conversão do Funil*, *Engajamento Médio* e *Carteira Ativa*), bem como os gráficos de tendência e territórios, atualizam instantaneamente via props sem refresh.
+
+### Interação 2 — Histórico de Clientes (Seleção de Cliente e Timeline):
+1. Acesse a aba **"Jornada de Clientes"**.
+2. No topo da tela, utilize o **`<Select>` do Ant Design** para escolher entre os clientes cadastrados (`CLI-001 - Supermercado Alvorada`, `CLI-002 - Atacado Horizonte`, `CLI-003 - Distribuidora Grão Nobre`).
+3. **Resultado Imediato:** A identificação completa do cliente (código, razão social, regional vinculada, ticket médio, tempo de contrato e score) e a **`Timeline` de eventos cronológicos** se ajustam imediatamente com os eventos daquele cliente específico.
+
+### Interação 3 — Comparativo entre Unidades (Tabela JSON Preservada):
+1. Acesse a aba **"Comparativo Regional"**.
+2. A tabela multidimensional alimentada pelo JSON exibe os dados de todas as 4 regionais com ordenação interativa e filtros por porte.
+
+---
+
+## 📱 5. Descrição Detalhada das Telas (Sprint 4)
 
 ### 🧩 Componentes React Reutilizáveis
 - **`UnidadeCard.jsx` (Componente de Unidade com Props):**
@@ -269,5 +299,3 @@ classDiagram
 ---
 
 *Distribuidora Vetor — Simulação Acadêmica para o Projeto Integrador (Bolsa Futuro Digital).*
-
-# Desafio-Primora ss

@@ -1,5 +1,5 @@
 ﻿import React, { useId, useState } from 'react';
-import { Empty } from 'antd';
+import { Empty, Select } from 'antd';
 import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
@@ -85,8 +85,32 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
   ];
   return <div className="executive-dashboard">
-    <header className="executive-heading"><div><span className="executive-eyebrow">Distribuidora Vetor</span><h1>Visão Executiva</h1><p>Sua operação, em perspectiva.</p></div>
-      <div className="period-control" role="group" aria-label="Período das tendências">{[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => <button type="button" key={p.value} aria-pressed={period === p.value} onClick={() => setPeriod(p.value)}>{p.label}</button>)}</div>
+    <header className="executive-heading">
+      <div>
+        <span className="executive-eyebrow">Distribuidora Vetor</span>
+        <h1>Visão Executiva</h1>
+        <p>Sua operação, em perspectiva.</p>
+      </div>
+      <div className="executive-heading-controls" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Select
+          aria-label="Selecionar Unidade Regional (Sprint 4)"
+          value={selectedTenantId}
+          onChange={onSelectTenant}
+          options={[
+            { value: 'todos', label: 'Todas as unidades (Consolidado)' },
+            ...tenants.map(t => ({ value: t.id, label: t.nome || t.regiao }))
+          ]}
+          style={{ minWidth: 230 }}
+          className="unit-selector-select"
+        />
+        <div className="period-control" role="group" aria-label="Período das tendências">
+          {[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => (
+            <button type="button" key={p.value} aria-pressed={period === p.value} onClick={() => setPeriod(p.value)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </header>
     <section className="reference-kpis" aria-label="Indicadores executivos">{metrics.map(m => <article key={m.title} className="reference-kpi" style={{ '--metric-accent': m.color }}><h2>{m.title}</h2><div className="reference-kpi-bottom"><strong>{m.value}</strong><span className={'metric-note ' + (m.trend !== undefined ? m.trend >= 0 ? 'is-positive' : 'is-negative' : '')}>{m.trend !== undefined && (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}{m.note}</span></div></article>)}</section>
     <section className="reference-panel pulse-panel" aria-labelledby="pulse-title"><h2 id="pulse-title">Pulso da <em>operação</em></h2>

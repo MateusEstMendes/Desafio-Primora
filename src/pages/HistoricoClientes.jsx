@@ -598,47 +598,51 @@ export default function HistoricoClientes({
         </div>
       </div>
 
-      {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS (MOBILE-FIRST) */}
-      {isMobile ? (
-        <div className="mobile-client-selector-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span className="mobile-client-selector-label">CONTA EM MONITORAMENTO</span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              {todosClientes.length} cadastradas
-            </span>
-          </div>
-          <Select
-            value={clienteSelecionado?.id}
-            onChange={(val) => {
-              setSelectedClienteId(val);
-              const found = todosClientes.find((c) => c.id === val);
-              if (found && selectedTenantId !== 'todos' && selectedTenantId !== found.tenantId) {
-                onSelectTenant(found.tenantId);
-              }
-            }}
-            style={{ width: '100%' }}
-            size="large"
-            className="mobile-client-select"
-            options={todosClientes.map((c) => {
-              const st = getStatusTokens(c.statusSaude);
-              return {
-                value: c.id,
-                label: (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
-                      <strong style={{ fontSize: 13 }}>{c.nome}</strong>
-                    </div>
-                    <span style={{ fontSize: 11, color: st.color, fontWeight: 700, flexShrink: 0 }}>
-                      {c.scoreSaudeAtual} pts ({c.statusSaude})
-                    </span>
-                  </div>
-                )
-              };
-            })}
-          />
+      {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS (ANT DESIGN SELECT - SPRINT 4) */}
+      <div className="client-selector-card" style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
+          <span className="client-selector-label" style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-secondary)' }}>
+            SELECIONAR CONTA (ANT DESIGN SELECT)
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+            {todosClientes.length} contas monitoradas · JSON Integrado
+          </span>
         </div>
-      ) : (
+        <Select
+          aria-label="Selecionar cliente fictício (Sprint 4)"
+          value={clienteSelecionado?.id}
+          onChange={(val) => {
+            setSelectedClienteId(val);
+            const found = todosClientes.find((c) => c.id === val);
+            if (found && selectedTenantId !== 'todos' && selectedTenantId !== found.tenantId) {
+              onSelectTenant(found.tenantId);
+            }
+          }}
+          style={{ width: '100%' }}
+          size="large"
+          className="client-select-control"
+          options={todosClientes.map((c) => {
+            const st = getStatusTokens(c.statusSaude);
+            return {
+              value: c.id,
+              label: (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
+                    <strong style={{ fontSize: 13 }}>{c.nome}</strong>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 4 }}>({c.id})</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: st.color, fontWeight: 700, flexShrink: 0 }}>
+                    {c.scoreSaudeAtual} pts ({c.statusSaude})
+                  </span>
+                </div>
+              )
+            };
+          })}
+        />
+      </div>
+
+      {!isMobile && (
         <div className="client-tabs-bar" role="tablist" aria-label="Contas monitoradas">
           {todosClientes.map((c, idx) => {
             const active = c.id === clienteSelecionado?.id;
