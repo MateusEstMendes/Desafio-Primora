@@ -597,11 +597,47 @@ export default function Comparativo({
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="donut-center-label">
-                <span className="donut-center-value">
+              <div
+                className="donut-center-label"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                  textAlign: 'center',
+                  width: 100,
+                  zIndex: 2
+                }}
+              >
+                <span
+                  className="donut-center-value tabular-nums"
+                  style={{
+                    fontFamily: 'var(--font-suisse-intl)',
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    lineHeight: 1
+                  }}
+                >
                   {formatarNumero(donutRegionalData.total)}
                 </span>
-                <span className="donut-center-sub">
+                <span
+                  className="donut-center-sub"
+                  style={{
+                    fontFamily: 'var(--font-roboto-mono)',
+                    fontSize: 10,
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--text-secondary)',
+                    marginTop: 4
+                  }}
+                >
                   {modoDonut === 'risco' ? 'Em Risco' : 'Carteira'}
                 </span>
               </div>
