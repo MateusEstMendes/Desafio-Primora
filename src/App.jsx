@@ -245,7 +245,13 @@ export default function App() {
 
         <main className="app-main-content">
           <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
-            {currentTab !== 'visao-geral' && <header className="module-heading"><span>Distribuidora Vetor</span><h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1><p>{currentTab === 'comparativo' ? 'Cada território, uma perspectiva.' : 'Relacionamentos que movem a operação.'}</p></header>}
+            {currentTab !== 'visao-geral' && (
+              <header className="module-heading">
+                <span>{currentTab === 'comparativo' ? 'Distribuidora Vetor · Camada Tática (Benchmarking)' : 'Distribuidora Vetor · Camada Operacional (Supervisão & Ação)'}</span>
+                <h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1>
+                <p>{currentTab === 'comparativo' ? 'Metamorfose adaptativa de matriz tabular para cartões autônomos contextuais.' : 'Triagem cronológica de eventos em tempo real e mitigação de risco da carteira.'}</p>
+              </header>
+            )}
             {currentTab === 'visao-geral' && (
               <VisaoGeral
                 dataset={dynamicDataset}

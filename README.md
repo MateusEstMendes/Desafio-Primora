@@ -133,6 +133,35 @@ Desafio-Primora/
 
 ---
 
+## 🏛️ 6. Arquitetura de Dashboards Modulares: Responsividade Contextual e Customização Executiva
+
+O projeto adota os pilares da moderna engenharia de front-end para dashboards de alto desempenho analítico, transpondo a visão tradicional de responsividade mecânica para uma **Responsividade Contextual e Cognitiva**:
+
+```mermaid
+flowchart TD
+    subgraph Pirâmide de Decisão Analítica
+        E["Camada Estratégica (Visão Executiva)<br/><b>Glanceability</b> · Macroeconomia · 4 KPIs Críticos"]
+        T["Camada Tática (Comparativo Regional)<br/><b>Benchmarking</b> · Risco Proporcional · Metamorfose Cartão/Tabela"]
+        O["Camada Operacional (Jornada de Clientes)<br/><b>Supervisão & Ação</b> · Linha do Tempo · Auditoria & Mitigação CRUD"]
+        E --> T
+        T --> O
+    end
+```
+
+### 6.1. Responsividade Contextual vs. Responsividade Mecânica
+- **Glanceability (Vislumbre Imediato):** Telas executivas otimizadas para compreensão visual em menos de 5 segundos, reduzindo a sobrecarga cognitiva e respeitando a **Lei de Hick**.
+- **Data-Ink Ratio (Edward Tufte):** Maximização da proporção tinta/dados através da eliminação de elementos puramente decorativos e da "poeira decimal" (arredondamento estratégico de valores com suporte a tipografia monotípica `tabular-nums`).
+- **Ergonomia e Thumb Zone (WCAG 2.2):** Botões de ação rápida e barra de navegação inferior (*Bottom Navigation*) respeitam a zona natural do polegar em dispositivos móveis, garantindo alvos de toque com dimensão mínima de 48×48px.
+
+### 6.2. Metamorfose Estrutural com CSS Container Queries
+A tabela de comparativo regional implementa **CSS Container Queries** (`container-type: inline-size; container-name: tableContainer`). Diferente de media queries globais (`@media (max-width)`), o componente reage à largura útil do seu próprio elemento pai, permitindo funcionamento perfeito em painéis divididos (*split-screen*), sidebars recolhíveis e janelas compactas sem quebra de números ou sobreposição visual.
+
+### 6.3. Persistência Híbrida em Duas Camadas
+- **Hidratação Síncrona:** Leitura direta do `localStorage` no carregamento da árvore React, eliminando completamente piscadas e Cumulative Layout Shift (CLS).
+- **Sincronização Inter-Abas:** Escuta ativa do evento global `window.addEventListener('storage')`, permitindo que mutações na carteira de clientes realizadas em uma aba reflitam instantaneamente nas demais abas abertas.
+
+---
+
 ## 🏛️ 7. Diagrama de Classes UML
 
 O diagrama abaixo modela a estrutura de dados (entidades e objetos de valor), a camada de regras de negócio (`MetricasService`) e a interação dos componentes visuais do painel:

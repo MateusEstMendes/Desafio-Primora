@@ -47,6 +47,8 @@
    TABELA COMPARATIVA ANT DESIGN RESPONSIVA E SEM CORTE DE NÚMEROS
    ========================================================================== */
 .table-region-wrapper {
+  container-type: inline-size;
+  container-name: tableContainer;
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: auto !important;
@@ -55,6 +57,13 @@
   border: 1px solid var(--border-default);
   border-radius: 12px;
   background-color: var(--bg-surface);
+}
+
+@container tableContainer (max-width: 768px) {
+  .table-region-wrapper .ant-table-cell {
+    padding: 8px 10px !important;
+    font-size: 12px;
+  }
 }
 
 .table-region-wrapper .ant-table {

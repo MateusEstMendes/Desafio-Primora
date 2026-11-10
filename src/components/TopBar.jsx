@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Select } from 'antd';
 import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import './componentsCSS/TopBar.css';

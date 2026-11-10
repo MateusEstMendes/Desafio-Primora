@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+﻿import React, { useId, useState } from 'react';
 import { Empty } from 'antd';
 import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
@@ -85,7 +85,12 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
   ];
   return <div className="executive-dashboard">
-    <header className="executive-heading"><div><span className="executive-eyebrow">Distribuidora Vetor</span><h1>Visão Executiva</h1><p>Sua operação, em perspectiva.</p></div>
+    <header className="executive-heading">
+      <div>
+        <span className="executive-eyebrow">Distribuidora Vetor · Camada Estratégica</span>
+        <h1>Visão Executiva</h1>
+        <p>Sua operação em perspectiva macroscópica. Vislumbre rápido (at-a-glance) com alto data-ink ratio.</p>
+      </div>
       <div className="period-control" role="group" aria-label="Período das tendências">{[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => <button type="button" key={p.value} aria-pressed={period === p.value} onClick={() => setPeriod(p.value)}>{p.label}</button>)}</div>
     </header>
     <section className="reference-kpis" aria-label="Indicadores executivos">{metrics.map(m => <article key={m.title} className="reference-kpi" style={{ '--metric-accent': m.color }}><h2>{m.title}</h2><div className="reference-kpi-bottom"><strong>{m.value}</strong><span className={'metric-note ' + (m.trend !== undefined ? m.trend >= 0 ? 'is-positive' : 'is-negative' : '')}>{m.trend !== undefined && (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}{m.note}</span></div></article>)}</section>

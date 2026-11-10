@@ -12,7 +12,10 @@
 .flat-card-header { margin-bottom: 14px; padding-bottom: 12px; gap: 10px; }
 .flat-section-eyebrow { font-family: var(--font-suisse-intl); font-size: 9px; letter-spacing: .12em; margin-bottom: 5px; }
 .app-main-content .geo-badge { font-family: var(--font-suisse-intl); font-size: 10px; letter-spacing: 0; text-transform: none; padding: 4px 9px; }
-.flat-action-btn { min-height: 40px; height: auto; padding: 7px 12px; font-family: var(--font-suisse-intl); text-transform: none; letter-spacing: 0; }
+.flat-action-btn { min-height: 48px; height: auto; padding: 10px 16px; font-family: var(--font-suisse-intl); text-transform: none; letter-spacing: 0; }
+@media (min-width: 1024px) {
+  .flat-action-btn { min-height: 40px; padding: 7px 12px; }
+}
 .app-main-content .client-tab-item { border-radius: 12px; }
 .app-main-content .client-tab-item--active { border-color: var(--brand-primary); background: var(--brand-primary-soft); }
 .app-main-content .regional-share-table { font-size: 12px; }

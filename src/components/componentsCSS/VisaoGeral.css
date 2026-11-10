@@ -5,7 +5,7 @@
 .executive-heading h1 { font: 400 clamp(31px, 8.5vw, 48px)/1.08 Georgia, 'Times New Roman', serif; letter-spacing: -.04em; margin: 6px 0 0; }
 .executive-heading p { display: none; }
 .period-control { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border-default); border-radius: 11px; background: var(--bg-subtle); padding: 1px; }
-.period-control button { min-height: 42px; border: 0; border-radius: 9px; background: transparent; color: var(--text-primary); font: 500 13px var(--font-suisse-intl); cursor: pointer; }
+.period-control button { min-height: 48px; border: 0; border-radius: 9px; background: transparent; color: var(--text-primary); font: 500 13px var(--font-suisse-intl); cursor: pointer; }
 .period-control button[aria-pressed='true'] { color: #fff; background: var(--brand-primary); }
 .reference-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .reference-kpi { position: relative; min-width: 0; padding: 13px 10px 12px 20px; border: 1px solid var(--border-default); background: var(--bg-surface); border-radius: 11px; }
