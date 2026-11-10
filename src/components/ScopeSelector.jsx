@@ -45,13 +45,11 @@ export default function ScopeSelector({
     {
       value: 'todos',
       label: 'Todas as regionais',
-      sublabel: 'Visão consolidada',
       icon: <GlobalOutlined />
     },
     ...tenants.map(t => ({
       value: t.id,
       label: t.regiao || t.nome,
-      sublabel: `Porte ${t.porte || '-'} · ${t.carteiraTotalClientes || 0} contas`,
       icon: <EnvironmentOutlined />
     }))
   ];
@@ -87,10 +85,6 @@ export default function ScopeSelector({
 
       {isOpen && (
         <div className="scope-selector-dropdown" role="listbox">
-          <div className="scope-dropdown-header">
-            <span>UNIDADE REGIONAL</span>
-            <span className="scope-count">{tenants.length} unidades</span>
-          </div>
           <div className="scope-dropdown-list">
             {options.map((opt) => {
               const isSelected = opt.value === value;
@@ -104,12 +98,7 @@ export default function ScopeSelector({
                   aria-selected={isSelected}
                 >
                   <span className="scope-option-icon">{opt.icon}</span>
-                  <div className="scope-option-text">
-                    <span className="scope-option-title">{opt.label}</span>
-                    {opt.sublabel && (
-                      <span className="scope-option-subtitle">{opt.sublabel}</span>
-                    )}
-                  </div>
+                  <span className="scope-option-title">{opt.label}</span>
                   {isSelected && (
                     <CheckOutlined className="scope-option-check" />
                   )}
