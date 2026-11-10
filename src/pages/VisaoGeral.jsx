@@ -1,4 +1,4 @@
-﻿import React, { useId, useState } from 'react';
+import React, { useId, useState } from 'react';
 import { Empty } from 'antd';
 import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';

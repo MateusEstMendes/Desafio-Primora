@@ -1,4 +1,4 @@
-﻿/* Shared visual language for all three modules. */
+/* Shared visual language for all three modules. */
 :root, [data-theme='dark'], [data-theme='light'] { --brand-primary: #0074ff; --brand-primary-hover: #0064de; --brand-cyan: #00cde5; --radius-cards: 12px; --font-lyon-display: Georgia, 'Times New Roman', serif; --category-1: #0074ff; --category-2: #00cde5; --category-3: #ffbd00; --category-4: #ff5864; }
 [data-theme='light'] { --bg-canvas: #f4f5f7; --bg-surface: #ffffff; --bg-subtle: #eef0f4; --bg-elevated: #f8f9fc; --text-primary: #0b1835; --text-cloud: #0b1835; --text-secondary: #53607b; --text-muted: #65718a; --border-default: #cdd5e4; --border-subtle: #e3e7ef; --status-success-text: #08772a; --status-success-soft: #d8fbe1; --status-critical-text: #d93f4e; --status-critical-soft: #ffedf0; --category-1: #0074ff; --category-2: #00cde5; --category-3: #ffbd00; --category-4: #ff5864; }
 .app-shell { padding-left: 0; }

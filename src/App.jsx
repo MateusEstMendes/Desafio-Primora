@@ -154,7 +154,7 @@ export default function App() {
   }, [clientes]);
 
   const screens = useBreakpoint();
-  const isMobile = !screens.lg;
+  const isMobile = screens.lg !== undefined ? !screens.lg : (typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 
   const activeTokens = THEME_TOKENS[themeMode] || THEME_TOKENS.dark;
 
@@ -234,6 +234,7 @@ export default function App() {
     >
       <div className="app-shell">
         <TopBar
+          isMobile={isMobile}
           currentTab={currentTab}
           onTabChange={setCurrentTab}
           selectedTenantId={selectedTenantId}

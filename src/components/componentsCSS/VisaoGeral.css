@@ -1,4 +1,4 @@
-﻿/* Executive dashboard: small-screen base, progressively enhanced for desktop. */
+/* Executive dashboard: small-screen base, progressively enhanced for desktop. */
 .executive-dashboard { display: grid; gap: 12px; min-width: 0; }
 .executive-heading { display: grid; gap: 16px; margin-bottom: 2px; }
 .executive-eyebrow { color: var(--text-secondary); text-transform: uppercase; letter-spacing: .16em; font-size: 10px; font-weight: 600; }

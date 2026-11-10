@@ -9,7 +9,16 @@ const navItems = [
   { key: 'historico-clientes', label: 'Jornada de Clientes', short: 'Jornada', icon: <TeamOutlined /> }
 ];
 
-export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTenantChange, tenants = [], themeMode, onToggleTheme }) {
+export default function TopBar({
+  isMobile = false,
+  currentTab,
+  onTabChange,
+  selectedTenantId,
+  onTenantChange,
+  tenants = [],
+  themeMode,
+  onToggleTheme
+}) {
   const logoSrc = themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png';
   const brand = (
     <img
@@ -36,11 +45,11 @@ export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTe
     ...tenants.map(t => ({ value: t.id, label: t.regiao || t.nome }))
   ];
 
-  return (
-    <>
-      {/* 1. SIDEBAR DESKTOP (>= 1024px) */}
-      <aside className="reference-sidebar" aria-label="Navegação principal">
-        <div className="reference-sidebar-top">
+  if (isMobile) {
+    return (
+      <>
+        {/* HEADER MOBILE / TABLET (< 1024px) */}
+        <header className="reference-mobile-header">
           <a
             className="reference-brand"
             href="#"
@@ -51,45 +60,45 @@ export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTe
           >
             {brand}
           </a>
-          <p className="reference-company">Distribuidora Vetor</p>
-
-          {/* Seletor de Escopo Regional no Topo (Acessível, Rápido e Sem Quebra) */}
-          <div className="reference-sidebar-scope-box">
-            <label className="scope-label" htmlFor="desktop-sidebar-scope-select">
-              Unidade Regional
-            </label>
+          <div className="mobile-header-controls">
             <Select
-              id="desktop-sidebar-scope-select"
-              aria-label="Filtrar por unidade regional"
+              aria-label="Filtrar por unidade regional mobile"
               value={selectedTenantId}
               onChange={onTenantChange}
               options={tenantOptions}
-              className="reference-scope"
+              size="middle"
+              style={{ width: 175 }}
+              getPopupContainer={triggerNode => triggerNode.parentElement}
+              placement="bottomRight"
+              popupMatchSelectWidth={false}
+              dropdownStyle={{ minWidth: 175 }}
             />
+            {themeButton}
           </div>
+        </header>
 
-          <nav className="reference-desktop-nav">
-            {navItems.map((item, i) => (
-              <button
-                type="button"
-                key={item.key}
-                onClick={() => onTabChange(item.key)}
-                aria-current={currentTab === item.key ? 'page' : undefined}
-              >
-                <span>{String(i + 1).padStart(2, '0')}</span>
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
+        {/* NAVEGAÇÃO INFERIOR MOBILE (< 1024px) */}
+        <nav className="reference-bottom-nav" aria-label="Navegação principal mobile">
+          {navItems.map(item => (
+            <button
+              type="button"
+              key={item.key}
+              onClick={() => onTabChange(item.key)}
+              aria-current={currentTab === item.key ? 'page' : undefined}
+            >
+              {item.icon}
+              <span>{item.short}</span>
+            </button>
+          ))}
+        </nav>
+      </>
+    );
+  }
 
-        <div className="reference-sidebar-bottom">
-          {themeButton}
-        </div>
-      </aside>
-
-      {/* 2. HEADER MOBILE / TABLET (< 1024px) */}
-      <header className="reference-mobile-header">
+  // DESKTOP (>= 1024px)
+  return (
+    <aside className="reference-sidebar" aria-label="Navegação principal">
+      <div className="reference-sidebar-top">
         <a
           className="reference-brand"
           href="#"
@@ -100,34 +109,43 @@ export default function TopBar({ currentTab, onTabChange, selectedTenantId, onTe
         >
           {brand}
         </a>
-        <div className="mobile-header-controls" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <p className="reference-company">Distribuidora Vetor</p>
+
+        {/* Seletor de Escopo Regional no Topo (Acessível, Rápido e Sem Quebra) */}
+        <div className="reference-sidebar-scope-box">
+          <label className="scope-label" htmlFor="desktop-sidebar-scope-select">
+            Unidade Regional
+          </label>
           <Select
-            aria-label="Filtrar por unidade regional mobile"
+            id="desktop-sidebar-scope-select"
+            aria-label="Filtrar por unidade regional"
             value={selectedTenantId}
             onChange={onTenantChange}
             options={tenantOptions}
-            size="middle"
-            style={{ width: 175 }}
-            popupMatchSelectWidth={false}
+            className="reference-scope"
+            getPopupContainer={triggerNode => triggerNode.parentElement}
+            popupMatchSelectWidth={true}
           />
-          {themeButton}
         </div>
-      </header>
 
-      {/* 3. NAVEGAÇÃO INFERIOR MOBILE (< 1024px) */}
-      <nav className="reference-bottom-nav" aria-label="Navegação principal mobile">
-        {navItems.map(item => (
-          <button
-            type="button"
-            key={item.key}
-            onClick={() => onTabChange(item.key)}
-            aria-current={currentTab === item.key ? 'page' : undefined}
-          >
-            {item.icon}
-            <span>{item.short}</span>
-          </button>
-        ))}
-      </nav>
-    </>
+        <nav className="reference-desktop-nav">
+          {navItems.map((item, i) => (
+            <button
+              type="button"
+              key={item.key}
+              onClick={() => onTabChange(item.key)}
+              aria-current={currentTab === item.key ? 'page' : undefined}
+            >
+              <span>{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="reference-sidebar-bottom">
+        {themeButton}
+      </div>
+    </aside>
   );
 }
