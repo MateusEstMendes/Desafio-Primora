@@ -27,8 +27,6 @@
 .reference-theme { display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; font: inherit; }
 .reference-theme .anticon { font-size: 24px; }
 .reference-mobile-header .reference-theme span:not(.anticon) { display: none; }
-.reference-scope { width: 100%; }
-
 .reference-sidebar-scope-box {
   margin: 0 4px 18px 4px;
   display: flex;
@@ -47,25 +45,11 @@
   font-family: var(--font-roboto-mono);
 }
 
-.reference-sidebar-scope-box .reference-scope .ant-select-selector {
-  border-radius: 8px !important;
-  border-color: var(--border-default) !important;
-  background-color: var(--bg-elevated) !important;
-  min-height: 38px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
 .mobile-header-controls {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.mobile-header-controls .ant-select-selector {
-  border-radius: 8px !important;
-  background-color: var(--bg-elevated) !important;
 }
 .reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-surface); border-top: 1px solid var(--border-default); }
 .reference-bottom-nav button { display: flex; position: relative; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 62px; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }

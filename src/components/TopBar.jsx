@@ -1,6 +1,6 @@
 import React from 'react';
-import { Select } from 'antd';
 import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import ScopeSelector from './ScopeSelector';
 import './componentsCSS/TopBar.css';
 
 const navItems = [
@@ -40,10 +40,6 @@ export default function TopBar({
     </button>
   );
 
-  const tenantOptions = [
-    { value: 'todos', label: 'Todas as regionais' },
-    ...tenants.map(t => ({ value: t.id, label: t.regiao || t.nome }))
-  ];
 
   if (isMobile) {
     return (
@@ -61,17 +57,11 @@ export default function TopBar({
             {brand}
           </a>
           <div className="mobile-header-controls">
-            <Select
-              aria-label="Filtrar por unidade regional mobile"
+            <ScopeSelector
               value={selectedTenantId}
               onChange={onTenantChange}
-              options={tenantOptions}
-              size="middle"
-              style={{ width: 175 }}
-              getPopupContainer={triggerNode => triggerNode.parentElement}
-              placement="bottomRight"
-              popupMatchSelectWidth={false}
-              dropdownStyle={{ minWidth: 175 }}
+              tenants={tenants}
+              isMobile={true}
             />
             {themeButton}
           </div>
@@ -113,18 +103,14 @@ export default function TopBar({
 
         {/* Seletor de Escopo Regional no Topo (Acessível, Rápido e Sem Quebra) */}
         <div className="reference-sidebar-scope-box">
-          <label className="scope-label" htmlFor="desktop-sidebar-scope-select">
+          <label className="scope-label">
             Unidade Regional
           </label>
-          <Select
-            id="desktop-sidebar-scope-select"
-            aria-label="Filtrar por unidade regional"
+          <ScopeSelector
             value={selectedTenantId}
             onChange={onTenantChange}
-            options={tenantOptions}
-            className="reference-scope"
-            getPopupContainer={triggerNode => triggerNode.parentElement}
-            popupMatchSelectWidth={true}
+            tenants={tenants}
+            isMobile={false}
           />
         </div>
 
