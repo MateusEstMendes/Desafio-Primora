@@ -303,9 +303,8 @@ desafio-primora/
 │   │   ├── Unidade.js                # Classe Unidade (13 atributos obrigatórios, proteção de mutação)
 │   │   └── index.js                  # Ponto de exportação das classes
 │   ├── components/                   # Componentes React (Ant Design)
-│   │   ├── DaoDemoModal.jsx          # Modal de demonstração interativa dos DAOs ao vivo
 │   │   ├── AcademicBanner.jsx        # Identificação de protótipo acadêmico
-│   │   ├── TopBar.jsx                # Navegação lateral e gatilho de auditoria dos DAOs
+│   │   ├── TopBar.jsx                # Navegação lateral
 │   │   └── ...
 │   ├── data/
 │   │   ├── dataset_painel_multitenant.json   # Dataset fornecido pela Primora
@@ -330,7 +329,7 @@ npm test
 npm run test:dao
 ```
 
-No ambiente frontend interativo, clique no botão **"Sprint 5 · DAOs"** no menu lateral ou superior para abrir o modal de auditoria em tempo real, onde é possível reexecutar as consultas assíncronas e inspecionar os objetos instanciados.
+Conforme os requisitos da Sprint 5, toda a camada visual das telas existentes foi 100% preservada sem alterações estéticas ou introdução de botões adicionais, ficando a substituição completa do consumo de dados nas telas para a Sprint 6. A demonstração e validação do contrato DAO ocorre através do script de testes executável.
 
 ---
 
