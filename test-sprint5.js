@@ -198,6 +198,32 @@ async function runTests() {
   console.log(`     • tenant-sul -> [Nenhum cliente cadastrado no dataset - retornou array vazio []]`);
 
   // ---------------------------------------------------------------------------
+  // Regressões: preservar a fonte, rejeitar coerções inválidas e proteger coleções.
+  for (const campo of ['receitaCarteira90d', 'engagementEvents7d', 'activeUsers7d', 'engagementTrend30d', 'funnelTrend30d']) {
+    assert(unidades.every((u) => u[campo] === null), `${campo} ausente no JSON permanece null.`);
+  }
+  assert(unidades.every((u) => u.riscoDrivers.length === 0), 'Não inventa fatores de risco ausentes no JSON.');
+  const minima = new Unidade({ id: 'minima', nome: 'Unidade mínima' });
+  assert(minima.riscoAbsoluto === null, 'Não calcula riscoAbsoluto quando ausente.');
+
+  function rejeita(criar) {
+    try { criar(); return false; } catch { return true; }
+  }
+  for (const score of ['', true, [], NaN, Infinity, -1, 101]) {
+    assert(rejeita(() => new RegistroSaude({ data: 'Out/2026', score })), `Rejeita score inválido: ${String(score)}.`);
+  }
+  assert(rejeita(() => new Unidade({ id: 'x', nome: 'X', carteiraTotalClientes: Infinity })), 'Rejeita carteira infinita.');
+  assert(rejeita(() => new Unidade({ id: 'x', nome: 'X', activeUsers7d: -1 })), 'Rejeita contagem negativa.');
+  assert((await new UnidadeDAO({ tenants: [] }).listar()).length === 0, 'Fonte sem unidades retorna [].');
+  assert((await new ClienteDAO({ clientes: [] }).listar()).length === 0, 'Fonte sem clientes retorna [].');
+  assert(rejeita(() => eventosProtegidos.push(evt)), 'Impede alteração da coleção de eventos.');
+  assert(rejeita(() => { historicoProtegido[0].score = 0; }), 'Impede alteração do score pelo getter.');
+  const entrada = { id: 'copia', nome: 'Cópia', funnel90d: { gerada: 10, vista: 5, sucesso: 2 }, riscoDrivers: ['Original'] };
+  const copia = new Unidade(entrada);
+  entrada.funnel90d.gerada = 999;
+  entrada.riscoDrivers.push('Externo');
+  assert(copia.funnel90d.gerada === 10 && copia.riscoDrivers.length === 1, 'Alterar a entrada não modifica a unidade.');
+
   // RESUMO FINAL
   // ---------------------------------------------------------------------------
   console.log('\n' + '='.repeat(75));

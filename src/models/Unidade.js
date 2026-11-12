@@ -65,7 +65,7 @@ export class Unidade {
     }
 
     const carteiraNum = Number(carteiraTotalClientes);
-    if (Number.isNaN(carteiraNum) || carteiraNum < 0) {
+    if (typeof carteiraTotalClientes !== 'number' || !Number.isFinite(carteiraNum) || carteiraNum < 0) {
       throw new RangeError('Unidade: "carteiraTotalClientes" deve ser um número maior ou igual a zero.');
     }
 
@@ -88,12 +88,7 @@ export class Unidade {
       critico: Number(rawHealth.critico || 0)
     };
 
-    // Risco absoluto: usa o campo do dataset ou calcula (risco + critico)
-    if (riscoAbsoluto !== null && riscoAbsoluto !== undefined) {
-      this.#riscoAbsoluto = Number(riscoAbsoluto);
-    } else {
-      this.#riscoAbsoluto = this.#healthDistribution.risco + this.#healthDistribution.critico;
-    }
+    this.#riscoAbsoluto = riscoAbsoluto;
 
     // Normalização e encapsulamento de funnel90d
     const rawFunnel = funnel90d ?? { gerada: 0, vista: 0, sucesso: 0 };
@@ -113,69 +108,22 @@ export class Unidade {
       ? Number(engajamentoMedio)
       : null;
 
-    // Tendência de engajamento 30d (se ausente, extrai dos últimos meses do historico)
-    if (engagementTrend30d !== null && engagementTrend30d !== undefined) {
-      this.#engagementTrend30d = engagementTrend30d;
-    } else if (this.#historicoTendencia.length >= 2) {
-      const ult = this.#historicoTendencia[this.#historicoTendencia.length - 1];
-      const penult = this.#historicoTendencia[this.#historicoTendencia.length - 2];
-      const delta = Number((ult.engajamento - penult.engajamento).toFixed(2));
-      this.#engagementTrend30d = `${delta >= 0 ? '+' : ''}${delta}%`;
-    } else {
-      this.#engagementTrend30d = '+0.0%';
-    }
+    // Campos ausentes permanecem ausentes: o modelo não estima indicadores.
+    this.#engagementTrend30d = engagementTrend30d;
+    this.#funnelTrend30d = funnelTrend30d;
+    this.#receitaCarteira90d = receitaCarteira90d;
+    this.#engagementEvents7d = engagementEvents7d;
+    this.#activeUsers7d = activeUsers7d;
 
-    // Tendência do funil 30d
-    if (funnelTrend30d !== null && funnelTrend30d !== undefined) {
-      this.#funnelTrend30d = funnelTrend30d;
-    } else if (this.#historicoTendencia.length >= 2) {
-      const ult = this.#historicoTendencia[this.#historicoTendencia.length - 1];
-      const penult = this.#historicoTendencia[this.#historicoTendencia.length - 2];
-      const delta = Number((ult.sucessoFunil - penult.sucessoFunil).toFixed(2));
-      this.#funnelTrend30d = `${delta >= 0 ? '+' : ''}${delta}%`;
-    } else {
-      this.#funnelTrend30d = '+0.0%';
-    }
-
-    // receitaCarteira90d: preserva se fornecido ou calcula estimativa consistente por porte
-    if (receitaCarteira90d !== null && receitaCarteira90d !== undefined) {
-      this.#receitaCarteira90d = receitaCarteira90d;
-    } else {
-      // Valor proporcional à carteira e porte
-      const basePorCliente = this.#porte === 'Grande' ? 42000 : this.#porte === 'Médio' ? 35000 : 28000;
-      const totalEstimado = this.#carteiraTotalClientes * basePorCliente * 3;
-      this.#receitaCarteira90d = `R$ ${totalEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    }
-
-    // engagementEvents7d: eventos nos últimos 7 dias
-    if (engagementEvents7d !== null && engagementEvents7d !== undefined) {
-      this.#engagementEvents7d = Number(engagementEvents7d);
-    } else {
-      this.#engagementEvents7d = Math.round(this.#carteiraTotalClientes * ((this.#engajamentoMedio || 70) / 100) * 1.8);
-    }
-
-    // activeUsers7d: usuários ativos nos últimos 7 dias
-    if (activeUsers7d !== null && activeUsers7d !== undefined) {
-      this.#activeUsers7d = Number(activeUsers7d);
-    } else {
-      this.#activeUsers7d = Math.round(this.#carteiraTotalClientes * 0.65);
-    }
-
-    // riscoDrivers: lista de principais fatores de risco da unidade
-    if (Array.isArray(riscoDrivers)) {
-      this.#riscoDrivers = [...riscoDrivers];
-    } else {
-      // Drivers contextuais defensivos baseados no dataset
-      if (this.#id === 'tenant-sudeste') {
-        this.#riscoDrivers = ['Volume absoluto elevado em clientes de transição', 'Renegociação de cotas QBR'];
-      } else if (this.#id === 'tenant-nordeste') {
-        this.#riscoDrivers = ['Atrasos logísticos na rota interestadual', 'Queda de frequência na plataforma B2B'];
-      } else if (this.#id === 'tenant-centro-oeste') {
-        this.#riscoDrivers = ['Inadimplência de duplicatas superior a 25 dias', 'Bloqueios temporários de crédito'];
-      } else {
-        this.#riscoDrivers = ['Monitoramento preventivo de engajamento', 'Acompanhamento de conversão de pedidos'];
+    for (const [campo, valor] of Object.entries({ engagementEvents7d, activeUsers7d, riscoAbsoluto })) {
+      if (valor !== null && (typeof valor !== 'number' || !Number.isFinite(valor) || valor < 0)) {
+        throw new TypeError(`Unidade: "${campo}" deve ser um número finito não negativo.`);
       }
     }
+    if (riscoDrivers !== null && (!Array.isArray(riscoDrivers) || riscoDrivers.some((item) => typeof item !== 'string'))) {
+      throw new TypeError('Unidade: "riscoDrivers" deve ser um array de strings.');
+    }
+    this.#riscoDrivers = [...(riscoDrivers ?? [])];
 
     this.#regiao = regiao ? String(regiao).trim() : null;
   }

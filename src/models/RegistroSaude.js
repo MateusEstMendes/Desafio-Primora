@@ -27,7 +27,7 @@ export class RegistroSaude {
     }
 
     const numScore = Number(score);
-    if (score === undefined || score === null || Number.isNaN(numScore)) {
+    if (typeof score !== 'number' || !Number.isFinite(numScore)) {
       throw new TypeError('RegistroSaude: "score" é obrigatório e deve ser um número válido.');
     }
 

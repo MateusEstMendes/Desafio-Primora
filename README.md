@@ -29,7 +29,7 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
 ## 🚀 3. Instalação e Execução Local
 
 ### Pré-requisitos
-- **Node.js** (versão 18 ou superior recomendada)
+- **Node.js** (versão 22.12 ou superior, para suporte ao carregamento JSON com `with { type: 'json' }`)
 - **npm** (versão 9 ou superior)
 
 ### Passo a Passo
@@ -49,7 +49,7 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
    ```bash
    npm test
    ```
-   *(Executa 56 asserções de integridade, atributos privados, imutabilidade e consultas aos DAOs)*
+   *(Executa asserções automatizadas de integridade, atributos privados, imutabilidade e consultas aos DAOs)*
 
 4. **Gerar build de produção:**
    ```bash
@@ -181,6 +181,9 @@ A tabela de comparativo regional implementa **CSS Container Queries** (`containe
 
 ### 7.2. Classes de Domínio Implementadas (`src/models/`)
 
+O JSON presente no repositório usa `saudeCarteira`, `unidadeNome`, `historicoScore` e `periodo`; os modelos mantêm esses acessos e oferecem os nomes pedidos no enunciado como aliases. Campos escalares ausentes (`receitaCarteira90d`, `engagementEvents7d`, `activeUsers7d`, tendências e `riscoAbsoluto`) ficam como `null`, e `riscoDrivers` ausente resulta em `[]`. Nenhuma receita, contagem, tendência ou causa de risco é estimada pelo modelo. A origem deste arquivo deve ser conferida com o dataset oficial da Primora antes da entrega.
+
+
 Todas as classes foram implementadas utilizando atributos estritamente privados do padrão ECMAScript (`#propriedade`), acessíveis apenas internamente na instância. Métodos de acesso (*getters*) expõem as leituras e protegem coleções internas contra mutações externas indevidas (`Object.freeze` e cópias defensivas):
 
 | Classe | Arquivo | Responsabilidades e Atributos Obrigatórios | Validações e Encapsulamento |
@@ -310,7 +313,7 @@ desafio-primora/
 │   │   ├── dataset_painel_multitenant.json   # Dataset fornecido pela Primora
 │   │   └── datasetLoader.js                 # Carregador universal do dataset
 │   └── ...
-├── test-sprint5.js                   # Script de testes e comprovação dos DAOs (56 asserções)
+├── test-sprint5.js                   # Script de testes e comprovação dos DAOs (asserções automatizadas)
 ├── test-metrics.js                   # Testes de cálculo de métricas
 └── package.json
 ```
@@ -437,7 +440,7 @@ classDiagram
 | **SP5-06** | `UnidadeDAO` com métodos assíncronos `listar()` (4 unidades) e `buscarPorId(id)` | ✅ Atendido | `src/dao/UnidadeDAO.js` e `test-sprint5.js` |
 | **SP5-07** | `ClienteDAO` com métodos assíncronos `listar()` (3 clientes), `buscarPorId(id)` e `listarPorUnidade(tenantId)` | ✅ Atendido | `src/dao/ClienteDAO.js` e `test-sprint5.js` |
 | **SP5-08** | Retornar `null` para busca sem correspondência e `[]` para listagem vazia | ✅ Atendido | DAOs e asserções nos testes |
-| **SP5-09** | Demonstração funcional das consultas e comprovação de instâncias | ✅ Atendido | `node test-sprint5.js` e modal interativo no app |
+| **SP5-09** | Demonstração funcional das consultas e comprovação de instâncias | ✅ Atendido | `node test-sprint5.js`  |
 | **SP5-10** | README atualizado com esclarecimento de contrato acadêmico e exemplos | ✅ Atendido | Seções 7, 8 e 9 do `README.md` |
 | **RF01–RF12** | Continuidade das 3 telas, navegação e componentes Ant Design preservados | ✅ Atendido | `src/App.jsx`, `VisaoGeral.jsx`, `Comparativo.jsx`, `HistoricoClientes.jsx` |
 
