@@ -5,14 +5,14 @@
 .clientes-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 
-/* Seletor Horizontal de Contas (16px Cards) */
+/* Seletor Horizontal de Contas (14px Cards) */
 .client-tabs-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
 }
 
 @media (max-width: 600px) {
@@ -38,7 +38,7 @@
   border: none;
   box-shadow: var(--shadow-card);
   border-radius: 14px;
-  padding: 18px 22px;
+  padding: 12px 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
