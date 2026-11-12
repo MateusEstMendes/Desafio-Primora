@@ -8,7 +8,9 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node test-metrics.js",
+    "test": "node test-metrics.js && node test-sprint5.js",
+    "test:dao": "node test-sprint5.js",
+    "test:metrics": "node test-metrics.js",
     "export:ai": "node scripts/export-ai.js"
   },
   "dependencies": {

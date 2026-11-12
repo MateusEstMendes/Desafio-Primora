@@ -6,6 +6,7 @@ import datasetLocal from './data/dataset_painel_multitenant.json';
 import { THEME_TOKENS } from './utils/themeTokens';
 
 import TopBar from './components/TopBar';
+import DaoDemoModal from './components/DaoDemoModal';
 import VisaoGeral from './pages/VisaoGeral';
 import Comparativo from './pages/Comparativo';
 import HistoricoClientes from './pages/HistoricoClientes';
@@ -87,6 +88,7 @@ export default function App() {
   const [themeMode, setThemeMode] = useState(getInitialThemeMode);
   const [clientes, setClientes] = useState(getInitialClients);
   const [focusedClientId, setFocusedClientId] = useState(null);
+  const [isDaoDemoOpen, setIsDaoDemoOpen] = useState(false);
 
   // Operações de CRUD para Clientes (Create, Read, Update, Delete) com persistência
   const handleAddCliente = (novoCliente) => {
@@ -242,6 +244,7 @@ export default function App() {
           tenants={dynamicDataset.tenants}
           themeMode={themeMode}
           onToggleTheme={handleToggleTheme}
+          onOpenDaoDemo={() => setIsDaoDemoOpen(true)}
         />
 
         <main className="app-main-content">
@@ -299,6 +302,10 @@ export default function App() {
           </ErrorBoundary>
         </main>
 
+        <DaoDemoModal
+          open={isDaoDemoOpen}
+          onClose={() => setIsDaoDemoOpen(false)}
+        />
       </div>
     </ConfigProvider>
   );

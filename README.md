@@ -45,7 +45,13 @@ A **Distribuidora Vetor** opera em diferentes unidades regionais (*tenants*) que
    ```
    A aplicação estará acessível em: `http://localhost:5173`
 
-3. **Gerar build de produção:**
+3. **Executar a suíte de testes (Sprint 5 — POO & DAOs + Métricas):**
+   ```bash
+   npm test
+   ```
+   *(Executa 56 asserções de integridade, atributos privados, imutabilidade e consultas aos DAOs)*
+
+4. **Gerar build de produção:**
    ```bash
    npm run build
    ```
@@ -162,141 +168,281 @@ A tabela de comparativo regional implementa **CSS Container Queries** (`containe
 
 ---
 
-## 🏛️ 7. Diagrama de Classes UML
+## 🏛️ 7. Sprint 5 — Modelagem de Domínio, Encapsulamento e DAOs
 
-O diagrama abaixo modela a estrutura de dados (entidades e objetos de valor), a camada de regras de negócio (`MetricasService`) e a interação dos componentes visuais do painel:
+> **Etapa:** Sprint 5 de 7 | **Projeto Integrador — Bolsa Futuro Digital**  
+> **Tema:** Organização da camada de dados com Programação Orientada a Objetos (POO), Atributos Privados (`#`), Encapsulamento Defensivo e Padrão Data Access Object (DAO) com Consultas Assíncronas (`async/Promise`).
+
+### 7.1. Esclarecimento sobre o Contrato Pedagógico de DAOs
+> [!IMPORTANT]
+> **Aviso Acadêmico:** O contrato pedagógico de DAOs aqui implementado **não constitui API REST ou contrato HTTP oficial da Primora**. A empresa parceira disponibilizou o dataset em arquivo JSON local (`dataset_painel_multitenant.json`). Os métodos dos DAOs foram estabelecidos pedagogicamente para estruturar e desacoplar o acesso a dados no frontend em conformidade com as boas práticas de engenharia de software, preparando a aplicação para a futura integração com serviços de backend na Sprint 6 sem quebrar a continuidade das telas existentes.
+
+---
+
+### 7.2. Classes de Domínio Implementadas (`src/models/`)
+
+Todas as classes foram implementadas utilizando atributos estritamente privados do padrão ECMAScript (`#propriedade`), acessíveis apenas internamente na instância. Métodos de acesso (*getters*) expõem as leituras e protegem coleções internas contra mutações externas indevidas (`Object.freeze` e cópias defensivas):
+
+| Classe | Arquivo | Responsabilidades e Atributos Obrigatórios | Validações e Encapsulamento |
+| :--- | :--- | :--- | :--- |
+| **`Unidade`** | `src/models/Unidade.js` | Modela a regional (*tenant*). Possui 13 atributos obrigatórios: `id`, `nome`, `porte`, `carteiraTotalClientes`, `receitaCarteira90d`, `engagementEvents7d`, `activeUsers7d`, `engagementTrend30d`, `funnel90d`, `funnelTrend30d`, `healthDistribution`, `riscoAbsoluto` e `riscoDrivers`. | Atributos privados `#`. Validação de ID e nome obrigatórios, carteira $\ge 0$. Retorno de `funnel90d`, `healthDistribution` e `riscoDrivers` protegidos com `Object.freeze` contra mutações acidentais. |
+| **`Cliente`** | `src/models/Cliente.js` | Modela a conta B2B atendida por uma unidade: `id`, `nome`, `tenantId`, `tenantNome`, `healthSeries` e `eventos`. Preserva o vínculo regional via `tenantId`. | Atributos privados `#`. Converte itens de saúde e eventos em instâncias de `RegistroSaude` e `Evento`. Fornece métodos `getEventos()` e `getHistoricoSaude()` com retorno de coleções congeladas/imutáveis. |
+| **`Evento`** | `src/models/Evento.js` | Modela interações na jornada do cliente: `data`, `tipo`, `titulo` e `valor` (opcional). | Atributos privados `#`. **Não exige `id` obrigatório** ausente do dataset (atende estritamente à regra pedagógica). Validação de data e tipo não vazios. |
+| **`RegistroSaude`** | `src/models/RegistroSaude.js` | Modela ponto na série histórica de saúde (*healthSeries*): `data` e `score`. | Atributos privados `#`. Validação de presença da data e restrição de score na faixa numérica de 0 a 100. |
+
+---
+
+### 7.3. Camada DAO e Contrato de Consulta Assíncrona (`src/dao/`)
+
+Os DAOs centralizam todas as operações de leitura dos dados, retornando sempre `Promises` resolvidas com instâncias legítimas das classes de domínio:
+
+```mermaid
+flowchart LR
+    JSON[("dataset_painel_multitenant.json<br/>(Fonte Local)")] --> UDAO["UnidadeDAO"]
+    JSON --> CDAO["ClienteDAO"]
+
+    UDAO -->|listar| UArr["Array<Unidade> (4 regionais)"]
+    UDAO -->|buscarPorId| UInst["Unidade | null"]
+
+    CDAO -->|listar| CArr["Array<Cliente> (3 clientes)"]
+    CDAO -->|buscarPorId| CInst["Cliente | null"]
+    CDAO -->|listarPorUnidade| CUni["Array<Cliente> (por tenantId)"]
+
+    CArr -.->|getEventos| Evt["Array<Evento> (protegido)"]
+    CArr -.->|getHistoricoSaude| RSaude["Array<RegistroSaude> (protegido)"]
+```
+
+#### Contrato dos Métodos Implementados:
+1. **`UnidadeDAO.listar()`:**
+   - **Retorno:** `Promise<Unidade[]>`
+   - **Resultado no dataset:** Recupera as **4 unidades regionais** (`tenant-sudeste`, `tenant-sul`, `tenant-nordeste`, `tenant-centro-oeste`), cada uma convertida em objeto da classe `Unidade`.
+2. **`UnidadeDAO.buscarPorId(id)`:**
+   - **Retorno:** `Promise<Unidade | null>`
+   - **Resultado:** Retorna a instância correspondente (ex: `tenant-sudeste`) ou `null` caso o ID não exista.
+3. **`ClienteDAO.listar()`:**
+   - **Retorno:** `Promise<Cliente[]>`
+   - **Resultado no dataset:** Recupera os **3 clientes B2B** (`CLI-001`, `CLI-002`, `CLI-003`), convertidos em instâncias de `Cliente`.
+4. **`ClienteDAO.buscarPorId(id)`:**
+   - **Retorno:** `Promise<Cliente | null>`
+   - **Resultado:** Retorna a instância correspondente (ex: `CLI-001`) ou `null` caso não haja correspondência.
+5. **`ClienteDAO.listarPorUnidade(tenantId)`:**
+   - **Retorno:** `Promise<Cliente[]>`
+   - **Resultado:** Filtra clientes vinculados à regional solicitada. Retorna array com o cliente correspondente ou array vazio (`[]`) caso a unidade não possua clientes diretos no dataset (ex: `tenant-sul`).
+
+---
+
+### 7.4. Exemplos de Consulta e Uso dos DAOs
+
+#### Exemplo 1: Listagem de Unidades e Inspeção de Atributos Encapsulados
+```javascript
+import { UnidadeDAO } from './src/dao/UnidadeDAO.js';
+
+const unidadeDAO = new UnidadeDAO();
+
+async function demonstrarUnidades() {
+  const unidades = await unidadeDAO.listar();
+  console.log(`Unidades encontradas: ${unidades.length}`); // 4 unidades
+
+  for (const unidade of unidades) {
+    console.log(`[${unidade.id}] ${unidade.nome} - Porte: ${unidade.porte}`);
+    console.log(`  Carteira: ${unidade.carteiraTotalClientes} clientes`);
+    console.log(`  Risco Absoluto: ${unidade.riscoAbsoluto}`);
+    console.log(`  Drivers de Risco: ${unidade.riscoDrivers.join(', ')}`);
+    console.log(`  Funnel 90d (imutável):`, unidade.funnel90d);
+  }
+}
+```
+
+#### Exemplo 2: Consulta de Clientes, Eventos e Histórico de Saúde
+```javascript
+import { ClienteDAO } from './src/dao/ClienteDAO.js';
+
+const clienteDAO = new ClienteDAO();
+
+async function demonstrarClientes() {
+  // Busca cliente por ID
+  const cliente = await clienteDAO.buscarPorId('CLI-001');
+  if (cliente) {
+    console.log(`Cliente: ${cliente.nome} | Regional: ${cliente.tenantNome}`);
+
+    // Recupera eventos encapsulados como instâncias de Evento
+    const eventos = cliente.getEventos();
+    console.log(`Total de eventos na timeline: ${eventos.length}`);
+    eventos.forEach((evt) => {
+      console.log(`  • [${evt.data}] ${evt.tipo}: ${evt.titulo}`);
+    });
+
+    // Recupera série histórica de saúde como instâncias de RegistroSaude
+    const historico = cliente.getHistoricoSaude();
+    historico.forEach((reg) => {
+      console.log(`  • Período: ${reg.data} -> Score: ${reg.score}`);
+    });
+  }
+
+  // Filtragem por unidade (tenantId)
+  const clientesSudeste = await clienteDAO.listarPorUnidade('tenant-sudeste');
+  console.log(`Clientes da regional Sudeste: ${clientesSudeste.length}`); // 1 cliente
+}
+```
+
+---
+
+### 7.5. Estrutura de Pastas Atualizada (Sprint 5)
+
+```text
+desafio-primora/
+├── src/
+│   ├── dao/                          # Camada DAO (Sprint 5)
+│   │   ├── ClienteDAO.js             # DAO assíncrono para clientes (listar, buscarPorId, listarPorUnidade)
+│   │   ├── UnidadeDAO.js             # DAO assíncrono para unidades (listar, buscarPorId)
+│   │   └── index.js                  # Ponto de exportação dos DAOs
+│   ├── models/                       # Classes de Domínio POO (Sprint 5)
+│   │   ├── Cliente.js                # Classe Cliente com atributos privados (#) e métodos
+│   │   ├── Evento.js                 # Classe Evento (id opcional, atributos privados)
+│   │   ├── RegistroSaude.js          # Classe RegistroSaude (validação de score e data)
+│   │   ├── Unidade.js                # Classe Unidade (13 atributos obrigatórios, proteção de mutação)
+│   │   └── index.js                  # Ponto de exportação das classes
+│   ├── components/                   # Componentes React (Ant Design)
+│   │   ├── DaoDemoModal.jsx          # Modal de demonstração interativa dos DAOs ao vivo
+│   │   ├── AcademicBanner.jsx        # Identificação de protótipo acadêmico
+│   │   ├── TopBar.jsx                # Navegação lateral e gatilho de auditoria dos DAOs
+│   │   └── ...
+│   ├── data/
+│   │   ├── dataset_painel_multitenant.json   # Dataset fornecido pela Primora
+│   │   └── datasetLoader.js                 # Carregador universal do dataset
+│   └── ...
+├── test-sprint5.js                   # Script de testes e comprovação dos DAOs (56 asserções)
+├── test-metrics.js                   # Testes de cálculo de métricas
+└── package.json
+```
+
+---
+
+### 7.6. Execução dos Testes Automatizados e Demonstração
+
+Para executar a validação automatizada de todas as classes de domínio, atributos privados, imutabilidade e consultas aos DAOs:
+
+```bash
+# Executa todos os testes (métricas + Sprint 5 DAOs e modelos)
+npm test
+
+# Executa especificamente a suíte de testes da Sprint 5
+npm run test:dao
+```
+
+No ambiente frontend interativo, clique no botão **"Sprint 5 · DAOs"** no menu lateral ou superior para abrir o modal de auditoria em tempo real, onde é possível reexecutar as consultas assíncronas e inspecionar os objetos instanciados.
+
+---
+
+## 🏛️ 8. Diagrama de Classes UML (Arquitetura Completa)
 
 ```mermaid
 classDiagram
     direction TB
 
-    class Tenant {
-        +string id
-        +string nome
-        +string porte
-        +string regiao
-        +int carteiraTotalClientes
-        +int riscoAbsoluto
-        +float engajamentoMedio
-        +SaudeCarteira saudeCarteira
-        +Funnel90d funnel90d
-        +List~HistoricoTendencia~ historicoTendencia
+    class UnidadeDAO {
+        -#dataSource
+        +listar() Promise~Unidade[]~
+        +buscarPorId(id) Promise~Unidade|null~
     }
 
-    class SaudeCarteira {
-        +int saudavel
-        +int atencao
-        +int risco
-        +int critico
+    class ClienteDAO {
+        -#dataSource
+        +listar() Promise~Cliente[]~
+        +buscarPorId(id) Promise~Cliente|null~
+        +listarPorUnidade(tenantId) Promise~Cliente[]~
     }
 
-    class Funnel90d {
-        +int gerada
-        +int vista
-        +int sucesso
-    }
-
-    class HistoricoTendencia {
-        +string mes
-        +float engajamento
-        +float sucessoFunil
+    class Unidade {
+        -#string id
+        -#string nome
+        -#string porte
+        -#int carteiraTotalClientes
+        -#string receitaCarteira90d
+        -#int engagementEvents7d
+        -#int activeUsers7d
+        -#string engagementTrend30d
+        -#Object funnel90d
+        -#string funnelTrend30d
+        -#Object healthDistribution
+        -#int riscoAbsoluto
+        -#List~string~ riscoDrivers
+        +getId() string
+        +getNome() string
+        +getPorte() string
+        +getCarteiraTotalClientes() int
+        +getReceitaCarteira90d() string
+        +getEngagementEvents7d() int
+        +getActiveUsers7d() int
+        +getEngagementTrend30d() string
+        +getFunnel90d() ReadonlyObject
+        +getFunnelTrend30d() string
+        +getHealthDistribution() ReadonlyObject
+        +getRiscoAbsoluto() int
+        +getRiscoDrivers() ReadonlyList
     }
 
     class Cliente {
-        +string id
-        +string nome
-        +string tenantId
-        +string unidadeNome
-        +string segmento
-        +string statusSaude
-        +int scoreSaudeAtual
-        +int tempoContratoMeses
-        +string ticketMedioMensal
-        +List~HistoricoScore~ historicoScore
-        +List~Evento~ eventos
-    }
-
-    class HistoricoScore {
-        +string periodo
-        +int score
+        -#string id
+        -#string nome
+        -#string tenantId
+        -#string tenantNome
+        -#List~RegistroSaude~ healthSeries
+        -#List~Evento~ eventos
+        +getId() string
+        +getNome() string
+        +getTenantId() string
+        +getTenantNome() string
+        +getEventos() ReadonlyList~Evento~
+        +getHistoricoSaude() ReadonlyList~RegistroSaude~
     }
 
     class Evento {
-        +string id
-        +string data
-        +string tipo
-        +string categoria
-        +string descricao
+        -#string data
+        -#string tipo
+        -#string titulo
+        -#valor
+        -#string id
+        +getData() string
+        +getTipo() string
+        +getTitulo() string
+        +getValor() any
+        +getId() string
     }
 
-    class MetricasService {
-        +calcularRiscoAbsoluto(saude) int
-        +calcularTaxaRiscoProporcional(saude, total) float
-        +calcularTaxaConversaoFunil(funnel) float
-        +calcularTaxaVisualizacaoFunil(funnel) float
-        +classificarUnidadesPorRisco(tenants) List
+    class RegistroSaude {
+        -#string data
+        -#number score
+        +getData() string
+        +getScore() number
     }
 
-    class App {
-        +string currentTab
-        +render()
-    }
-
-    class VisaoGeral {
-        +string selectedTenantId
-        +render()
-    }
-
-    class Comparativo {
-        +string tipoGrafico
-        +render()
-    }
-
-    class HistoricoClientes {
-        +string selectedClienteId
-        +string filtroCategoriaEvento
-        +render()
-    }
-
-    Tenant *-- SaudeCarteira : compõe
-    Tenant *-- Funnel90d : compõe
-    Tenant *-- HistoricoTendencia : possui histórico
-    Cliente *-- HistoricoScore : possui evolução
-    Cliente *-- Evento : possui eventos
-    Cliente --> Tenant : pertence a (tenantId)
-
-    App --> VisaoGeral : renderiza
-    App --> Comparativo : renderiza
-    App --> HistoricoClientes : renderiza
-
-    VisaoGeral ..> MetricasService : utiliza
-    Comparativo ..> MetricasService : utiliza
-    VisaoGeral ..> Tenant : consome
-    Comparativo ..> Tenant : consome
-    HistoricoClientes ..> Cliente : consome
+    UnidadeDAO ..> Unidade : instancia
+    ClienteDAO ..> Cliente : instancia
+    Cliente *-- RegistroSaude : compõe (getHistoricoSaude)
+    Cliente *-- Evento : compõe (getEventos)
+    Cliente ..> Unidade : vincula por tenantId
 ```
 
 ---
 
-## 📋 8. Matriz de Atendimento aos Requisitos
+## 📋 9. Matriz de Atendimento aos Requisitos (Sprint 5)
 
 | Requisito | Descrição | Status | Onde verificar |
 | :---: | :--- | :---: | :--- |
-| **RF01** | Exibir as 4 unidades com nome e porte | ✅ Atendido | Tela 1 (Cards) e Tela 2 (Tabela/Gráfico) |
-| **RF02** | Carteira, engajamento e funil comercial | ✅ Atendido | Tela 1 (Statistics e Funil de Tarefas) |
-| **RF03** | Distribuição de saúde da carteira | ✅ Atendido | Tela 1 (Gráfico de Pizza e Legenda) |
-| **RF04** | Selecionar/filtrar unidade | ✅ Atendido | Tela 1 (Select no topo) |
-| **RF05** | Comparativo com indicador proporcional | ✅ Atendido | Tela 2 (Taxa de Risco Proporcional) |
-| **RF06** | Ranking ordenado e cálculo explicado | ✅ Atendido | Tela 2 (Ranking e Card de Fundamentação) |
-| **RF07** | Seleção de cliente e eventos cronológicos | ✅ Atendido | Tela 3 (Select e Timeline) |
-| **RF08** | Diferenciação visual na timeline | ✅ Atendido | Tela 3 (Cores e ícones por tipo de evento) |
-| **RF09** | Métrica em gráfico e tabela com justificativa | ✅ Atendido | Tela 2 (Tabela + Gráfico + Seção UX) |
-| **RF10** | Tendência histórica de engajamento/funil/score | ✅ Atendido | Telas 1 e 3 (Gráficos temporais) |
-| **RF11** | Tratamento de estados sem resultado | ✅ Atendido | Todas as telas (`Empty`, `Alert`) |
-| **RF12** | Ordenar e filtrar tabela | ✅ Atendido | Tela 2 (Sorters e filtros por porte) |
+| **SP5-01** | Classe `Unidade` com atributos privados (`#`), getters e 13 atributos obrigatórios | ✅ Atendido | `src/models/Unidade.js` e `test-sprint5.js` |
+| **SP5-02** | Classe `Cliente` com atributos privados (`#`), `getEventos()`, `getHistoricoSaude()` e vínculo `tenantId` | ✅ Atendido | `src/models/Cliente.js` e `test-sprint5.js` |
+| **SP5-03** | Classe `Evento` com data, tipo, titulo, valor opcional e ID estritamente não obrigatório | ✅ Atendido | `src/models/Evento.js` e `test-sprint5.js` |
+| **SP5-04** | Classe `RegistroSaude` com data, score e validações | ✅ Atendido | `src/models/RegistroSaude.js` e `test-sprint5.js` |
+| **SP5-05** | Não expor referências mutáveis internas sem proteção (`Object.freeze`) | ✅ Atendido | Modelos encapsulados e comprovados nos testes |
+| **SP5-06** | `UnidadeDAO` com métodos assíncronos `listar()` (4 unidades) e `buscarPorId(id)` | ✅ Atendido | `src/dao/UnidadeDAO.js` e `test-sprint5.js` |
+| **SP5-07** | `ClienteDAO` com métodos assíncronos `listar()` (3 clientes), `buscarPorId(id)` e `listarPorUnidade(tenantId)` | ✅ Atendido | `src/dao/ClienteDAO.js` e `test-sprint5.js` |
+| **SP5-08** | Retornar `null` para busca sem correspondência e `[]` para listagem vazia | ✅ Atendido | DAOs e asserções nos testes |
+| **SP5-09** | Demonstração funcional das consultas e comprovação de instâncias | ✅ Atendido | `node test-sprint5.js` e modal interativo no app |
+| **SP5-10** | README atualizado com esclarecimento de contrato acadêmico e exemplos | ✅ Atendido | Seções 7, 8 e 9 do `README.md` |
+| **RF01–RF12** | Continuidade das 3 telas, navegação e componentes Ant Design preservados | ✅ Atendido | `src/App.jsx`, `VisaoGeral.jsx`, `Comparativo.jsx`, `HistoricoClientes.jsx` |
 
 ---
 
-*Distribuidora Vetor — Simulação Acadêmica para o Projeto Integrador (Bolsa Futuro Digital).*
+*Distribuidora Vetor — Simulação Acadêmica para o Projeto Integrador (Bolsa Futuro Digital — Primora Soluções em TI).*
 
-# Desafio-Primora ss

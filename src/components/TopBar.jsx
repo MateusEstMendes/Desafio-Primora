@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import ScopeSelector from './ScopeSelector';
 import './componentsCSS/TopBar.css';
 
@@ -17,7 +17,8 @@ export default function TopBar({
   onTenantChange,
   tenants = [],
   themeMode,
-  onToggleTheme
+  onToggleTheme,
+  onOpenDaoDemo
 }) {
   const logoSrc = themeMode === 'light' ? '/primora-logo.png' : '/primora-logo-white.png';
   const brand = (
@@ -63,6 +64,19 @@ export default function TopBar({
               tenants={tenants}
               isMobile={true}
             />
+            {onOpenDaoDemo && (
+              <button
+                type="button"
+                className="reference-theme"
+                onClick={onOpenDaoDemo}
+                aria-label="Demonstração DAO Sprint 5"
+                title="Auditoria de Classes de Domínio e DAOs (Sprint 5)"
+                style={{ padding: '4px 8px' }}
+              >
+                <SafetyCertificateOutlined style={{ color: '#1677FF' }} />
+                <span>DAOs</span>
+              </button>
+            )}
             {themeButton}
           </div>
         </header>
@@ -130,6 +144,18 @@ export default function TopBar({
       </div>
 
       <div className="reference-sidebar-bottom">
+        {onOpenDaoDemo && (
+          <button
+            type="button"
+            className="reference-theme"
+            onClick={onOpenDaoDemo}
+            style={{ marginBottom: 8 }}
+            title="Demonstração funcional de Classes de Domínio e DAOs (Sprint 5)"
+          >
+            <SafetyCertificateOutlined style={{ color: '#1677FF' }} />
+            <span>Sprint 5 · DAOs</span>
+          </button>
+        )}
         {themeButton}
       </div>
     </aside>
