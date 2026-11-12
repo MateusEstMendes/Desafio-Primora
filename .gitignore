@@ -12,6 +12,7 @@ node_modules/
 # Production build output
 dist/
 dist-ssr/
+.vite/
 
 # Local env files
 *.local
