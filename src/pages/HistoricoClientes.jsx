@@ -1,4 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
+import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
+import SegmentedPill from '../components/SegmentedPill';
+import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
 import {
   Timeline,
   Typography,
@@ -85,6 +90,7 @@ export default function HistoricoClientes({
 
   const [selectedClienteId, setSelectedClienteId] = useState(initialClientId || todosClientes[0]?.id || null);
   const [filtroCategoriaEvento, setFiltroCategoriaEvento] = useState('todos');
+  const [activePieSlice, setActivePieSlice] = useState(-1);
 
   useEffect(() => {
     if (clientesVisiveis.length > 0) {
@@ -176,7 +182,7 @@ export default function HistoricoClientes({
     }
   };
 
-  const getTimelineItemProps = (evt) => {
+  const getTimelineItemProps = (evt, index = 0) => {
     const meta = getEventoCategoryMeta(evt.categoria);
     const dataFormatada = dayjs(evt.data).format('DD/MM/YYYY HH:mm');
 
@@ -201,7 +207,12 @@ export default function HistoricoClientes({
       color,
       dot: dotIcon,
       children: (
-        <div className="antd-timeline-card">
+        <motion.div
+          className="antd-timeline-card"
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.22, delay: Math.min(index * 0.04, 0.28), ease: EXECUTIVE_EASE }}
+        >
           <div className="antd-timeline-card-header">
             <Typography.Text strong className="antd-timeline-title">
               {evt.tipo}
@@ -219,7 +230,7 @@ export default function HistoricoClientes({
           <Typography.Paragraph type="secondary" className="antd-timeline-desc">
             {evt.descricao}
           </Typography.Paragraph>
-        </div>
+        </motion.div>
       )
     };
   };
@@ -756,11 +767,45 @@ export default function HistoricoClientes({
             </div>
           </section>
 
-          {/* 3. WORKSPACE ANALÍTICO EM 2 COLUNAS: GRÁFICOS À ESQUERDA + TIMELINE À DIREITA */}
+          {/* 3. KPIs EXECUTIVOS DO CLIENTE (REUTILIZADO DA VISÃO EXECUTIVA) */}
+          <ExecutiveKpiGrid
+            ariaLabel="Indicadores do cliente selecionado"
+            metrics={[
+              {
+                title: 'Score de saúde',
+                rawValue: clienteSelecionado.scoreSaudeAtual,
+                isPercent: false,
+                note: clienteSelecionado.statusSaude,
+                color: clienteSelecionado.scoreSaudeAtual >= 70 ? '#10B981' : clienteSelecionado.scoreSaudeAtual >= 45 ? '#F59E0B' : '#EF4444'
+              },
+              {
+                title: 'Variação (6m)',
+                displayValue: `${deltaScore >= 0 ? '+' : ''}${deltaScore} pts`,
+                trend: deltaScore,
+                note: 'vs. início da série',
+                color: deltaScore >= 0 ? '#10B981' : '#EF4444'
+              },
+              {
+                title: 'Eventos na jornada',
+                rawValue: (clienteSelecionado.eventos || []).length,
+                isPercent: false,
+                note: 'registros auditados',
+                color: '#00CDE5'
+              },
+              {
+                title: 'Ticket médio mensal',
+                displayValue: clienteSelecionado.ticketMedioMensal || '—',
+                note: (clienteSelecionado.unidadeNome || '').replace('Unidade ', ''),
+                color: '#0074FF'
+              }
+            ]}
+          />
+
+          {/* 4. WORKSPACE ANALÍTICO EM 2 COLUNAS: GRÁFICOS À ESQUERDA + TIMELINE À DIREITA */}
           <div className="client-Workspace-grid">
             <div className="client-left-stack">
               {/* Evolução do Score */}
-              <section className="flat-card" aria-labelledby="score-trend-heading">
+              <ExecutivePanel className="flat-card" delay={0.08} aria-labelledby="score-trend-heading">
                 <div className="flat-card-header">
                   <h2 id="score-trend-heading" className="flat-card-title">
                     Evolução do Score de Saúde (6m)
@@ -808,15 +853,14 @@ export default function HistoricoClientes({
                         label={{ value: 'Crítico (<40)', position: 'insideBottomRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
                       />
                       <RechartsTooltip
-                        contentStyle={{
-                          backgroundColor: themeTokens.chartTooltipBg,
-                          border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                          borderRadius: 4,
-                          boxShadow: 'none',
-                          color: themeTokens.textPrimary,
-                          fontSize: 12
-                        }}
-                        formatter={(val) => [`${val} pts`, 'Score']}
+                        isAnimationActive={false}
+                        wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+                        cursor={{ stroke: statusMeta.color, strokeWidth: 1.5, strokeDasharray: '4 4' }}
+                        content={
+                          <ExecutiveChartTooltip
+                            valueFormatter={(val) => [`${val} pts`, 'Score']}
+                          />
+                        }
                       />
                       <Line
                         type="monotone"
@@ -826,15 +870,17 @@ export default function HistoricoClientes({
                         strokeWidth={2.5}
                         dot={{ r: 5, fill: statusMeta.color, strokeWidth: 2, stroke: '#FFFFFF' }}
                         activeDot={{ r: 7, fill: statusMeta.color }}
-                        isAnimationActive={false}
+                        animationDuration={500}
+                        animationEasing="ease-out"
+                        isAnimationActive={true}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-              </section>
+              </ExecutivePanel>
 
               {/* Donut de Perfil de Eventos da Conta */}
-              <section className="flat-card" aria-labelledby="events-mix-heading">
+              <ExecutivePanel className="flat-card" delay={0.14} aria-labelledby="events-mix-heading">
                 <div className="flat-card-header">
                   <h2 id="events-mix-heading" className="flat-card-title">
                     Perfil de Interações da Conta
@@ -859,41 +905,43 @@ export default function HistoricoClientes({
                           nameKey="name"
                           cx="50%"
                           cy="50%"
-                          innerRadius={42}
-                          outerRadius={64}
+                          innerRadius={0}
+                          outerRadius={62}
                           startAngle={90}
                           endAngle={-270}
-                          paddingAngle={1}
+                          paddingAngle={0}
                           stroke={themeTokens.bgSurface}
                           strokeWidth={2}
-                          isAnimationActive={false}
+                          activeIndex={activePieSlice}
+                          activeShape={renderActivePieSlice}
+                          onClick={(_, idx) => setActivePieSlice(prev => (prev === idx ? -1 : idx))}
+                          animationDuration={500}
+                          animationEasing="ease-out"
+                          isAnimationActive={true}
                         >
-                          {mixEventosDonut.map((entry) => (
-                            <Cell key={entry.name} fill={entry.color} />
+                          {mixEventosDonut.map((entry, idx) => (
+                            <Cell
+                              key={entry.name}
+                              fill={entry.color}
+                              cursor="pointer"
+                              opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : 0.35}
+                            />
                           ))}
                         </Pie>
                         <RechartsTooltip
-                          contentStyle={{
-                            backgroundColor: themeTokens.chartTooltipBg,
-                            border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                            borderRadius: 4,
-                            boxShadow: 'none',
-                            color: themeTokens.textPrimary,
-                            fontSize: 12
-                          }}
-                          formatter={(val, name, props) => [
-                            `${val} eventos (${formatarPercentual(props.payload.pct)})`,
-                            name
-                          ]}
+                          isAnimationActive={false}
+                          wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+                          content={
+                            <ExecutiveChartTooltip
+                              valueFormatter={(val, name, props) => [
+                                `${val} eventos (${formatarPercentual(props.payload.pct)})`,
+                                name
+                              ]}
+                            />
+                          }
                         />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="donut-center-label">
-                      <span className="donut-center-value" style={{ fontSize: 17 }}>
-                        {clienteSelecionado.eventos?.length || 0}
-                      </span>
-                      <span className="donut-center-sub">Total</span>
-                    </div>
                   </div>
 
                   <table className="regional-share-table">
@@ -926,11 +974,11 @@ export default function HistoricoClientes({
                     </tbody>
                   </table>
                 </div>
-              </section>
+              </ExecutivePanel>
             </div>
 
             {/* Direita: Linha do Tempo Cronológica Oficial Ant Design (Timeline - Sprint 2) */}
-            <section className="flat-card" aria-labelledby="timeline-heading">
+            <ExecutivePanel className="flat-card" delay={0.2} aria-labelledby="timeline-heading">
               <div className="flat-card-header">
                 <div>
                   <span className="flat-section-eyebrow">HISTÓRICO DE EVENTOS B2B</span>
@@ -939,18 +987,19 @@ export default function HistoricoClientes({
                   </h2>
                 </div>
 
-                <Radio.Group
+                <SegmentedPill
+                  size="sm"
+                  ariaLabel="Filtrar eventos por categoria"
                   value={filtroCategoriaEvento}
-                  onChange={(e) => setFiltroCategoriaEvento(e.target.value)}
-                  size="small"
-                  buttonStyle="solid"
-                >
-                  <Radio.Button value="todos">Todos</Radio.Button>
-                  <Radio.Button value="sucesso">Sucesso</Radio.Button>
-                  <Radio.Button value="comercial">Comercial</Radio.Button>
-                  <Radio.Button value="alerta">Alertas</Radio.Button>
-                  <Radio.Button value="critico">Críticos</Radio.Button>
-                </Radio.Group>
+                  onChange={setFiltroCategoriaEvento}
+                  options={[
+                    { value: 'todos', label: 'Todos' },
+                    { value: 'sucesso', label: 'Sucesso' },
+                    { value: 'comercial', label: 'Comercial' },
+                    { value: 'alerta', label: 'Alertas' },
+                    { value: 'critico', label: 'Críticos' }
+                  ]}
+                />
               </div>
 
               {eventosOrdenados.length === 0 ? (
@@ -965,7 +1014,7 @@ export default function HistoricoClientes({
                   />
                 </div>
               )}
-            </section>
+            </ExecutivePanel>
           </div>
 
           {/* 3. AÇÕES DE GESTÃO DA CONTA (FIM DA PÁGINA) */}

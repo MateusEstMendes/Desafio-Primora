@@ -35,8 +35,9 @@
 
 .client-tab-item {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border: none;
+  box-shadow: var(--shadow-card);
+  border-radius: 14px;
   padding: 18px 22px;
   cursor: pointer;
   display: flex;
@@ -44,10 +45,11 @@
   justify-content: space-between;
   gap: 12px;
   text-align: left;
+  transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease;
 }
 
 .client-tab-item:hover {
-  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-card-hover);
   background-color: var(--bg-elevated);
 }
 
@@ -103,8 +105,9 @@
    ========================================================================== */
 .mobile-client-selector-card {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border: none;
+  box-shadow: var(--shadow-card);
+  border-radius: 14px;
   padding: 12px 14px;
   margin-bottom: 12px;
 }
@@ -127,8 +130,9 @@
 /* Faixa Contínua de Metadados Financeiros e Contratuais da Conta */
 .account-ledger-strip {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border: none;
+  box-shadow: var(--shadow-card);
+  border-radius: 14px;
   display: grid;
   grid-template-columns: 1.6fr repeat(5, 1fr);
   overflow: hidden;

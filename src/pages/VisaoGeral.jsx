@@ -1,10 +1,14 @@
 import React, { useId, useState } from 'react';
 import { Empty } from 'antd';
-import { RightOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { motion } from 'motion/react';
+import { RightOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
 import { getRegionalColors } from '../utils/themeTokens';
 import { useChartAutoReset } from '../utils/useChartAutoReset';
+import { SPRING_PILL } from '../components/MotionPrimitives';
+import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
+import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
 import '../components/componentsCSS/VisaoGeral.css';
 
 function Sparkline({ data, dataKey, color, label, isPercent = false, full = false, themeTokens }) {
@@ -29,8 +33,18 @@ function Sparkline({ data, dataKey, color, label, isPercent = false, full = fals
           {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
           {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />}
           <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />
-          <Tooltip contentStyle={{ background: themeTokens.chartTooltipBg, borderColor: themeTokens.chartTooltipBorder, borderRadius: 10, color: themeTokens.textPrimary }} formatter={v => [isPercent ? formatarPercentual(v) : formatarNumero(v), label]} labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''} />
-          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={false} dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
+          <Tooltip
+            isAnimationActive={false}
+            wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+            cursor={{ stroke: color, strokeWidth: 1.5, strokeDasharray: '3 3' }}
+            content={
+              <ExecutiveChartTooltip
+                valueFormatter={v => [isPercent ? formatarPercentual(v) : formatarNumero(v), label]}
+                labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''}
+              />
+            }
+          />
+          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={true} animationDuration={520} animationEasing="ease-out" dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -79,10 +93,10 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     ? (selected[0].historicoTendencia.at(-1)?.engajamento || 0) - (selected[0].historicoTendencia[0]?.engajamento || 0)
     : 0;
   const metrics = [
-    { title: 'Exposição a risco', value: formatarPercentual(total ? risk / total * 100 : 0), note: formatarNumero(risk) + ' contas sob risco', color: '#EF4444' },
-    { title: 'Conversão do funil', value: formatarPercentual(conversion), note: '90 dias · tarefas', color: '#00CDE5' },
-    { title: 'Engajamento médio', value: formatarPercentual(engagement), note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: '#0074FF' },
-    { title: 'Carteira ativa', value: formatarNumero(total), note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
+    { title: 'Exposição a risco', rawValue: total ? (risk / total) * 100 : 0, isPercent: true, note: formatarNumero(risk) + ' contas sob risco', color: '#EF4444' },
+    { title: 'Conversão do funil', rawValue: conversion, isPercent: true, note: '90 dias · tarefas', color: '#00CDE5' },
+    { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: '#0074FF' },
+    { title: 'Carteira ativa', rawValue: total, isPercent: false, note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
   ];
   return <div className="executive-dashboard">
     <header className="executive-heading">
@@ -91,10 +105,28 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         <h1>Visão Executiva</h1>
         <p>Sua operação em perspectiva macroscópica. Vislumbre rápido (at-a-glance) com alto data-ink ratio.</p>
       </div>
-      <div className="period-control" role="group" aria-label="Período das tendências">{[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => <button type="button" key={p.value} aria-pressed={period === p.value} onClick={() => setPeriod(p.value)}>{p.label}</button>)}</div>
+      <div className="period-control" role="group" aria-label="Período das tendências">
+        {[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => {
+          const isActive = period === p.value;
+          return (
+            <button type="button" key={p.value} aria-pressed={isActive} onClick={() => setPeriod(p.value)}>
+              {isActive && (
+                <motion.span
+                  layoutId="period-pill"
+                  className="period-pill-bg"
+                  transition={SPRING_PILL}
+                  aria-hidden="true"
+                />
+              )}
+              {p.label}
+            </button>
+          );
+        })}
+      </div>
     </header>
-    <section className="reference-kpis" aria-label="Indicadores executivos">{metrics.map(m => <article key={m.title} className="reference-kpi" style={{ '--metric-accent': m.color }}><h2>{m.title}</h2><div className="reference-kpi-bottom"><strong>{m.value}</strong><span className={'metric-note ' + (m.trend !== undefined ? m.trend >= 0 ? 'is-positive' : 'is-negative' : '')}>{m.trend !== undefined && (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}{m.note}</span></div></article>)}</section>
-    <section className="reference-panel pulse-panel" aria-labelledby="pulse-title"><h2 id="pulse-title">Pulso da <em>operação</em></h2>
+    <ExecutiveKpiGrid metrics={metrics} ariaLabel="Indicadores executivos" />
+    <ExecutivePanel className="reference-panel pulse-panel" delay={0.14} aria-labelledby="pulse-title">
+      <h2 id="pulse-title">Pulso da <em>operação</em></h2>
       {[
         { key: 'taxaRisco', label: 'Exposição a Risco', value: formatarPercentual(total ? (risk / total) * 100 : 0), isPercent: true, color: '#EF4444' },
         { key: 'carteiraTotal', label: 'Carteira Ativa', value: formatarNumero(total), isPercent: false, color: '#0074FF' }
@@ -106,7 +138,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         </div>
       ))}
       <p className="chart-context">Evolução geral da carteira · {period === 1 ? 'Último mês vs. anterior' : 'Últimas ' + period + ' amostras mensais'} ({series[0]?.mes} a {series.at(-1)?.mes}).</p>
-    </section>
+    </ExecutivePanel>
     <div className="reference-middle-grid">
       <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">
         <div
@@ -122,12 +154,17 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
                 data={regions}
                 dataKey="value"
                 nameKey="regiao"
-                innerRadius="71%"
-                outerRadius="98%"
+                innerRadius={0}
+                outerRadius="92%"
                 startAngle={90}
                 endAngle={-270}
-                stroke="none"
-                isAnimationActive={false}
+                stroke={themeTokens.bgSurface}
+                strokeWidth={2}
+                activeIndex={regions.findIndex(t => t.id === selectedTenantId)}
+                activeShape={renderActivePieSlice}
+                isAnimationActive={true}
+                animationDuration={500}
+                animationEasing="ease-out"
                 onClick={entry => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
               >
                 {regions.map(t => (
@@ -140,24 +177,19 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
                 ))}
               </Pie>
               <Tooltip
+                isAnimationActive={false}
                 wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
-                formatter={value => [formatarNumero(value), 'Contas']}
-                contentStyle={{
-                  background: themeTokens.chartTooltipBg,
-                  borderColor: themeTokens.chartTooltipBorder,
-                  borderRadius: 10,
-                  color: themeTokens.textPrimary
-                }}
+                content={
+                  <ExecutiveChartTooltip
+                    valueFormatter={(value, name) => [formatarNumero(value), name || 'Contas']}
+                  />
+                }
               />
             </PieChart>
           </ResponsiveContainer>
-          <div className="reference-donut-label">
-            <strong>{formatarNumero(nationalTotal)}</strong>
-            <span>Contas</span>
-          </div>
         </div>
         <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
-      </div><p className="chart-context">Participação na carteira · toque em uma regional para filtrar.</p></section>
+      </div><p className="chart-context">Total: {formatarNumero(nationalTotal)} contas · toque em uma regional para filtrar.</p></section>
       <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores <em>mudanças</em></h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
         {changes.map(t => <div className="change-row" key={t.id} style={{ '--metric-accent': t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan }}><button type="button" className="signal-label" onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}>{t.regiao}</button><Sparkline data={t.points} dataKey="engajamento" color={t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan} label={t.regiao + ': engajamento'} themeTokens={themeTokens} /><strong className={t.change >= 0 ? 'is-positive' : 'is-negative'}>{t.change >= 0 ? '+' : ''}{t.change.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}<small> p.p.</small></strong></div>)}
         <p className="chart-context">Variação do engajamento no período.</p>

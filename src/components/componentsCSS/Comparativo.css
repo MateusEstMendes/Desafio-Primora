@@ -54,9 +54,10 @@
   overflow-x: auto !important;
   overflow-y: hidden !important;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border: none;
+  border-radius: 14px;
   background-color: var(--bg-surface);
+  box-shadow: var(--shadow-card);
 }
 
 @container tableContainer (max-width: 768px) {
@@ -68,11 +69,47 @@
 
 .table-region-wrapper .ant-table {
   min-width: 1100px;
+  background: transparent !important;
+}
+
+.table-region-wrapper .ant-table-container {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table-region-wrapper .ant-table-thead > tr > th {
+  background: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 13px 16px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+/* Remove default AntD vertical column divider lines */
+.table-region-wrapper .ant-table-thead > tr > th::before {
+  display: none !important;
+}
+
+.table-region-wrapper .ant-table-tbody > tr > td {
+  padding: 15px 16px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  transition: background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.table-region-wrapper .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+.table-region-wrapper .ant-table-tbody > tr:hover > td {
+  background: var(--bg-subtle) !important;
 }
 
 .table-region-wrapper .ant-table-cell {
   white-space: nowrap !important;
-  padding: 10px 14px !important;
   vertical-align: middle;
 }
 
@@ -262,7 +299,8 @@
   flex-wrap: wrap;
   padding: 10px 14px;
   background-color: var(--bg-elevated);
-  border: 1px solid var(--border-default);
+  border: none;
+  box-shadow: var(--shadow-card);
   border-radius: 12px;
 }
 
@@ -287,7 +325,8 @@
 
 .client-mini-card {
   background-color: var(--bg-elevated);
-  border: 1px solid var(--border-default);
+  border: none;
+  box-shadow: var(--shadow-card);
   border-radius: 12px;
   padding: 16px 18px;
   display: flex;
@@ -480,23 +519,27 @@
 }
 
 .mobile-comparativo-card {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-left: 4px solid var(--card-accent, var(--brand-primary)) !important;
-  border-radius: 12px;
-  padding: 14px 16px;
+  background-color: var(--bg-subtle);
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   cursor: pointer;
-  transition: border-color 0.18s ease, background-color 0.18s ease;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   user-select: none;
 }
 
+[data-theme="dark"] .mobile-comparativo-card {
+  background-color: var(--bg-elevated);
+}
+
 .mobile-comparativo-card:hover {
-  border-color: var(--brand-primary);
-  background-color: var(--bg-subtle, var(--bg-elevated));
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .mobile-comparativo-card:focus-visible {
@@ -505,8 +548,8 @@
 }
 
 .mobile-comparativo-card--focused {
-  border-color: var(--brand-primary) !important;
   background-color: var(--brand-primary-soft, rgba(41, 112, 255, 0.08)) !important;
+  box-shadow: 0 0 0 2px var(--brand-primary), var(--shadow-card-hover) !important;
 }
 
 .mobile-card-header {

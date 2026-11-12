@@ -1,6 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Table, Radio, Tooltip, Typography, Button, Modal, Form, Input, InputNumber, Select, Tag, Empty, message } from 'antd';
+import { motion, AnimatePresence } from 'motion/react';
+import { Table, Tooltip, Typography, Button, Modal, Form, Input, InputNumber, Select, Tag, Empty, message } from 'antd';
+import SegmentedPill from '../components/SegmentedPill';
+import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
 import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
+import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
 import {
   ResponsiveContainer,
   BarChart,
@@ -385,26 +390,69 @@ export default function Comparativo({
     return todosClientes.filter(isClienteNovo).length;
   }, [todosClientes, baseClientIds]);
 
+  const comparativoKpis = useMemo(() => {
+    if (!dadosClassificados.length) return [];
+    const maior = dadosClassificados[0];
+    const menor = dadosClassificados[dadosClassificados.length - 1];
+    const totalContas = dadosClassificados.reduce((acc, u) => acc + u.carteiraTotalClientes, 0);
+    const mediaConversao =
+      dadosClassificados.reduce((acc, u) => acc + u.taxaConversaoFunil, 0) / dadosClassificados.length;
+
+    return [
+      {
+        title: 'Maior exposição',
+        rawValue: maior.taxaRiscoProporcional,
+        isPercent: true,
+        note: maior.nome.replace('Unidade ', '').replace(' (Matriz)', ''),
+        color: '#EF4444'
+      },
+      {
+        title: 'Melhor benchmark',
+        rawValue: menor.taxaRiscoProporcional,
+        isPercent: true,
+        note: menor.nome.replace('Unidade ', '').replace(' (Matriz)', ''),
+        color: '#10B981'
+      },
+      {
+        title: 'Conversão média',
+        rawValue: mediaConversao,
+        isPercent: true,
+        note: 'Funil 90 dias',
+        color: '#00CDE5'
+      },
+      {
+        title: 'Contas auditadas',
+        rawValue: totalContas,
+        isPercent: false,
+        note: `${dadosClassificados.length} regionais`,
+        color: '#0074FF'
+      }
+    ];
+  }, [dadosClassificados]);
+
   return (
     <div className="comparativo-container">
+      <ExecutiveKpiGrid metrics={comparativoKpis} ariaLabel="Indicadores táticos comparativos" />
+
       {/* 1. PAINEL ANALÍTICO DUPLO: GRÁFICO DE ESCALAS + DONUT DE CONCENTRAÇÃO REGIONAL */}
       <div className="comparativo-top-charts-grid">
         {/* Esquerda: Contraste Volume Bruto vs. Taxa Proporcional (%) */}
-        <section className="flat-card" aria-labelledby="comparativo-chart-heading">
+        <ExecutivePanel className="flat-card" delay={0.08} aria-labelledby="comparativo-chart-heading">
           <div className="flat-card-header">
             <h2 id="comparativo-chart-heading" className="flat-card-title">
               Risco Absoluto vs. Taxa Proporcional (%)
             </h2>
 
-            <Radio.Group
+            <SegmentedPill
+              size="sm"
+              ariaLabel="Tipo de gráfico comparativo"
               value={tipoGrafico}
-              onChange={(e) => setTipoGrafico(e.target.value)}
-              size="small"
-              buttonStyle="solid"
-            >
-              <Radio.Button value="composto">Volume vs %</Radio.Button>
-              <Radio.Button value="barras">Taxas (%)</Radio.Button>
-            </Radio.Group>
+              onChange={setTipoGrafico}
+              options={[
+                { value: 'composto', label: 'Volume vs %' },
+                { value: 'barras', label: 'Taxas (%)' }
+              ]}
+            />
           </div>
 
           <div
@@ -448,14 +496,17 @@ export default function Comparativo({
                     tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
                   />
                   <RechartsTooltip
-                    contentStyle={{
-                      backgroundColor: themeTokens.chartTooltipBg,
-                      border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                      borderRadius: 4,
-                      boxShadow: 'none',
-                      color: themeTokens.textPrimary,
-                      fontSize: 12
-                    }}
+                    isAnimationActive={false}
+                    wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+                    cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
+                    content={
+                      <ExecutiveChartTooltip
+                        valueFormatter={(val, name) => [
+                          String(name).includes('%') ? formatarPercentual(val) : formatarNumero(val),
+                          name
+                        ]}
+                      />
+                    }
                   />
                   <Legend
                     itemSorter={null}
@@ -470,8 +521,24 @@ export default function Comparativo({
                     fill={themeTokens.brandPrimary}
                     barSize={isMobile ? 22 : 34}
                     radius={[4, 4, 0, 0]}
-                    isAnimationActive={false}
-                  />
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
+                    onClick={(entry) => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
+                  >
+                    {dadosGrafico.map((entry) => {
+                      const isSel = selectedTenantId === entry.id;
+                      return (
+                        <Cell
+                          key={entry.id}
+                          fill={themeTokens.brandPrimary}
+                          cursor="pointer"
+                          opacity={selectedTenantId === 'todos' || isSel ? 1 : 0.35}
+                          style={isSel ? { filter: 'brightness(1.16) saturate(1.3)' } : undefined}
+                        />
+                      );
+                    })}
+                  </Bar>
                   <Line
                     yAxisId="right"
                     type="monotone"
@@ -481,7 +548,9 @@ export default function Comparativo({
                     strokeWidth={3}
                     dot={{ r: 5, fill: '#EF4444', strokeWidth: 2, stroke: '#FFFFFF' }}
                     activeDot={{ r: 7, fill: '#EF4444' }}
-                    isAnimationActive={false}
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
                   />
                 </ComposedChart>
               ) : (
@@ -511,14 +580,17 @@ export default function Comparativo({
                     tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
                   />
                   <RechartsTooltip
-                    contentStyle={{
-                      backgroundColor: themeTokens.chartTooltipBg,
-                      border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                      borderRadius: 4,
-                      boxShadow: 'none',
-                      color: themeTokens.textPrimary,
-                      fontSize: 12
-                    }}
+                    isAnimationActive={false}
+                    wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
+                    cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
+                    content={
+                      <ExecutiveChartTooltip
+                        valueFormatter={(val, name) => [
+                          String(name).includes('%') ? formatarPercentual(val) : formatarNumero(val),
+                          name
+                        ]}
+                      />
+                    }
                   />
                   <Legend
                     itemSorter={null}
@@ -531,37 +603,42 @@ export default function Comparativo({
                     name="Risco Proporcional (%)"
                     fill={themeTokens.statusCritical}
                     radius={[2, 2, 0, 0]}
-                    isAnimationActive={false}
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
                   />
                   <Bar
                     dataKey="sucessoFunil"
                     name="Conversão Funil (%)"
                     fill={themeTokens.brandCyan}
                     radius={[2, 2, 0, 0]}
-                    isAnimationActive={false}
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
                   />
                 </BarChart>
               )}
             </ResponsiveContainer>
           </div>
-        </section>
+        </ExecutivePanel>
 
         {/* Direita: Donut Financeiro de Concentração Regional (Risco vs Carteira) */}
-        <section className="flat-card" aria-labelledby="concentration-donut-heading">
+        <ExecutivePanel className="flat-card" delay={0.14} aria-labelledby="concentration-donut-heading">
           <div className="flat-card-header">
             <h2 id="concentration-donut-heading" className="flat-card-title">
               Concentração por Regional
             </h2>
 
-            <Radio.Group
+            <SegmentedPill
+              size="sm"
+              ariaLabel="Modo de concentração regional"
               value={modoDonut}
-              onChange={(e) => setModoDonut(e.target.value)}
-              size="small"
-              buttonStyle="solid"
-            >
-              <Radio.Button value="risco">Share de Risco</Radio.Button>
-              <Radio.Button value="carteira">Share de Carteira</Radio.Button>
-            </Radio.Group>
+              onChange={setModoDonut}
+              options={[
+                { value: 'risco', label: 'Share de Risco' },
+                { value: 'carteira', label: 'Share de Carteira' }
+              ]}
+            />
           </div>
 
           <div className="regional-donut-layout">
@@ -578,12 +655,17 @@ export default function Comparativo({
                     data={donutRegionalData.slices}
                     dataKey="value"
                     nameKey="name"
-                    innerRadius="71%"
-                    outerRadius="98%"
+                    innerRadius={0}
+                    outerRadius="92%"
                     startAngle={90}
                     endAngle={-270}
-                    stroke="none"
-                    isAnimationActive={false}
+                    stroke={themeTokens.bgSurface}
+                    strokeWidth={2}
+                    activeIndex={donutRegionalData.slices.findIndex(s => s.id === selectedTenantId)}
+                    activeShape={renderActivePieSlice}
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
                     onClick={(entry) => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
                   >
                     {donutRegionalData.slices.map((s) => (
@@ -596,30 +678,19 @@ export default function Comparativo({
                     ))}
                   </Pie>
                   <RechartsTooltip
+                    isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
-                    contentStyle={{
-                      backgroundColor: themeTokens.chartTooltipBg,
-                      border: `1px solid ${themeTokens.chartTooltipBorder}`,
-                      borderRadius: 10,
-                      boxShadow: 'none',
-                      color: themeTokens.textPrimary,
-                      fontSize: 12
-                    }}
-                    formatter={(val, name, props) => [
-                      `${formatarNumero(val)} contas (${formatarPercentual(props.payload.pct)})`,
-                      name
-                    ]}
+                    content={
+                      <ExecutiveChartTooltip
+                        valueFormatter={(val, name, props) => [
+                          `${formatarNumero(val)} contas (${formatarPercentual(props.payload.pct)})`,
+                          name
+                        ]}
+                      />
+                    }
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="reference-donut-label">
-                <strong>
-                  {formatarNumero(donutRegionalData.total)}
-                </strong>
-                <span>
-                  {modoDonut === 'risco' ? 'Em Risco' : 'Contas'}
-                </span>
-              </div>
             </div>
 
             <table className="regional-share-table">
@@ -671,9 +742,9 @@ export default function Comparativo({
             </table>
           </div>
           <p className="chart-context" style={{ marginTop: 8 }}>
-            Participação por regional ({modoDonut === 'risco' ? 'contas sob risco' : 'carteira ativa'}) · toque em uma fatia ou regional para filtrar.
+            Total: {formatarNumero(donutRegionalData.total)} {modoDonut === 'risco' ? 'contas em risco' : 'contas ativas'} · toque em uma fatia ou regional para filtrar.
           </p>
-        </section>
+        </ExecutivePanel>
       </div>
 
       {/* 2. TABELA MULTIDIMENSIONAL / MOBILE CARDS DE PRECISÃO ESTATÍSTICA (OPÇÃO A) */}
@@ -827,45 +898,51 @@ export default function Comparativo({
                   </div>
 
                   {/* Seção Expansível (Nível 2) */}
-                  {isExpanded && (
-                    <div
-                      id={`mobile-card-details-${record.id}`}
-                      className="mobile-card-details"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="mobile-details-row">
-                        <span className="mobile-details-label">Funil Comercial (90d):</span>
-                        <span className="mobile-details-val tabular-nums">
-                          <strong style={{ color: 'var(--brand-primary)' }}>
-                            {formatarPercentual(record.taxaConversaoFunil)}
-                          </strong>{' '}
-                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                            ({record.funnel90d?.sucesso} de {record.funnel90d?.gerada} tarefas)
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        id={`mobile-card-details-${record.id}`}
+                        className="mobile-card-details"
+                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.2, ease: EXECUTIVE_EASE }}
+                      >
+                        <div className="mobile-details-row">
+                          <span className="mobile-details-label">Funil Comercial (90d):</span>
+                          <span className="mobile-details-val tabular-nums">
+                            <strong style={{ color: 'var(--brand-primary)' }}>
+                              {formatarPercentual(record.taxaConversaoFunil)}
+                            </strong>{' '}
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                              ({record.funnel90d?.sucesso} de {record.funnel90d?.gerada} tarefas)
+                            </span>
                           </span>
-                        </span>
-                      </div>
+                        </div>
 
-                      <div className="mobile-details-row">
-                        <span className="mobile-details-label">Saúde da Carteira:</span>
-                        <span className="mobile-details-val tabular-nums">
-                          <span style={{ color: 'var(--status-success-text)' }}>
-                            {formatarNumero(record.saudeCarteira?.saudavel)} Saudáveis
-                          </span>{' '}
-                          /{' '}
-                          <span style={{ color: 'var(--status-warning-text)' }}>
-                            {formatarNumero(record.saudeCarteira?.atencao)} Atenção
+                        <div className="mobile-details-row">
+                          <span className="mobile-details-label">Saúde da Carteira:</span>
+                          <span className="mobile-details-val tabular-nums">
+                            <span style={{ color: 'var(--status-success-text)' }}>
+                              {formatarNumero(record.saudeCarteira?.saudavel)} Saudáveis
+                            </span>{' '}
+                            /{' '}
+                            <span style={{ color: 'var(--status-warning-text)' }}>
+                              {formatarNumero(record.saudeCarteira?.atencao)} Atenção
+                            </span>
                           </span>
-                        </span>
-                      </div>
+                        </div>
 
-                      <div className="mobile-details-row">
-                        <span className="mobile-details-label">Engajamento Médio:</span>
-                        <span className="mobile-details-val tabular-nums">
-                          <strong>{formatarPercentual(record.engajamentoMedio)}</strong>
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                        <div className="mobile-details-row">
+                          <span className="mobile-details-label">Engajamento Médio:</span>
+                          <span className="mobile-details-val tabular-nums">
+                            <strong>{formatarPercentual(record.engajamentoMedio)}</strong>
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </article>
               );
             })}
@@ -940,22 +1017,26 @@ export default function Comparativo({
 
         {/* Filtros e Busca */}
         <div className="comparativo-clients-controls-bar">
-          <Radio.Group
+          <SegmentedPill
+            size="sm"
+            ariaLabel="Filtro de clientes da carteira"
             value={filtroTipoClientes}
-            onChange={(e) => setFiltroTipoClientes(e.target.value)}
-            size="small"
-            buttonStyle="solid"
-          >
-            <Radio.Button value="todos">
-              Todos ({todosClientes.filter((c) => selectedTenantId === 'todos' || c.tenantId === selectedTenantId).length})
-            </Radio.Button>
-            <Radio.Button value="novos">
-              ✨ Novos Adicionados ({todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && isClienteNovo(c)).length})
-            </Radio.Button>
-            <Radio.Button value="risco">
-              Risco / Crítico ({todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && (c.statusSaude === 'Risco' || c.statusSaude === 'Crítico')).length})
-            </Radio.Button>
-          </Radio.Group>
+            onChange={setFiltroTipoClientes}
+            options={[
+              {
+                value: 'todos',
+                label: `Todos (${todosClientes.filter((c) => selectedTenantId === 'todos' || c.tenantId === selectedTenantId).length})`
+              },
+              {
+                value: 'novos',
+                label: `Novos (${todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && isClienteNovo(c)).length})`
+              },
+              {
+                value: 'risco',
+                label: `Risco / Crítico (${todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && (c.statusSaude === 'Risco' || c.statusSaude === 'Crítico')).length})`
+              }
+            ]}
+          />
 
           <Input.Search
             placeholder="Buscar por cliente ou segmento..."

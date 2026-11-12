@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ConfigProvider, Grid, theme as antdTheme } from 'antd';
 import ptBR from 'antd/locale/pt_BR';
+import { MotionConfig, AnimatePresence } from 'motion/react';
 
 import datasetLocal from './data/dataset_painel_multitenant.json';
 import { THEME_TOKENS } from './utils/themeTokens';
 
 import TopBar from './components/TopBar';
+import { PageTransition } from './components/MotionPrimitives';
 import VisaoGeral from './pages/VisaoGeral';
 import Comparativo from './pages/Comparativo';
 import HistoricoClientes from './pages/HistoricoClientes';
@@ -184,8 +186,9 @@ export default function App() {
   };
 
   return (
-    <ConfigProvider
-      locale={ptBR}
+    <MotionConfig reducedMotion="user">
+      <ConfigProvider
+        locale={ptBR}
       theme={{
         algorithm:
           themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
@@ -246,60 +249,65 @@ export default function App() {
 
         <main className="app-main-content">
           <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
-            {currentTab !== 'visao-geral' && (
-              <header className="module-heading">
-                <span>{currentTab === 'comparativo' ? 'Distribuidora Vetor · Camada Tática (Benchmarking)' : 'Distribuidora Vetor · Camada Operacional (Supervisão & Ação)'}</span>
-                <h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1>
-                <p>{currentTab === 'comparativo' ? 'Metamorfose adaptativa de matriz tabular para cartões autônomos contextuais.' : 'Triagem cronológica de eventos em tempo real e mitigação de risco da carteira.'}</p>
-              </header>
-            )}
-            {currentTab === 'visao-geral' && (
-              <VisaoGeral
-                dataset={dynamicDataset}
-                isMobile={isMobile}
-                selectedTenantId={selectedTenantId}
-                onSelectTenant={setSelectedTenantId}
-                onNavigateTab={setCurrentTab}
-                themeTokens={activeTokens}
-                onOpenClient={(client) => {
-                  setFocusedClientId(client.id);
-                  setSelectedTenantId(client.tenantId);
-                  setCurrentTab('historico-clientes');
-                }}
-              />
-            )}
+            <AnimatePresence mode="wait">
+              <PageTransition pageKey={currentTab}>
+                {currentTab !== 'visao-geral' && (
+                  <header className="module-heading">
+                    <span>{currentTab === 'comparativo' ? 'Distribuidora Vetor · Camada Tática (Benchmarking)' : 'Distribuidora Vetor · Camada Operacional (Supervisão & Ação)'}</span>
+                    <h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1>
+                    <p>{currentTab === 'comparativo' ? 'Metamorfose adaptativa de matriz tabular para cartões autônomos contextuais.' : 'Triagem cronológica de eventos em tempo real e mitigação de risco da carteira.'}</p>
+                  </header>
+                )}
+                {currentTab === 'visao-geral' && (
+                  <VisaoGeral
+                    dataset={dynamicDataset}
+                    isMobile={isMobile}
+                    selectedTenantId={selectedTenantId}
+                    onSelectTenant={setSelectedTenantId}
+                    onNavigateTab={setCurrentTab}
+                    themeTokens={activeTokens}
+                    onOpenClient={(client) => {
+                      setFocusedClientId(client.id);
+                      setSelectedTenantId(client.tenantId);
+                      setCurrentTab('historico-clientes');
+                    }}
+                  />
+                )}
 
-            {currentTab === 'comparativo' && (
-              <Comparativo
-                dataset={dynamicDataset}
-                isMobile={isMobile}
-                selectedTenantId={selectedTenantId}
-                onSelectTenant={setSelectedTenantId}
-                themeTokens={activeTokens}
-                onNavigateTab={setCurrentTab}
-                onAddCliente={handleAddCliente}
-                onUpdateCliente={handleUpdateCliente}
-                onDeleteCliente={handleDeleteCliente}
-              />
-            )}
+                {currentTab === 'comparativo' && (
+                  <Comparativo
+                    dataset={dynamicDataset}
+                    isMobile={isMobile}
+                    selectedTenantId={selectedTenantId}
+                    onSelectTenant={setSelectedTenantId}
+                    themeTokens={activeTokens}
+                    onNavigateTab={setCurrentTab}
+                    onAddCliente={handleAddCliente}
+                    onUpdateCliente={handleUpdateCliente}
+                    onDeleteCliente={handleDeleteCliente}
+                  />
+                )}
 
-            {currentTab === 'historico-clientes' && (
-              <HistoricoClientes
-                initialClientId={focusedClientId}
-                dataset={dynamicDataset}
-                isMobile={isMobile}
-                selectedTenantId={selectedTenantId}
-                onSelectTenant={setSelectedTenantId}
-                themeTokens={activeTokens}
-                onAddCliente={handleAddCliente}
-                onUpdateCliente={handleUpdateCliente}
-                onDeleteCliente={handleDeleteCliente}
-              />
-            )}
+                {currentTab === 'historico-clientes' && (
+                  <HistoricoClientes
+                    initialClientId={focusedClientId}
+                    dataset={dynamicDataset}
+                    isMobile={isMobile}
+                    selectedTenantId={selectedTenantId}
+                    onSelectTenant={setSelectedTenantId}
+                    themeTokens={activeTokens}
+                    onAddCliente={handleAddCliente}
+                    onUpdateCliente={handleUpdateCliente}
+                    onDeleteCliente={handleDeleteCliente}
+                  />
+                )}
+              </PageTransition>
+            </AnimatePresence>
           </ErrorBoundary>
         </main>
 
       </div>
     </ConfigProvider>
+    </MotionConfig>
   );
 }

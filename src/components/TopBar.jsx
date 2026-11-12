@@ -1,6 +1,8 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import ScopeSelector from './ScopeSelector';
+import { SPRING_PILL } from './MotionPrimitives';
 import './componentsCSS/TopBar.css';
 
 const navItems = [
@@ -115,17 +117,29 @@ export default function TopBar({
         </div>
 
         <nav className="reference-desktop-nav">
-          {navItems.map((item, i) => (
-            <button
-              type="button"
-              key={item.key}
-              onClick={() => onTabChange(item.key)}
-              aria-current={currentTab === item.key ? 'page' : undefined}
-            >
-              <span>{String(i + 1).padStart(2, '0')}</span>
-              {item.label}
-            </button>
-          ))}
+          {navItems.map((item, i) => {
+            const isActive = currentTab === item.key;
+            return (
+              <motion.button
+                type="button"
+                key={item.key}
+                whileTap={{ scale: 0.985 }}
+                onClick={() => onTabChange(item.key)}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="sidebar-nav-pill"
+                    className="sidebar-nav-pill"
+                    transition={SPRING_PILL}
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="nav-index">{String(i + 1).padStart(2, '0')}</span>
+                {item.label}
+              </motion.button>
+            );
+          })}
         </nav>
       </div>
 

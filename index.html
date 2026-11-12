@@ -13,14 +13,14 @@
     <link rel="icon" type="image/png" href="/primora-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Painel Executivo Multi-Tenant — Distribuidora Vetor | Primora</title>
-    <!-- Tipografia em Três Vozes (DESIGN.md):
-         1. Serif Display (Weight 300 Editorial): Cormorant Garamond / Playfair Display
-         2. Neo-Grotesque Sans (UI & Subheads): Inter (Weights 300, 400, 500, 600)
-         3. Technical Monospace (Uppercase Labels & Data): Roboto Mono (Weights 400, 500) -->
+    <!-- Tipografia Executiva B2B em Três Vozes (Plus Jakarta Sans + Inter + JetBrains Mono):
+         1. Display & Headings: Plus Jakarta Sans (Weights 500, 600, 700)
+         2. UI, Body & Tabular Numbers: Inter (Variable 300..700)
+         3. Technical Monospace (Eyebrows, Badges & Data): JetBrains Mono (Weights 400, 500, 600) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -49,10 +49,12 @@
         --color-void: #000000;
 
         /* Typography Families */
-        --font-lyon-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        --font-display: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        --font-lyon-display: var(--font-display);
         --font-suisse-intl: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        --font-suisse-intl-trial: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        --font-roboto-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        --font-suisse-intl-trial: var(--font-suisse-intl);
+        --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        --font-roboto-mono: var(--font-mono);
 
         accent-color: var(--color-blue-gleam);
       }
@@ -75,10 +77,7 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Elevação Flat por Camadas de Superfície (DESIGN.md: Sem drop-shadows em cards) */
-      .ant-card,
-      .ant-select-selector,
-      .ant-table,
+      /* Sombras sutis executivas em cards e superfícies (sem bordas 1px pesadas) */
       .ant-tag,
       .ant-alert {
         box-shadow: none !important;
@@ -115,7 +114,7 @@
       .ant-select-selector,
       .ant-radio-button-wrapper {
         touch-action: manipulation;
-        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease !important;
+        transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       /* Prevenção de Auto-Zoom em campos de formulário no Safari iOS (mínimo 16px) */
@@ -168,9 +167,10 @@
         overflow: auto;
         max-inline-size: 100%;
         container-type: inline-size;
-        border: 1px solid var(--border-default);
-        border-radius: 16px;
+        border: none;
+        border-radius: 14px;
         background-color: var(--bg-surface);
+        box-shadow: var(--shadow-card);
       }
 
       .table-region-wrapper:focus-visible {

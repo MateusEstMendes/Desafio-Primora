@@ -67,11 +67,8 @@ export function useChartAutoReset(inactivityMs = 3000) {
   }, [resetChart]);
 
   const interactionProps = {
-    onMouseDown: triggerInteraction,
-    onClick: triggerInteraction,
     onTouchStart: triggerInteraction,
-    onTouchMove: triggerInteraction,
-    onMouseMove: triggerInteraction
+    onTouchMove: triggerInteraction
   };
 
   return {

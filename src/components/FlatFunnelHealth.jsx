@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { renderActivePieSlice } from './ExecutiveChartTooltip';
 import {
   ResponsiveContainer,
   PieChart,
@@ -12,6 +13,7 @@ import './componentsCSS/FlatFunnelHealth.css';
 
 export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
   const healthDonutReset = useChartAutoReset(3000);
+  const [activePieSlice, setActivePieSlice] = useState(-1);
   if (!estatisticas) return null;
 
   const {
@@ -108,17 +110,27 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={86}
+                  innerRadius={0}
+                  outerRadius={80}
                   startAngle={90}
                   endAngle={-270}
-                  paddingAngle={2}
+                  paddingAngle={0}
                   stroke={themeTokens?.bgSurface || '#181A1C'}
                   strokeWidth={2}
-                  isAnimationActive={false}
+                  activeIndex={activePieSlice}
+                  activeShape={renderActivePieSlice}
+                  onClick={(_, idx) => setActivePieSlice(prev => (prev === idx ? -1 : idx))}
+                  animationDuration={500}
+                  animationEasing="ease-out"
+                  isAnimationActive={true}
                 >
-                  {categoriasSaude.map((entry) => (
-                    <Cell key={entry.key} fill={entry.color} />
+                  {categoriasSaude.map((entry, idx) => (
+                    <Cell
+                      key={entry.key}
+                      fill={entry.color}
+                      cursor="pointer"
+                      opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : 0.35}
+                    />
                   ))}
                 </Pie>
                 <RechartsTooltip
@@ -137,10 +149,6 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                 />
               </PieChart>
             </ResponsiveContainer>
-            <div className="donut-center-label">
-              <span className="donut-center-value">{formatarNumero(carteiraTotal)}</span>
-              <span className="donut-center-sub">CONTAS</span>
-            </div>
           </div>
 
           <div>

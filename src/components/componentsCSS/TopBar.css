@@ -11,7 +11,7 @@
 .reference-brand { display: inline-flex; align-items: center; gap: 9px; color: var(--text-primary); text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 3px; background: var(--brand-primary); }
 .brand-mark svg { width: 33px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.brand-word { font: 500 33px/1 Georgia, 'Times New Roman', serif; letter-spacing: -1.5px; }
+.brand-word { font: 600 30px/1 var(--font-display); letter-spacing: -1px; }
 .reference-mobile-header {
   height: 66px;
   display: flex;
@@ -51,7 +51,7 @@
   align-items: center;
   gap: 8px;
 }
-.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-surface); border-top: 1px solid var(--border-default); }
+.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-default); }
 .reference-bottom-nav button { display: flex; position: relative; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 62px; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }
 .reference-bottom-nav .anticon { font-size: 25px; }
 .reference-bottom-nav button > span:last-child { font: 600 10px/1.5 var(--font-suisse-intl); text-transform: uppercase; letter-spacing: .06em; }
@@ -76,11 +76,12 @@
   .reference-sidebar .reference-brand { margin: 0 10px; }
   .reference-sidebar .brand-word { font-size: 35px; }
   .reference-company { margin: 18px 10px 24px; padding-bottom: 25px; border-bottom: 1px solid var(--border-default); color: var(--text-secondary); font-size: 10px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
-  .reference-desktop-nav { display: grid; gap: 8px; }
-  .reference-desktop-nav button { display: flex; align-items: center; gap: 13px; min-height: 48px; padding: 12px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--text-primary); text-align: left; font: 500 13px/1.4 var(--font-suisse-intl); cursor: pointer; }
-  .reference-desktop-nav button[aria-current] { background: var(--brand-primary); color: #fff; }
+  .reference-desktop-nav { display: grid; gap: 6px; }
+  .reference-desktop-nav button { position: relative; z-index: 1; display: flex; align-items: center; gap: 13px; min-height: 46px; padding: 11px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--text-primary); text-align: left; font: 500 13px/1.4 var(--font-suisse-intl); cursor: pointer; transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
+  .reference-desktop-nav button[aria-current] { color: #fff; }
   .reference-desktop-nav button:hover:not([aria-current]) { background: var(--bg-subtle); }
-  .reference-desktop-nav button > span { font-size: 12px; }
+  .reference-desktop-nav button > span.nav-index { font-family: var(--font-mono); font-size: 11px; opacity: 0.78; }
+  .sidebar-nav-pill { position: absolute; inset: 0; border-radius: 10px; background: var(--brand-primary); z-index: -1; }
   .reference-sidebar-bottom {
     display: flex;
     align-items: center;
