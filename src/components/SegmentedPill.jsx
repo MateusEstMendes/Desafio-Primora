@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import { motion } from 'motion/react';
-import { SPRING_PILL } from './MotionPrimitives';
+import { PILL_TRANSITION } from './MotionPrimitives';
 
 /**
  * Controle segmentado executivo com pílula deslizante (substitui Radio.Group do AntD).
@@ -36,7 +36,7 @@ export default function SegmentedPill({
               <motion.span
                 layoutId={`seg-pill-${layoutGroupId}`}
                 className="exec-segmented-pill"
-                transition={SPRING_PILL}
+                transition={PILL_TRANSITION}
                 aria-hidden="true"
               />
             )}

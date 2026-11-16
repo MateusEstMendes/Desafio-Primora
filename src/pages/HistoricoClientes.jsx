@@ -1,10 +1,11 @@
+import { useChartMotion, activeChartDot } from '../utils/chartMotion';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
 import ClientDirectory from '../components/ClientDirectory';
 import SegmentedPill from '../components/SegmentedPill';
-import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
+import ExecutiveChartTooltip, { usePieSliceRenderer } from '../components/ExecutiveChartTooltip';
 import {
   Timeline,
   Typography,
@@ -37,7 +38,7 @@ import {
   Cell
 } from 'recharts';
 import dayjs from 'dayjs';
-import { formatarPercentual } from '../utils/metrics';
+import { formatarNumero, formatarPercentual } from '../utils/metrics';
 import { getRiskSemanticTokens } from '../utils/themeTokens';
 import { useChartAutoReset } from '../utils/useChartAutoReset';
 import '../components/componentsCSS/HistoricoClientes.css';
@@ -51,6 +52,7 @@ export default function HistoricoClientes({
   themeTokens
 }) {
   const detailRef = useRef(null);
+  const chartMotion = useChartMotion();
   const scoreChartReset = useChartAutoReset(3000);
   const eventosDonutReset = useChartAutoReset(3000);
   const todosClientes = dataset?.clientes || [];
@@ -65,6 +67,7 @@ export default function HistoricoClientes({
   const [filtroCategoriaEvento, setFiltroCategoriaEvento] = useState('todos');
   const [activePieSlice, setActivePieSlice] = useState(-1);
 
+  const pieSliceRenderer = usePieSliceRenderer(activePieSlice, eventosDonutReset.tooltipProps.active === false, 'index');
   useEffect(() => {
     if (clientesVisiveis.length > 0) {
       const exists = clientesVisiveis.some((c) => c.id === selectedClienteId);
@@ -393,7 +396,7 @@ export default function HistoricoClientes({
                   <h2 id="score-trend-heading" className="flat-card-title">
                     Evolução do Score de Saúde (6m)
                   </h2>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
                     Meta Saudável: &ge; 70 pts
                   </span>
                 </div>
@@ -405,21 +408,20 @@ export default function HistoricoClientes({
                 >
                   <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <LineChart
-                      key={scoreChartReset.chartKey}
-                      accessibilityLayer={false}
+                      accessibilityLayer
                       data={histScore}
                       margin={{ top: 8, right: 16, left: -22, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                      <CartesianGrid vertical={false} strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
                       <XAxis
                         dataKey="periodo"
                         stroke={themeTokens.chartAxis}
-                        tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                        tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                       />
                       <YAxis
                         domain={[0, 100]}
                         stroke={themeTokens.chartAxis}
-                        tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                        tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                       />
                       <ReferenceLine
                         y={70}
@@ -436,12 +438,13 @@ export default function HistoricoClientes({
                         label={{ value: 'Crítico (<40)', position: 'insideBottomRight', fill: themeTokens.statusCriticalText, fontSize: 10, fontWeight: 600 }}
                       />
                       <RechartsTooltip
+                        {...scoreChartReset.tooltipProps}
                         isAnimationActive={false}
                         wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                         cursor={{ stroke: statusMeta.color, strokeWidth: 1.5, strokeDasharray: '4 4' }}
                         content={
                           <ExecutiveChartTooltip
-                            valueFormatter={(val) => [`${val} pts`, 'Score']}
+                            valueFormatter={(val) => [`${Number(val).toLocaleString('pt-BR')} pts`, 'Score']}
                           />
                         }
                       />
@@ -452,10 +455,8 @@ export default function HistoricoClientes({
                         stroke={statusMeta.color}
                         strokeWidth={2.5}
                         dot={{ r: 5, fill: statusMeta.color, strokeWidth: 2, stroke: themeTokens.bgSurface }}
-                        activeDot={{ r: 7, fill: statusMeta.color }}
-                        animationDuration={500}
-                        animationEasing="ease-out"
-                        isAnimationActive={true}
+                        activeDot={scoreChartReset.tooltipProps.active === false ? false : { ...activeChartDot, fill: statusMeta.color }}
+                        {...chartMotion}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -468,7 +469,7 @@ export default function HistoricoClientes({
                   <h2 id="events-mix-heading" className="flat-card-title">
                     Perfil de Interações da Conta
                   </h2>
-                  <span className="tabular-nums" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  <span className="tabular-nums" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                     {clienteSelecionado.eventos?.length || 0} eventos
                   </span>
                 </div>
@@ -481,7 +482,7 @@ export default function HistoricoClientes({
                     {...eventosDonutReset.interactionProps}
                   >
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <PieChart key={eventosDonutReset.chartKey} accessibilityLayer={false}>
+                      <PieChart accessibilityLayer={false}>
                         <Pie
                           data={mixEventosDonut}
                           dataKey="value"
@@ -495,12 +496,10 @@ export default function HistoricoClientes({
                           paddingAngle={0}
                           stroke={themeTokens.bgSurface}
                           strokeWidth={2}
-                          activeIndex={activePieSlice}
-                          activeShape={renderActivePieSlice}
+                          shape={pieSliceRenderer}
+                          activeShape={pieSliceRenderer}
                           onClick={(_, idx) => setActivePieSlice(prev => (prev === idx ? -1 : idx))}
-                          animationDuration={500}
-                          animationEasing="ease-out"
-                          isAnimationActive={true}
+                          {...chartMotion}
                         >
                           {mixEventosDonut.map((entry, idx) => (
                             <Cell
@@ -512,12 +511,13 @@ export default function HistoricoClientes({
                           ))}
                         </Pie>
                         <RechartsTooltip
+                          {...eventosDonutReset.tooltipProps}
                           isAnimationActive={false}
                           wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                           content={
                             <ExecutiveChartTooltip
                               valueFormatter={(val, name, props) => [
-                                `${val} eventos (${formatarPercentual(props.payload.pct)})`,
+                                `${formatarNumero(val)} eventos (${formatarPercentual(props.payload.pct)})`,
                                 name
                               ]}
                             />
@@ -536,7 +536,7 @@ export default function HistoricoClientes({
                       </tr>
                     </thead>
                     <tbody>
-                      {mixEventosDonut.map((item) => (
+                      {mixEventosDonut.map((item, index) => (
                         <tr key={item.name}>
                           <td>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
@@ -545,7 +545,10 @@ export default function HistoricoClientes({
                                 style={{ backgroundColor: item.color }}
                                 aria-hidden="true"
                               />
-                              <span>{item.name}</span>
+                              <button type="button" className="chart-legend-button"
+                                aria-pressed={activePieSlice === index}
+                                aria-label={`${item.name}: ${formatarNumero(item.value)} eventos, ${formatarPercentual(item.pct)}`}
+                                onClick={() => setActivePieSlice(prev => prev === index ? -1 : index)}>{item.name}</button>
                             </span>
                           </td>
                           <td className="num-col">{item.value}</td>

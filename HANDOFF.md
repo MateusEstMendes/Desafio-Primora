@@ -1,10 +1,30 @@
-# Handoff — refinamento visual e Jornada de Clientes
+# Handoff — animações e leitura dos gráficos
 
 Atualizado em 16/11/2026. Leia também [DESIGN.md](DESIGN.md), cuja primeira parte descreve a interface atual. A referência Origin preservada ao final desse arquivo é apenas histórica.
 
 ## Pedido atual e ponto de parada
 
-O usuário pediu: “Não mude isso, crie um handoff e atualise o design.md”. A entrega desta rodada é documental. Não recolher a lista de clientes, não reorganizar a Jornada em dois momentos e não iniciar a antiga etapa 7. Não há nova alteração visual autorizada pendente.
+O pedido atual autoriza o plano “Refinar animações e leitura dos gráficos”, implementado nas três telas. A restrição anterior sobre a lista de clientes continua válida: a lista permanece aberta, a Jornada e o Comparativo mantêm rolagem natural, e o layout compacto da Visão Executiva foi preservado. Não há mudanças de API, modelos, dados ou cálculos.
+
+## Refinamento entregue nesta rodada
+
+- `src/utils/chartMotion.js`: durações compartilhadas, configuração do Recharts com movimento reduzido e estilo dos pontos ativos.
+- `ExecutiveChartTooltip`: apresentação unificada e expansão radial de até 6 px. `usePieSliceRenderer` guarda o raio visível por fatia para continuar animações interrompidas mesmo quando o Recharts substitui seus wrappers. Substitui o `activeIndex` obsoleto do Recharts 3 por seleção explícita na shape.
+- `useChartAutoReset`: controla o fechamento do tooltip sem remontagem; toque expira em três segundos, inclusive quando gera foco. Clique/toque fora, saída de foco e Escape fecham a consulta sem limpar a regional selecionada.
+- Eixos e legendas com 12 px, tooltip com valores de 13 px e unidades explícitas, grades horizontais, eixos Contas/% e marcações ajustadas no Comparativo. Referências e escalas foram preservadas.
+- Teclado nos gráficos cartesianos e controles acessíveis nas três legendas de pizza. A Jornada reinicia o destaque ao trocar de cliente, como antes.
+- Pílulas e navegação usam tween de 220 ms. O contador compartilhado de KPIs retoma do número visível ao ser interrompido, sem saltar ao alvo anterior.
+
+## Verificações desta rodada
+
+- `npm test`: cálculos, 77 verificações de domínio/DAO e seis testes de API aprovados.
+- `npm run build`: aprovado; permanecem avisos preexistentes de chunks vazios (`vendor`, `utils`) e bundles acima de 500 kB.
+- Chromium com Playwright disponível fora do projeto, sem adicionar dependências: três telas nos dois temas em 1440×900, 1366×768, 1024×720, 390×844 e 1440×650. Sem rolagem horizontal ou SVGs com dimensões zero.
+- Verificados troca rápida de pontos sem remontar o conteúdo do tooltip, período, seleção/desseleção regional, preservação da regional após inatividade, tipo de gráfico, troca de cliente e botões da legenda da Jornada.
+- Toque emulado: fechamento após três segundos, reabertura, toque fora e identidade do SVG preservada. Testes de teclado, Escape, foco visível e preferência de movimento reduzido complementam a inspeção visual.
+- Limites dos tooltips verificados nas três telas, nos dois temas, em 390 e 1440 px: sem ultrapassar o viewport ou ancestrais com recorte. Foco visível, unidades por teclado e geometria completa do Recharts com movimento reduzido também passaram.
+- Console sem erros de carregamento, chaves ou dimensões. Ao emular movimento reduzido, Motion pode emitir seu aviso informativo de desenvolvimento sobre animações desativadas; esse aviso esperado foi separado dos erros.
+- Capturas e scripts desta sessão ficam em `/tmp/primora-browser/charts-*`, `chart-access.mjs`, `tooltip-bounds.mjs` e `paint-check.mjs`; são artefatos temporários, não dependências do repositório. Toque foi emulado no Chromium; não houve ensaio em aparelho físico nem leitor de tela.
 
 ## Histórico das etapas e decisões
 
@@ -56,7 +76,7 @@ No lugar da etapa 6, o usuário pediu mover “Clientes das Unidades Regionais�
 | [src/components/ExecutiveKpiGrid.jsx](src/components/ExecutiveKpiGrid.jsx) e [ReferenceSystem.css](src/components/componentsCSS/ReferenceSystem.css) | KPIs compartilhados, cores apenas no texto e superfícies com sombras. |
 | [src/components/MotionPrimitives.jsx](src/components/MotionPrimitives.jsx) | Transição de página com classe usada pelo layout executivo. |
 
-## Verificação realizada antes deste handoff
+## Histórico de validação do diretório (rodada anterior)
 
 - Build passou após a última alteração de código. Há avisos de chunks `vendor`/`utils` vazios e bundle acima de 500 kB.
 - Testes de navegador com 2.000 clientes simulados verificaram busca fora da página atual, 6 cards por padrão no DOM, paginação de 24, último cliente, seleção exata, filtros e estados vazios.
@@ -65,7 +85,7 @@ No lugar da etapa 6, o usuário pediu mover “Clientes das Unidades Regionais�
 - Nessa regressão, o console não apresentou os avisos de chave/dimensão reportados, nem respostas HTTP 500.
 - Rolagem suave: posições intermediárias, destino e foco verificados; rolagem imediata confirmada com movimento reduzido.
 - As verificações de navegador usaram Playwright instalado em `/tmp/primora-browser`, com scripts e imagens nessa pasta. São artefatos temporários locais, não testes versionados nem dependência do projeto.
-- Esta rodada altera apenas documentação. Não atribuir a ela uma nova execução de build ou da suíte completa `npm test`.
+- A rodada anterior foi documental. A execução atual de build e `npm test` está registrada nas verificações do refinamento dos gráficos, acima.
 
 Para executar localmente: `npm run dev:server` inicia a API; `npm run dev` inicia o Vite. A URL padrão da API é `http://localhost:3001/api/v1`, configurável por `VITE_API_BASE_URL`. Para verificar compilação, use `npm run build`.
 

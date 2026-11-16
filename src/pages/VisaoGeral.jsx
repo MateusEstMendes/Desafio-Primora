@@ -1,3 +1,4 @@
+import { useChartMotion, activeChartDot } from '../utils/chartMotion';
 import React, { useId, useState } from 'react';
 import { Empty } from 'antd';
 import { motion } from 'motion/react';
@@ -6,45 +7,46 @@ import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAx
 import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
 import { getRegionalColors, getTrendTone } from '../utils/themeTokens';
 import { useChartAutoReset } from '../utils/useChartAutoReset';
-import { SPRING_PILL } from '../components/MotionPrimitives';
+import { PILL_TRANSITION } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
-import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
+import ExecutiveChartTooltip, { usePieSliceRenderer } from '../components/ExecutiveChartTooltip';
 import '../components/componentsCSS/VisaoGeral.css';
 
 function Sparkline({ data, dataKey, color, label, isPercent = false, full = false, themeTokens }) {
+  const chartMotion = useChartMotion();
   const gradient = useId().replace(/:/g, '');
-  const { chartKey, containerRef, interactionProps } = useChartAutoReset(3000);
+  const { tooltipProps, containerRef, interactionProps } = useChartAutoReset(3000);
   return (
     <div
       ref={containerRef}
       className={full ? 'focus-chart' : 'reference-spark'}
-      role="img"
+      role="group"
       aria-label={label}
       {...interactionProps}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <AreaChart
-          key={chartKey}
-          accessibilityLayer={false}
+          accessibilityLayer
           data={data}
           margin={full ? { top: 12, right: 16, left: -25, bottom: 0 } : { top: 7, right: 3, left: 3, bottom: 1 }}
         >
           <defs><linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={0.3} /><stop offset="100%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
           {full && <CartesianGrid vertical={false} stroke={themeTokens.chartGrid} />}
-          {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />}
-          <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: themeTokens.chartAxis }} />
+          {full && <XAxis dataKey="periodo" tickFormatter={v => v.split('/')[0]} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: themeTokens.chartAxis }} />}
+          <YAxis hide={!full} domain={full ? [0, 100] : ['dataMin - 3', 'dataMax + 3']} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: themeTokens.chartAxis }} />
           <Tooltip
+            {...tooltipProps}
             isAnimationActive={false}
             wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
             cursor={{ stroke: color, strokeWidth: 1.5, strokeDasharray: '3 3' }}
             content={
               <ExecutiveChartTooltip
-                valueFormatter={v => [isPercent ? formatarPercentual(v) : formatarNumero(v), label]}
+                valueFormatter={v => [isPercent || dataKey === 'engajamento' ? formatarPercentual(v) : `${formatarNumero(v)} pts`, label]}
                 labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''}
               />
             }
           />
-          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} fill={'url(#' + gradient + ')'} isAnimationActive={true} animationDuration={520} animationEasing="ease-out" dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
+          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} activeDot={tooltipProps.active === false ? false : { ...activeChartDot, fill: color }} fill={'url(#' + gradient + ')'} {...chartMotion} dot={full ? { r: 3, strokeWidth: 2, fill: color } : false} />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -52,8 +54,10 @@ function Sparkline({ data, dataKey, color, label, isPercent = false, full = fals
 }
 
 export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId = 'todos', onSelectTenant, onNavigateTab, themeTokens, onOpenClient }) {
+  const chartMotion = useChartMotion();
   const [period, setPeriod] = useState(3);
   const donutReset = useChartAutoReset(3000);
+  const pieSliceRenderer = usePieSliceRenderer(selectedTenantId, donutReset.tooltipProps.active === false);
   const tenants = dataset?.tenants || [];
   const selected = tenants.filter(t => selectedTenantId === 'todos' || t.id === selectedTenantId);
   if (!selected.length) return <Empty description="Nenhuma unidade encontrada." />;
@@ -103,7 +107,7 @@ export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId
                 <motion.span
                   layoutId="period-pill"
                   className="period-pill-bg"
-                  transition={SPRING_PILL}
+                  transition={PILL_TRANSITION}
                   aria-hidden="true"
                 />
               )}
@@ -138,22 +142,20 @@ export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId
           {...donutReset.interactionProps}
         >
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <PieChart key={donutReset.chartKey} accessibilityLayer={false}>
+            <PieChart accessibilityLayer={false}>
               <Pie
                 data={regions}
                 dataKey="value"
                 nameKey="regiao"
                 innerRadius={0}
-                outerRadius="92%"
+                outerRadius="86%"
                 startAngle={90}
                 endAngle={-270}
                 stroke={themeTokens.bgSurface}
                 strokeWidth={2}
-                activeIndex={regions.findIndex(t => t.id === selectedTenantId)}
-                activeShape={renderActivePieSlice}
-                isAnimationActive={true}
-                animationDuration={500}
-                animationEasing="ease-out"
+                shape={pieSliceRenderer}
+                activeShape={pieSliceRenderer}
+                {...chartMotion}
                 onClick={entry => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
               >
                 {regions.map(t => (
@@ -166,18 +168,19 @@ export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId
                 ))}
               </Pie>
               <Tooltip
+                {...donutReset.tooltipProps}
                 isAnimationActive={false}
                 wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                 content={
                   <ExecutiveChartTooltip
-                    valueFormatter={(value, name) => [formatarNumero(value), name || 'Contas']}
+                    valueFormatter={(value, name) => [`${formatarNumero(value)} contas`, name || 'Contas']}
                   />
                 }
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
+        <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} aria-label={`${t.regiao}: ${formatarNumero(t.value)} contas, ${formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}`} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
       </div><p className="chart-context">Total: {formatarNumero(nationalTotal)} contas · toque em uma regional para filtrar.</p></section>
       <section className="reference-panel changes-panel" tabIndex={0} aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores mudanças</h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
         {changes.map(t => {

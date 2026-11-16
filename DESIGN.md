@@ -57,6 +57,16 @@ Títulos usam Plus Jakarta Sans; a interface usa Inter e números tabulares. Car
 - “Trocar cliente” retorna à lista existente. Busca, filtros e paginação permanecem no componente enquanto a tela estiver montada; não há persistência entre saídas e retornos à Jornada.
 - A lista **permanece aberta** após selecionar. A página usa rolagem natural; não há novo layout fixo ou rolagem independente por coluna.
 
+## Gráficos e interações
+
+- As três telas compartilham `useChartMotion`, `ExecutiveChartTooltip` e `usePieSliceRenderer`. Entradas do Recharts usam 450 ms com `ease-out`; destaques usam 180 ms; navegação e pílulas usam tween de 220 ms, sem mola. Preferência de movimento reduzido desativa a animação do Recharts, a expansão interpolada e as transições CSS.
+- O tooltip entra por opacidade e escala de 0,98 a 1 em 140 ms. O conteúdo muda no mesmo elemento ao passar entre pontos; a posição não recebe interpolação. Título, série, valores e unidades usam formato brasileiro e números tabulares; valores têm 13 px, eixos e legendas têm 12 px.
+- `useChartAutoReset` fecha o tooltip por toque fora, saída de foco ou Escape, sem trocar a chave nem remontar o gráfico. Após toque, três segundos de inatividade também encerram a interação; o foco gerado pelo toque preserva esse temporizador. Mouse e teclado não expiram enquanto o usuário consulta o gráfico.
+- A seleção regional permanece até selecionar/desselecionar explicitamente. As pizzas usam renderização de fatias compatível com Recharts 3, independente do antigo `activeIndex`; o realce por hover é temporário e o realce selecionado persiste. A expansão radial máxima é 6 px, com contorno da superfície do tema e folga no raio. Interrupções continuam do raio visível, inclusive quando o Recharts substitui seu wrapper interno.
+- Barras e fatias suavizam a opacidade; pontos ativos têm halo discreto. Grades cartesianas mantêm apenas linhas horizontais. O Comparativo identifica Contas no eixo esquerdo e % no direito, preservando domínios e referências; nomes móveis usam inclinação e abreviação de Centro-Oeste para evitar colisões.
+- Gráficos cartesianos recebem foco visível e permitem consultar os pontos com setas. Escape fecha o tooltip. As legendas das pizzas oferecem seleção por teclado e identificação dos valores: botões regionais na Visão, tabela interativa no Comparativo e botões de natureza na Jornada. Minigráficos permanecem compactos; scores completos preservam 0–100.
+- APIs, modelos, dados, cálculos, organização dos painéis, rolagem e lista aberta da Jornada foram preservados.
+
 ## Limites e decisões de continuidade
 
 A paginação limita os cards renderizados, mas ocorre no navegador. A API ainda retorna a coleção completa de clientes; não há paginação, busca ou filtros no servidor. A interface foi validada com 2.000 clientes simulados, sem equivaler a um teste de carga da API.
@@ -67,7 +77,7 @@ A proposta de recolher a lista após selecionar, separar escolha e consulta em d
 
 As verificações realizadas durante a implementação incluíram os dois temas; desktop em 1440×900, 1366×768 e 1024×720; celular de 390 px; janelas abaixo do limite de altura; filtros e estados vazios; paginação e acesso ao último cliente; seleção e foco por teclado. A rolagem suave foi verificada com e sem movimento reduzido. O build passou após a última alteração de código, com avisos de chunks vazios e tamanho de bundles.
 
-Mudanças futuras devem preservar APIs, dados e cálculos, e verificar as dimensões e fluxos afetados. A rodada de documentação não modifica a interface.
+Mudanças futuras devem preservar APIs, dados e cálculos, e verificar as dimensões e fluxos afetados. O refinamento dos gráficos descrito acima sucede a rodada documental anterior.
 
 ## Referência original
 

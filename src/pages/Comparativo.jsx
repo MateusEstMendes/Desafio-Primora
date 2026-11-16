@@ -1,8 +1,9 @@
+import { useChartMotion, activeChartDot } from '../utils/chartMotion';
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Table, Tooltip, Typography } from 'antd';
 import SegmentedPill from '../components/SegmentedPill';
-import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
+import ExecutiveChartTooltip, { usePieSliceRenderer } from '../components/ExecutiveChartTooltip';
 import { InfoCircleOutlined, CheckCircleOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
@@ -38,6 +39,7 @@ export default function Comparativo({
   onSelectTenant,
   themeTokens,
 }) {
+  const chartMotion = useChartMotion();
   const mainChartReset = useChartAutoReset(3000);
   const donutReset = useChartAutoReset(3000);
   const [tipoGrafico, setTipoGrafico] = useState('composto');
@@ -58,6 +60,7 @@ export default function Comparativo({
     });
   };
 
+  const pieSliceRenderer = usePieSliceRenderer(selectedTenantId, donutReset.tooltipProps.active === false);
   const tenants = dataset?.tenants || [];
 
   const dadosClassificados = useMemo(() => {
@@ -176,7 +179,7 @@ export default function Comparativo({
       width: 145,
       align: 'right',
       render: (_, record) => (
-        <span className="tabular-nums" style={{ fontSize: 12 }}>
+        <span className="tabular-nums" style={{ fontSize: 11 }}>
           <strong style={{ color: 'var(--status-success-text)' }}>
             {formatarNumero(record.saudeCarteira?.saudavel)}
           </strong>{' '}
@@ -372,12 +375,11 @@ export default function Comparativo({
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               {tipoGrafico === 'composto' ? (
                 <ComposedChart
-                  key={mainChartReset.chartKey}
-                  accessibilityLayer={false}
+                  accessibilityLayer
                   data={dadosGrafico}
-                  margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
+                  margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
                 >
-                  <CartesianGrid yAxisId="left" strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                  <CartesianGrid vertical={false} yAxisId="left" strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
                   <ReferenceLine
                     yAxisId="right"
                     y={15}
@@ -388,30 +390,44 @@ export default function Comparativo({
                   />
                   <XAxis
                     dataKey="nome"
+                    minTickGap={12}
+                    interval={0}
+                    angle={isMobile ? -25 : 0}
+                    textAnchor={isMobile ? 'end' : 'middle'}
+                    height={isMobile ? 44 : 30}
+                    tickFormatter={v => isMobile ? v.replace('Centro-Oeste', 'C.-Oeste') : v}
+                    tickLine={false}
+                    axisLine={false}
                     stroke={themeTokens.chartAxis}
-                    tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                    tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                   />
                   <YAxis
                     yAxisId="left"
+                    tickFormatter={v => formatarNumero(v)}
+                    label={{ value: 'Contas', angle: -90, position: 'insideLeft', offset: 4, fill: themeTokens.chartAxis, fontSize: 12 }}
+                    width={72}
+                    tickCount={5}
                     stroke={themeTokens.brandPrimary}
-                    tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                    tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                   />
                   <YAxis
                     yAxisId="right"
                     orientation="right"
                     domain={[0, 30]}
+                    ticks={[0, 10, 20, 30]}
                     unit="%"
                     stroke={themeTokens.statusCritical}
-                    tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                    tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                   />
                   <RechartsTooltip
+                    {...mainChartReset.tooltipProps}
                     isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                     cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
                     content={
                       <ExecutiveChartTooltip
                         valueFormatter={(val, name) => [
-                          String(name).includes('%') ? formatarPercentual(val) : formatarNumero(val),
+                          String(name).includes('%') ? formatarPercentual(val) : `${formatarNumero(val)} contas`,
                           name
                         ]}
                       />
@@ -421,7 +437,7 @@ export default function Comparativo({
                     itemSorter={null}
                     verticalAlign="top"
                     height={28}
-                    wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
+                    wrapperStyle={{ fontSize: 12, fontWeight: 600 }}
                   />
                   <Bar
                     yAxisId="left"
@@ -430,9 +446,7 @@ export default function Comparativo({
                     fill={themeTokens.brandPrimary}
                     barSize={isMobile ? 22 : 34}
                     radius={[4, 4, 0, 0]}
-                    animationDuration={500}
-                    animationEasing="ease-out"
-                    isAnimationActive={true}
+                    {...chartMotion}
                     onClick={(entry) => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
                   >
                     {dadosGrafico.map((entry) => {
@@ -456,20 +470,17 @@ export default function Comparativo({
                     stroke={themeTokens.statusCritical}
                     strokeWidth={3}
                     dot={{ r: 5, fill: themeTokens.statusCriticalText, strokeWidth: 2, stroke: themeTokens.bgSurface }}
-                    activeDot={{ r: 7, fill: themeTokens.statusCriticalText }}
-                    animationDuration={500}
-                    animationEasing="ease-out"
-                    isAnimationActive={true}
+                    activeDot={mainChartReset.tooltipProps.active === false ? false : { ...activeChartDot, fill: themeTokens.statusCriticalText }}
+                    {...chartMotion}
                   />
                 </ComposedChart>
               ) : (
                 <BarChart
-                  key={mainChartReset.chartKey}
-                  accessibilityLayer={false}
+                  accessibilityLayer
                   data={dadosGrafico}
-                  margin={{ top: 8, right: 16, left: -18, bottom: 0 }}
+                  margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
+                  <CartesianGrid vertical={false} strokeDasharray="2 2" stroke={themeTokens.chartGrid} />
                   <ReferenceLine
                     y={15}
                     stroke="var(--status-critical, #EF4444)"
@@ -479,23 +490,32 @@ export default function Comparativo({
                   />
                   <XAxis
                     dataKey="nome"
+                    minTickGap={12}
+                    interval={0}
+                    angle={isMobile ? -25 : 0}
+                    textAnchor={isMobile ? 'end' : 'middle'}
+                    height={isMobile ? 44 : 30}
+                    tickFormatter={v => isMobile ? v.replace('Centro-Oeste', 'C.-Oeste') : v}
+                    tickLine={false}
+                    axisLine={false}
                     stroke={themeTokens.chartAxis}
-                    tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                    tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                   />
                   <YAxis
                     domain={[0, 100]}
                     unit="%"
                     stroke={themeTokens.chartAxis}
-                    tick={{ fontSize: 11, fill: themeTokens.chartAxis }}
+                    tick={{ fontSize: 12, fill: themeTokens.chartAxis }}
                   />
                   <RechartsTooltip
+                    {...mainChartReset.tooltipProps}
                     isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                     cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
                     content={
                       <ExecutiveChartTooltip
                         valueFormatter={(val, name) => [
-                          String(name).includes('%') ? formatarPercentual(val) : formatarNumero(val),
+                          String(name).includes('%') ? formatarPercentual(val) : `${formatarNumero(val)} contas`,
                           name
                         ]}
                       />
@@ -505,25 +525,21 @@ export default function Comparativo({
                     itemSorter={null}
                     verticalAlign="top"
                     height={28}
-                    wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
+                    wrapperStyle={{ fontSize: 12, fontWeight: 600 }}
                   />
                   <Bar
                     dataKey="taxaRiscoProporcional"
                     name="Risco Proporcional (%)"
                     fill={themeTokens.statusCritical}
                     radius={[2, 2, 0, 0]}
-                    animationDuration={500}
-                    animationEasing="ease-out"
-                    isAnimationActive={true}
+                    {...chartMotion}
                   />
                   <Bar
                     dataKey="sucessoFunil"
                     name="Conversão Funil (%)"
                     fill={themeTokens.brandCyan}
                     radius={[2, 2, 0, 0]}
-                    animationDuration={500}
-                    animationEasing="ease-out"
-                    isAnimationActive={true}
+                    {...chartMotion}
                   />
                 </BarChart>
               )}
@@ -559,22 +575,20 @@ export default function Comparativo({
               {...donutReset.interactionProps}
             >
               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                <PieChart key={donutReset.chartKey} accessibilityLayer={false}>
+                <PieChart accessibilityLayer={false}>
                   <Pie
                     data={donutRegionalData.slices}
                     dataKey="value"
                     nameKey="name"
                     innerRadius={0}
-                    outerRadius="92%"
+                    outerRadius="86%"
                     startAngle={90}
                     endAngle={-270}
                     stroke={themeTokens.bgSurface}
                     strokeWidth={2}
-                    activeIndex={donutRegionalData.slices.findIndex(s => s.id === selectedTenantId)}
-                    activeShape={renderActivePieSlice}
-                    animationDuration={500}
-                    animationEasing="ease-out"
-                    isAnimationActive={true}
+                    shape={pieSliceRenderer}
+                    activeShape={pieSliceRenderer}
+                    {...chartMotion}
                     onClick={(entry) => onSelectTenant(selectedTenantId === entry.id ? 'todos' : entry.id)}
                   >
                     {donutRegionalData.slices.map((s) => (
@@ -587,6 +601,7 @@ export default function Comparativo({
                     ))}
                   </Pie>
                   <RechartsTooltip
+                    {...donutReset.tooltipProps}
                     isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                     content={

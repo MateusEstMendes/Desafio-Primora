@@ -1,80 +1,52 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-/**
- * Hook para gerenciar o auto-retorno de gráficos Recharts ao estado original após inatividade.
- * Quando o usuário clica ou toca em um ponto do gráfico, ele fica selecionado (tooltip / activeDot).
- * Após o período de inatividade especificado (padrão: 3 segundos) ou ao clicar fora do gráfico,
- * a chave interna do gráfico é atualizada, fazendo com que o Recharts retorne ao seu estado limpo original.
- *
- * @param {number} inactivityMs - Tempo em milissegundos de inatividade antes de resetar (padrão: 3000ms)
- * @returns {{
- *   chartKey: number,
- *   containerRef: React.RefObject<HTMLDivElement>,
- *   interactionProps: {
- *     onMouseDown: (e: any) => void,
- *     onClick: (e: any) => void,
- *     onTouchStart: (e: any) => void,
- *     onTouchMove: (e: any) => void,
- *     onMouseMove: (e: any) => void
- *   },
- *   resetChart: () => void,
- *   triggerInteraction: () => void
- * }}
- */
+// Fechar uma interação não remonta o SVG nem altera a seleção de negócio.
 export function useChartAutoReset(inactivityMs = 3000) {
-  const [chartKey, setChartKey] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
   const containerRef = useRef(null);
   const timerRef = useRef(null);
-  const isInteractingRef = useRef(false);
+  const touchRef = useRef(false);
 
   const resetChart = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (isInteractingRef.current) {
-      isInteractingRef.current = false;
-      setChartKey((k) => (k + 1) % 100000);
-    }
+    clearTimeout(timerRef.current);
+    setDismissed(true);
   }, []);
 
-  const triggerInteraction = useCallback(() => {
-    isInteractingRef.current = true;
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+  const triggerInteraction = useCallback((event) => {
+    if (event?.pointerType) touchRef.current = event.pointerType === 'touch';
+    else if (event?.type?.startsWith('touch')) touchRef.current = true;
+    else if (event?.type === 'keydown') touchRef.current = false;
+    setDismissed(false);
+    clearTimeout(timerRef.current);
+    // Mouse e teclado permanecem disponíveis enquanto houver foco/hover.
+    if (touchRef.current) {
+      timerRef.current = setTimeout(resetChart, inactivityMs);
     }
-    timerRef.current = setTimeout(() => {
-      resetChart();
-    }, inactivityMs);
   }, [inactivityMs, resetChart]);
 
-  // Listener para detectar clique/toque fora do gráfico e desativar imediatamente
   useEffect(() => {
-    const handleGlobalPointerDown = (e) => {
-      if (!isInteractingRef.current) return;
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        resetChart();
-      }
+    const outside = event => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) resetChart();
     };
-
-    document.addEventListener('pointerdown', handleGlobalPointerDown, true);
+    document.addEventListener('pointerdown', outside, true);
     return () => {
-      document.removeEventListener('pointerdown', handleGlobalPointerDown, true);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
+      document.removeEventListener('pointerdown', outside, true);
+      clearTimeout(timerRef.current);
     };
   }, [resetChart]);
 
-  const interactionProps = {
-    onTouchStart: triggerInteraction,
-    onTouchMove: triggerInteraction
-  };
-
   return {
-    chartKey,
     containerRef,
-    interactionProps,
+    tooltipProps: { active: dismissed ? false : undefined },
+    interactionProps: {
+      onPointerDown: triggerInteraction,
+      onPointerMove: triggerInteraction,
+      onTouchStart: triggerInteraction,
+      onTouchMove: triggerInteraction,
+      onFocus: triggerInteraction,
+      onKeyDown: event => event.key === 'Escape' ? resetChart() : triggerInteraction(event),
+      onBlur: event => { if (!event.currentTarget.contains(event.relatedTarget)) resetChart(); }
+    },
     resetChart,
     triggerInteraction
   };

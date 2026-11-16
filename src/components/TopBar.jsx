@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { BarChartOutlined, BuildOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import ScopeSelector from './ScopeSelector';
-import { SPRING_PILL } from './MotionPrimitives';
+import { PILL_TRANSITION } from './MotionPrimitives';
 import './componentsCSS/TopBar.css';
 
 const navItems = [
@@ -131,7 +131,7 @@ export default function TopBar({
                   <motion.span
                     layoutId="sidebar-nav-pill"
                     className="sidebar-nav-pill"
-                    transition={SPRING_PILL}
+                    transition={PILL_TRANSITION}
                     aria-hidden="true"
                   />
                 )}

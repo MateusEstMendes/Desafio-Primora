@@ -1,14 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, animate, useReducedMotion } from 'motion/react';
+import { CHART_TIMING } from '../utils/chartMotion';
 
 export const EXECUTIVE_EASE = [0.16, 1, 0.3, 1];
 
-export const SPRING_PILL = {
-  type: 'spring',
-  stiffness: 440,
-  damping: 34,
-  mass: 0.8
-};
+export const PILL_TRANSITION = { type: 'tween', duration: CHART_TIMING.navigation / 1000, ease: EXECUTIVE_EASE };
 
 export function PageTransition({ children, pageKey }) {
   return (
@@ -18,7 +14,7 @@ export function PageTransition({ children, pageKey }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.22, ease: EXECUTIVE_EASE }}
+      transition={{ duration: CHART_TIMING.navigation / 1000, ease: EXECUTIVE_EASE }}
       style={{ minWidth: 0 }}
     >
       {children}
@@ -47,7 +43,7 @@ export function NumberTicker({ value, isPercent = false, decimals = 1, duration 
     const controls = animate(from, numericTarget, {
       duration,
       ease: EXECUTIVE_EASE,
-      onUpdate: (latest) => setDisplayValue(latest),
+      onUpdate: (latest) => { prevValueRef.current = latest; setDisplayValue(latest); },
       onComplete: () => {
         prevValueRef.current = numericTarget;
       }
