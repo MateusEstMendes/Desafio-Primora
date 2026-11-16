@@ -19,7 +19,7 @@ export function ExecutiveKpiGrid({ metrics = [], ariaLabel = 'Indicadores execut
         return (
           <motion.article
             key={m.title}
-            className={`reference-kpi${tone ? ` reference-kpi--${tone}` : ''}`}
+            className={`reference-kpi${tone ? ` reference-kpi--${tone}` : ''}${tone && m.tone !== 'trend' ? ' reference-kpi--text-only' : ''}`}
             style={{ '--metric-accent': m.color }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

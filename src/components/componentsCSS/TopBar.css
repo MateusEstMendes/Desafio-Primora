@@ -2,17 +2,17 @@
 .sidebar-brand-logo { height: 44px; width: auto; max-width: 160px; object-fit: contain; display: block; }
 .reference-sidebar { display: none; }
 .reference-brand { display: inline-flex; align-items: center; color: var(--text-primary); text-decoration: none; border-radius: 6px; }
-.reference-mobile-header { min-height: 76px; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 14px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); position: relative; z-index: 1001; }
+.reference-mobile-header { min-height: 76px; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 14px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--bg-surface); border-bottom: 0; box-shadow: var(--shadow-card); position: relative; z-index: 1001; }
 .reference-mobile-header .sidebar-brand-logo { width: 96px; height: auto; max-height: 40px; }
-.reference-theme { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 44px; min-height: 44px; padding: 10px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; font: 500 13px var(--font-suisse-intl); }
-.reference-theme:hover { color: var(--brand-primary); border-color: var(--brand-primary-border); }
+.reference-theme { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 44px; min-height: 44px; padding: 10px; border: 0; box-shadow: var(--shadow-card); border-radius: 10px; background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; font: 500 13px var(--font-suisse-intl); }
+.reference-theme:hover { color: var(--brand-primary); }
 .reference-theme .anticon { font-size: 18px; }
 .reference-mobile-header .reference-theme span:not(.anticon) { display: none; }
 .reference-sidebar-scope-box { margin: 0 0 28px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 20; }
 .reference-sidebar-scope-box .scope-label { color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
 .mobile-header-controls { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
 .mobile-header-controls .scope-selector-container { min-width: 0; max-width: 200px; flex: 1; }
-.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-subtle); }
+.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 0; box-shadow: var(--shadow-card); }
 .reference-bottom-nav button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 52px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); cursor: pointer; }
 .reference-bottom-nav .anticon { font-size: 20px; }
 .reference-bottom-nav button > span:last-child { font: 500 11px/1.5 var(--font-suisse-intl); }
@@ -24,7 +24,7 @@
 }
 @media (min-width: 1024px) {
   .reference-mobile-header, .reference-bottom-nav { display: none; }
-  .reference-sidebar { display: flex; flex-direction: column; justify-content: space-between; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 244px; padding: 32px 18px 20px; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); overflow-y: auto; overflow-x: hidden; }
+  .reference-sidebar { display: flex; flex-direction: column; justify-content: space-between; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 244px; padding: 32px 18px 20px; background: var(--bg-surface); border-right: 0; box-shadow: var(--shadow-card); overflow-y: auto; overflow-x: hidden; }
   .reference-sidebar .reference-brand { margin: 0 10px; }
   .reference-company { margin: 16px 10px 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 12px; font-weight: 500; }
   .reference-desktop-nav { display: grid; gap: 6px; }

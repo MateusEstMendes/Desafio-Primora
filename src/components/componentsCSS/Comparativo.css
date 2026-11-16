@@ -280,7 +280,7 @@
   align-items: center;
   gap: 5px;
   background-color: rgba(0, 179, 221, 0.16);
-  border: 1px solid rgba(0, 179, 221, 0.45);
+  border: 0; box-shadow: var(--shadow-card);
   color: var(--brand-cyan, #00b3dd);
   font-family: var(--font-roboto-mono);
   font-size: 10px;
@@ -337,13 +337,11 @@
 }
 
 .client-mini-card:hover {
-  border-color: var(--brand-primary);
   background-color: var(--bg-subtle);
   transform: translateY(-2px);
 }
 
 .client-mini-card--novo {
-  border-left: 3px solid var(--brand-cyan, #00b3dd);
   background: linear-gradient(135deg, rgba(0, 179, 221, 0.05) 0%, var(--bg-elevated) 40%);
 }
 
@@ -446,7 +444,7 @@
   align-items: center;
   gap: 6px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 6px;
   padding: 5px 10px;
   color: var(--text-primary);
@@ -458,7 +456,6 @@
 }
 
 .client-mini-inspect-btn:hover {
-  border-color: var(--brand-primary);
   color: var(--brand-primary);
   background-color: var(--brand-primary-soft);
 }
@@ -479,7 +476,7 @@
 
 .ux-rationale-block {
   background-color: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 16px;
   padding: 20px 24px;
   font-size: 13px;
@@ -498,7 +495,7 @@
 .ux-formula-code {
   display: block;
   background-color: var(--bg-canvas);
-  border: 1px solid var(--border-strong);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 8px;
   padding: 10px 14px;
   margin: 10px 0;
@@ -548,9 +545,12 @@
 }
 
 .mobile-comparativo-card--focused {
+  color: var(--brand-primary);
   background-color: var(--brand-primary-soft, rgba(41, 112, 255, 0.08)) !important;
-  box-shadow: 0 0 0 2px var(--brand-primary), var(--shadow-card-hover) !important;
+  box-shadow: var(--shadow-card) !important;
 }
+
+.mobile-comparativo-card--focused .mobile-card-name { color: var(--brand-primary); }
 
 .mobile-card-header {
   display: flex;
@@ -586,7 +586,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   background-color: var(--bg-surface, #141517);
-  border: 1px solid var(--border-subtle);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 8px;
   padding: 10px 8px;
   text-align: center;
@@ -655,7 +655,7 @@
   flex-direction: column;
   gap: 8px;
   background-color: var(--bg-surface, #141517);
-  border: 1px solid var(--border-subtle);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 8px;
   padding: 10px 12px;
   margin-top: 2px;

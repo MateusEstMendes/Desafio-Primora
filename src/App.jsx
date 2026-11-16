@@ -15,9 +15,9 @@ import './components/componentsCSS/ReferenceSystem.css';
 
 const { useBreakpoint } = Grid;
 const MODULES = {
-  'visao-geral': { title: 'Visão Executiva', description: 'Os principais sinais de saúde e desempenho da operação.' },
-  comparativo: { title: 'Comparativo Regional', description: 'Compare exposição a risco, conversão e participação de cada unidade.' },
-  'historico-clientes': { title: 'Jornada de Clientes', description: 'Acompanhe a saúde, o histórico e os eventos de cada conta.' }
+  'visao-geral': 'Visão Executiva',
+  comparativo: 'Comparativo Regional',
+  'historico-clientes': 'Jornada de Clientes'
 };
 
 class ErrorBoundary extends React.Component {
@@ -37,7 +37,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 32, textAlign: 'center', background: 'var(--bg-surface)', borderRadius: 12, border: '1px solid var(--border-subtle)', margin: 24 }}>
+        <div style={{ padding: 32, textAlign: 'center', background: 'var(--bg-surface)', borderRadius: 12, boxShadow: 'var(--shadow-card)', margin: 24 }}>
           <h3 style={{ color: 'var(--status-critical, #EF4444)', marginBottom: 8 }}>Ops, ocorreu um erro ao carregar esta visualização</h3>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 16, fontSize: 13 }}>{this.state.error?.message || 'Erro inesperado no componente.'}</p>
           <button
@@ -155,8 +155,8 @@ export default function App() {
           borderRadiusLG: 16,
           controlHeight: 40,
           borderRadiusSM: 8,
-          boxShadow: 'none',
-          boxShadowSecondary: 'none',
+          boxShadow: activeTokens.shadowCard,
+          boxShadowSecondary: activeTokens.shadowCard,
           motionDurationMid: '0.2s',
           motionDurationSlow: '0.2s',
           fontFamily: `'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
@@ -196,14 +196,7 @@ export default function App() {
         />
 
         <main id="main-content" className="app-main-content" tabIndex={-1}>
-          <header className="module-heading">
-            <div>
-              <span className="module-eyebrow">Distribuidora Vetor · Painel de gestão</span>
-              <h1>{MODULES[currentTab].title}</h1>
-              <p>{MODULES[currentTab].description}</p>
-            </div>
-            <span className="module-scope"><span aria-hidden="true" />{selectedTenantId === 'todos' ? 'Todas as regionais' : dadosPainel.tenants.find(t => t.id === selectedTenantId)?.regiao || 'Regional selecionada'}</span>
-          </header>
+          <h1 className="sr-only">{MODULES[currentTab]}</h1>
           {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
           : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
           : dadosPainel.tenants.length === 0 && dadosPainel.clientes.length === 0 ? <Empty description="Nenhum resultado encontrado." />

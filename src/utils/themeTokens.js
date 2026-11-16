@@ -2,7 +2,7 @@
 export const THEME_TOKENS = {
   light: {
     mode: 'light', label: 'Claro',
-    bgCanvas: '#F4F6FA', bgAbyss: '#E9EEF5', bgSurface: '#FFFFFF',
+    bgCanvas: '#FAFBFD', bgAbyss: '#E9EEF5', bgSurface: '#FFFFFF',
     bgSubtle: '#EDF1F7', bgElevated: '#F8FAFC', bgSteel: '#D6DEEA',
     bgSilver: '#17243B', bgHeader: 'rgba(255, 255, 255, 0.94)', bgFooter: '#EDF1F7',
     borderDefault: '#D6DEEA', borderSubtle: '#E3E9F1', borderStrong: '#8795AA', borderFocus: '#2563EB',
@@ -16,8 +16,8 @@ export const THEME_TOKENS = {
     statusCritical: '#DC2626', statusCriticalText: '#B91C1C', statusCriticalSoft: '#FEF0F0', statusCriticalBorder: '#F0BBBB',
     category1: '#2563EB', category2: '#0F766E', category3: '#A16207', category4: '#64748B',
     chartGrid: '#E3E9F1', chartAxis: '#5C6D84', chartTooltipBg: '#FFFFFF', chartTooltipBorder: '#D6DEEA',
-    shadowCard: '0 2px 5px rgba(23, 36, 59, 0.025)',
-    shadowCardHover: '0 6px 18px rgba(23, 36, 59, 0.07)'
+    shadowCard: '0 2px 10px rgba(23, 36, 59, 0.10)',
+    shadowCardHover: '0 6px 18px rgba(23, 36, 59, 0.12)'
   },
   dark: {
     mode: 'dark', label: 'Escuro',
@@ -35,8 +35,8 @@ export const THEME_TOKENS = {
     statusCritical: '#FF9494', statusCriticalText: '#FF9494', statusCriticalSoft: '#40272F', statusCriticalBorder: '#80434F',
     category1: '#8AB4FF', category2: '#5FD3C4', category3: '#F2C568', category4: '#95A7C0',
     chartGrid: '#2B394D', chartAxis: '#95A7C0', chartTooltipBg: '#182231', chartTooltipBorder: '#35455D',
-    shadowCard: '0 2px 5px rgba(0, 0, 0, 0.08)',
-    shadowCardHover: '0 6px 18px rgba(0, 0, 0, 0.16)'
+    shadowCard: '0 3px 12px rgba(0, 0, 0, 0.26)',
+    shadowCardHover: '0 6px 18px rgba(0, 0, 0, 0.30)'
   }
 };
 

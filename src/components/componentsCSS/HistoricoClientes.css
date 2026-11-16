@@ -83,7 +83,6 @@
 }
 
 .client-tab-item--active {
-  border-color: var(--brand-primary);
   background-color: var(--brand-primary-soft);
 }
 
@@ -147,7 +146,7 @@
 .mobile-client-select .ant-select-selector {
   border-radius: 8px !important;
   background-color: var(--bg-elevated) !important;
-  border-color: var(--border-default) !important;
+
 }
 
 /* Faixa Contínua de Metadados Financeiros e Contratuais da Conta */
@@ -178,7 +177,7 @@
   }
   .account-ledger-cell {
     background: var(--bg-surface);
-    border: 1px solid var(--border-default) !important;
+    border: 0 !important; box-shadow: var(--shadow-card);
     border-radius: 12px !important;
     padding: 14px !important;
   }
@@ -318,14 +317,9 @@
 
 .antd-timeline-card {
   background: var(--bg-canvas);
-  border: 1px solid var(--border-subtle);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 6px;
   padding: 10px 14px;
-  transition: border-color 0.2s ease;
-}
-
-.antd-timeline-card:hover {
-  border-color: var(--brand-primary);
 }
 
 .antd-timeline-card-header {
@@ -373,7 +367,7 @@
   flex-wrap: wrap;
   padding: 16px 20px;
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  border: 0; box-shadow: var(--shadow-card);
   border-radius: 12px;
   margin-top: 20px;
 }
