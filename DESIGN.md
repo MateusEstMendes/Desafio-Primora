@@ -10,6 +10,7 @@ A interface foi adaptada para consulta de indicadores B2B. A referência editori
 - **Consistência:** mesma geometria de cards, controles de filtro e espaçamentos entre módulos; superfícies estáticas não se elevam ao passar o mouse.
 - **Concisão:** a faixa de identificação do cliente apresenta nome/código, regional e contrato. Score, variação, eventos e ticket aparecem na grade de indicadores, evitando repetir os mesmos dados em três blocos.
 - **Semântica:** engajamento usa azul; conversão usa verde azulado; o gráfico de participação se chama “Distribuição da carteira”. A cor do score de uma conta acompanha seu status de saúde, enquanto o risco regional usa sua própria taxa.
+- **Destaques:** exposição ao risco recebe fundo, borda e valor em vermelho. Variações favoráveis usam verde; desfavoráveis, vermelho; variação zero permanece neutra. Na Jornada, o card de variação também recebe esse destaque. Em “Maiores mudanças”, a curva e o valor seguem a mesma cor. O delta do engajamento considera as regionais e o período selecionados.
 
 ## Paleta principal
 

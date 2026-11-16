@@ -65,6 +65,13 @@ export function getRegionalColors(tokens) {
   };
 }
 
+/** A cor expressa o resultado da variação, inclusive quando reduzir é melhor. */
+export function getTrendTone(value, lowerIsBetter = false) {
+  if (!Number.isFinite(value) || value === 0) return 'neutral';
+  const improved = lowerIsBetter ? value < 0 : value > 0;
+  return improved ? 'positive' : 'negative';
+}
+
 /**
  * Retorna os tokens semânticos de acordo com a taxa de risco proporcional (%) ou status direto
  */

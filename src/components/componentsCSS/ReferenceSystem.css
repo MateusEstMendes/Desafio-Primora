@@ -44,14 +44,20 @@
 .donut-center-sub { font-family: var(--font-suisse-intl); font-size: 11px; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
 .reference-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; margin: 0; }
 .reference-kpi { position: relative; min-width: 0; padding: 18px; border: 1px solid var(--border-subtle); background: var(--bg-surface); border-radius: var(--radius-cards); box-shadow: var(--shadow-card); }
-.reference-kpi::before { content: ''; position: absolute; top: 22px; left: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--metric-accent, var(--brand-primary)); }
+.reference-kpi::before { content: ''; position: absolute; top: 22px; left: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--metric-value-color, var(--metric-accent, var(--brand-primary))); }
 .reference-kpi h2 { margin: 0 0 14px; padding-left: 14px; color: var(--text-secondary); font: 500 12px/1.5 var(--font-suisse-intl); letter-spacing: 0; }
 .reference-kpi-bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.reference-kpi-bottom > strong { color: var(--text-primary); font-size: clamp(26px, 3vw, 32px); line-height: 1.1; letter-spacing: -.04em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.reference-kpi-bottom > strong { color: var(--metric-value-color, var(--text-primary)); font-size: clamp(26px, 3vw, 32px); line-height: 1.1; letter-spacing: -.04em; font-weight: 700; font-variant-numeric: tabular-nums; }
 .reference-kpi-bottom > strong.is-currency { font-size: clamp(16px, 1.65vw, 24px); white-space: nowrap; }
 .metric-note { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; background: var(--bg-elevated); border-radius: 6px; padding: 4px 7px; font-size: 11px; line-height: 1.5; font-weight: 500; color: var(--text-secondary); }
 .metric-note.is-positive { background: var(--status-success-soft); color: var(--status-success-text); }
 .metric-note.is-negative { background: var(--status-critical-soft); color: var(--status-critical-text); }
+.metric-note.is-neutral { background: var(--bg-subtle); color: var(--text-secondary); }
+/* Draw attention to risk and meaningful changes without recoloring every KPI. */
+.reference-kpi--negative { --metric-value-color: var(--status-critical-text); background: var(--status-critical-soft); border-color: var(--status-critical-border); box-shadow: inset 3px 0 0 var(--status-critical), var(--shadow-card); }
+.reference-kpi--positive { --metric-value-color: var(--status-success-text); background: var(--status-success-soft); border-color: var(--status-success-border); box-shadow: inset 3px 0 0 var(--status-success), var(--shadow-card); }
+.reference-kpi--negative h2, .reference-kpi--positive h2 { color: var(--metric-value-color); }
+.reference-kpi--negative .metric-note, .reference-kpi--positive .metric-note { background: var(--bg-surface); color: var(--metric-value-color); }
 .comparativo-container, .clientes-container { min-width: 0; gap: 20px; }
 .comparativo-top-charts-grid { gap: 20px; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
 .comparativo-top-charts-grid > *, .clientes-container > *, .bottom-summary-grid > * { min-width: 0; }

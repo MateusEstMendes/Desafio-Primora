@@ -440,10 +440,11 @@ export default function HistoricoClientes({
               },
               {
                 title: 'Variação (6m)',
-                displayValue: `${deltaScore >= 0 ? '+' : ''}${deltaScore} pts`,
+                tone: 'trend',
+                displayValue: `${deltaScore > 0 ? '+' : ''}${deltaScore} pts`,
                 trend: deltaScore,
                 note: 'vs. início da série',
-                color: deltaScore >= 0 ? themeTokens.statusSuccess : themeTokens.statusCritical
+                color: deltaScore > 0 ? themeTokens.statusSuccess : deltaScore < 0 ? themeTokens.statusCritical : themeTokens.textMuted
               },
               {
                 title: 'Eventos na jornada',

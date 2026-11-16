@@ -340,6 +340,7 @@ export default function Comparativo({
     return [
       {
         title: 'Maior exposição',
+        tone: 'negative',
         rawValue: maior.taxaRiscoProporcional,
         isPercent: true,
         note: maior.nome.replace('Unidade ', '').replace(' (Matriz)', ''),
@@ -347,6 +348,7 @@ export default function Comparativo({
       },
       {
         title: 'Melhor benchmark',
+        tone: 'positive',
         rawValue: menor.taxaRiscoProporcional,
         isPercent: true,
         note: menor.nome.replace('Unidade ', '').replace(' (Matriz)', ''),

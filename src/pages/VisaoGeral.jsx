@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { RightOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { calcularRiscoAbsoluto, calcularTaxaConversaoFunil, formatarNumero, formatarPercentual } from '../utils/metrics';
-import { getRegionalColors } from '../utils/themeTokens';
+import { getRegionalColors, getTrendTone } from '../utils/themeTokens';
 import { useChartAutoReset } from '../utils/useChartAutoReset';
 import { SPRING_PILL } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
@@ -82,13 +82,13 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
   const client = (dataset.clientes || []).find(c => selectedTenantId === 'todos' || c.tenantId === selectedTenantId);
   const events = [...(client?.eventos || [])].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 3);
   const openClient = () => { if (onOpenClient) onOpenClient(client); else { onSelectTenant(client.tenantId); onNavigateTab('historico-clientes'); } };
-  const deltaEngagement = (selected[0]?.historicoTendencia || []).length > 1
-    ? (selected[0].historicoTendencia.at(-1)?.engajamento || 0) - (selected[0].historicoTendencia[0]?.engajamento || 0)
+  const deltaEngagement = series.length > 1
+    ? Number((series.at(-1).engajamento - series[0].engajamento).toFixed(1))
     : 0;
   const metrics = [
-    { title: 'Exposição a risco', rawValue: total ? (risk / total) * 100 : 0, isPercent: true, note: formatarNumero(risk) + ' contas sob risco', color: themeTokens.statusCritical },
+    { title: 'Exposição a risco', rawValue: total ? (risk / total) * 100 : 0, isPercent: true, note: formatarNumero(risk) + ' contas sob risco', color: themeTokens.statusCritical, tone: 'negative' },
     { title: 'Conversão do funil', rawValue: conversion, isPercent: true, note: '90 dias · tarefas', color: themeTokens.brandCyan },
-    { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: themeTokens.brandPrimary },
+    { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement > 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: themeTokens.brandPrimary },
     { title: 'Carteira ativa', rawValue: total, isPercent: false, note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: themeTokens.textSecondary }
   ];
   return <div className="executive-dashboard">
@@ -180,7 +180,19 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
       </div><p className="chart-context">Total: {formatarNumero(nationalTotal)} contas · toque em uma regional para filtrar.</p></section>
       <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores mudanças</h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
-        {changes.map(t => <div className="change-row" key={t.id} style={{ '--metric-accent': t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan }}><button type="button" className="signal-label" onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}>{t.regiao}</button><Sparkline data={t.points} dataKey="engajamento" color={t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan} label={t.regiao + ': engajamento'} themeTokens={themeTokens} /><strong className={t.change >= 0 ? 'is-positive' : 'is-negative'}>{t.change >= 0 ? '+' : ''}{t.change.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}<small> p.p.</small></strong></div>)}
+        {changes.map(t => {
+          const tone = getTrendTone(t.change);
+          const color = tone === 'positive' ? themeTokens.statusSuccess : tone === 'negative' ? themeTokens.statusCritical : themeTokens.textMuted;
+          return (
+            <div className="change-row" key={t.id} style={{ '--metric-accent': color }}>
+              <button type="button" className="signal-label" onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}>{t.regiao}</button>
+              <Sparkline data={t.points} dataKey="engajamento" color={color} label={t.regiao + ': engajamento'} themeTokens={themeTokens} />
+              <strong className={`change-value is-${tone}`}>
+                {t.change > 0 ? '+' : ''}{t.change.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}<small> p.p.</small>
+              </strong>
+            </div>
+          );
+        })}
         <p className="chart-context">Variação do engajamento no período.</p>
       </section>
     </div>

@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, ArrowDownOutlined, MinusOutlined } from '@ant-design/icons';
 import { EXECUTIVE_EASE, NumberTicker } from './MotionPrimitives';
+import { getTrendTone } from '../utils/themeTokens';
 
 /**
  * Grade executiva reutilizável de KPIs (originada da Visão Executiva).
@@ -10,43 +11,49 @@ import { EXECUTIVE_EASE, NumberTicker } from './MotionPrimitives';
 export function ExecutiveKpiGrid({ metrics = [], ariaLabel = 'Indicadores executivos' }) {
   return (
     <section className="reference-kpis" aria-label={ariaLabel}>
-      {metrics.map((m, idx) => (
-        <motion.article
-          key={m.title}
-          className="reference-kpi"
-          style={{ '--metric-accent': m.color }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28, delay: idx * 0.045, ease: EXECUTIVE_EASE }}
-        >
-          <h2>{m.title}</h2>
-          <div className="reference-kpi-bottom">
-            <strong className={typeof m.displayValue === 'string' && m.displayValue.startsWith('R$') ? 'is-currency' : undefined}>
-              {m.displayValue !== undefined ? (
-                m.displayValue
-              ) : (
-                <NumberTicker
-                  value={m.rawValue}
-                  isPercent={Boolean(m.isPercent)}
-                  decimals={m.decimals ?? 1}
-                />
+      {metrics.map((m, idx) => {
+        const hasTrend = Number.isFinite(m.trend);
+        const trendTone = getTrendTone(m.trend, m.lowerIsBetter);
+        const tone = m.tone === 'trend' ? trendTone : m.tone;
+        const trendLabel = { positive: 'Variação favorável', negative: 'Variação desfavorável', neutral: 'Sem variação' }[trendTone];
+        return (
+          <motion.article
+            key={m.title}
+            className={`reference-kpi${tone ? ` reference-kpi--${tone}` : ''}`}
+            style={{ '--metric-accent': m.color }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28, delay: idx * 0.045, ease: EXECUTIVE_EASE }}
+          >
+            <h2>{m.title}</h2>
+            <div className="reference-kpi-bottom">
+              <strong className={typeof m.displayValue === 'string' && m.displayValue.startsWith('R$') ? 'is-currency' : undefined}>
+                {m.displayValue !== undefined ? (
+                  m.displayValue
+                ) : (
+                  <NumberTicker
+                    value={m.rawValue}
+                    isPercent={Boolean(m.isPercent)}
+                    decimals={m.decimals ?? 1}
+                  />
+                )}
+              </strong>
+              {m.note && (
+                <span
+                  className={
+                    'metric-note ' +
+                    (hasTrend ? `is-${trendTone}` : '')
+                  }
+                  aria-label={hasTrend ? `${trendLabel}: ${m.note}` : undefined}
+                >
+                  {hasTrend && (m.trend > 0 ? <ArrowUpOutlined /> : m.trend < 0 ? <ArrowDownOutlined /> : <MinusOutlined />)}
+                  {m.note}
+                </span>
               )}
-            </strong>
-            {m.note && (
-              <span
-                className={
-                  'metric-note ' +
-                  (m.trend !== undefined ? (m.trend >= 0 ? 'is-positive' : 'is-negative') : '')
-                }
-              >
-                {m.trend !== undefined &&
-                  (m.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />)}
-                {m.note}
-              </span>
-            )}
-          </div>
-        </motion.article>
-      ))}
+            </div>
+          </motion.article>
+        );
+      })}
     </section>
   );
 }
