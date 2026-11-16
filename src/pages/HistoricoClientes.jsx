@@ -158,19 +158,15 @@ export default function HistoricoClientes({
     const meta = getEventoCategoryMeta(evt.categoria);
     const dataFormatada = dayjs(evt.data).format('DD/MM/YYYY HH:mm');
 
-    let color = 'blue';
+    const color = meta.color;
     let dotIcon = <InfoCircleOutlined style={{ fontSize: 15 }} />;
     if (evt.categoria === 'sucesso') {
-      color = 'green';
       dotIcon = <CheckCircleOutlined style={{ fontSize: 15 }} />;
     } else if (evt.categoria === 'critico') {
-      color = 'red';
       dotIcon = <AlertOutlined style={{ fontSize: 15 }} />;
     } else if (evt.categoria === 'alerta') {
-      color = 'orange';
       dotIcon = <ExclamationCircleOutlined style={{ fontSize: 15 }} />;
     } else if (evt.categoria === 'comercial') {
-      color = 'cyan';
       dotIcon = <ShoppingCartOutlined style={{ fontSize: 15 }} />;
     }
 
@@ -189,7 +185,7 @@ export default function HistoricoClientes({
             <Typography.Text strong className="antd-timeline-title">
               {evt.tipo}
             </Typography.Text>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div className="timeline-event-meta">
               <span className={`geo-badge ${meta.badgeClass}`}>
                 {meta.symbol} {meta.label}
               </span>
@@ -422,13 +418,6 @@ export default function HistoricoClientes({
               </span>
             </div>
 
-            <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-primary, #0074FF)' }}>
-              <span className="account-ledger-label">Ticket Médio Mensal</span>
-              <span className="account-ledger-val" style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>
-                {clienteSelecionado.ticketMedioMensal}
-              </span>
-            </div>
-
             <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-cyan, #00CDE5)' }}>
               <span className="account-ledger-label">Tempo de Contrato</span>
               <span className="account-ledger-val">
@@ -436,30 +425,6 @@ export default function HistoricoClientes({
               </span>
             </div>
 
-            <div className="account-ledger-cell" style={{ '--cell-accent': statusMeta.color }}>
-              <span className="account-ledger-label">Score de Saúde</span>
-              <span className="account-ledger-val" style={{ color: statusMeta.color, fontWeight: 700 }}>
-                {statusMeta.symbol} {clienteSelecionado.scoreSaudeAtual} / 100 ({clienteSelecionado.statusSaude})
-              </span>
-            </div>
-
-            <div
-              className="account-ledger-cell"
-              style={{
-                '--cell-accent': deltaScore >= 0 ? 'var(--status-success-text)' : 'var(--status-critical-text)'
-              }}
-            >
-              <span className="account-ledger-label">Variação (6m)</span>
-              <span
-                className="account-ledger-val"
-                style={{
-                  color: deltaScore >= 0 ? 'var(--status-success-text)' : 'var(--status-critical-text)',
-                  fontWeight: 700
-                }}
-              >
-                {deltaScore >= 0 ? `▲ +${deltaScore} pts` : `▼ ${deltaScore} pts`}
-              </span>
-            </div>
           </section>
 
           {/* 3. KPIs EXECUTIVOS DO CLIENTE (REUTILIZADO DA VISÃO EXECUTIVA) */}
@@ -471,27 +436,27 @@ export default function HistoricoClientes({
                 rawValue: clienteSelecionado.scoreSaudeAtual,
                 isPercent: false,
                 note: clienteSelecionado.statusSaude,
-                color: clienteSelecionado.scoreSaudeAtual >= 70 ? '#10B981' : clienteSelecionado.scoreSaudeAtual >= 45 ? '#F59E0B' : '#EF4444'
+                color: statusMeta.color
               },
               {
                 title: 'Variação (6m)',
                 displayValue: `${deltaScore >= 0 ? '+' : ''}${deltaScore} pts`,
                 trend: deltaScore,
                 note: 'vs. início da série',
-                color: deltaScore >= 0 ? '#10B981' : '#EF4444'
+                color: deltaScore >= 0 ? themeTokens.statusSuccess : themeTokens.statusCritical
               },
               {
                 title: 'Eventos na jornada',
                 rawValue: (clienteSelecionado.eventos || []).length,
                 isPercent: false,
                 note: 'registros auditados',
-                color: '#00CDE5'
+                color: themeTokens.brandCyan
               },
               {
                 title: 'Ticket médio mensal',
                 displayValue: clienteSelecionado.ticketMedioMensal || '—',
                 note: (clienteSelecionado.unidadeNome || '').replace('Unidade ', ''),
-                color: '#0074FF'
+                color: themeTokens.brandPrimary
               }
             ]}
           />
@@ -535,17 +500,17 @@ export default function HistoricoClientes({
                       />
                       <ReferenceLine
                         y={70}
-                        stroke="#10B981"
+                        stroke={themeTokens.statusSuccess}
                         strokeDasharray="4 4"
                         strokeWidth={1.5}
-                        label={{ value: 'Saudável (≥70)', position: 'insideTopRight', fill: '#10B981', fontSize: 10, fontWeight: 600 }}
+                        label={{ value: 'Saudável (≥70)', position: 'insideTopRight', fill: themeTokens.statusSuccessText, fontSize: 10, fontWeight: 600 }}
                       />
                       <ReferenceLine
                         y={40}
-                        stroke="#EF4444"
+                        stroke={themeTokens.statusCritical}
                         strokeDasharray="3 3"
                         strokeWidth={1.5}
-                        label={{ value: 'Crítico (<40)', position: 'insideBottomRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
+                        label={{ value: 'Crítico (<40)', position: 'insideBottomRight', fill: themeTokens.statusCriticalText, fontSize: 10, fontWeight: 600 }}
                       />
                       <RechartsTooltip
                         isAnimationActive={false}
@@ -563,7 +528,7 @@ export default function HistoricoClientes({
                         name="Score"
                         stroke={statusMeta.color}
                         strokeWidth={2.5}
-                        dot={{ r: 5, fill: statusMeta.color, strokeWidth: 2, stroke: '#FFFFFF' }}
+                        dot={{ r: 5, fill: statusMeta.color, strokeWidth: 2, stroke: themeTokens.bgSurface }}
                         activeDot={{ r: 7, fill: statusMeta.color }}
                         animationDuration={500}
                         animationEasing="ease-out"
@@ -710,16 +675,6 @@ export default function HistoricoClientes({
                 </div>
               )}
             </ExecutivePanel>
-          </div>
-          <div className="client-footer-actions-bar">
-            <div className="client-footer-actions-info">
-              <span className="client-footer-account-title">
-                Dados da Conta: <strong>{clienteSelecionado.nome}</strong>
-              </span>
-              <span className="client-footer-account-sub">
-                Código: {clienteSelecionado.id} · {clienteSelecionado.unidadeNome} · {clienteSelecionado.ticketMedioMensal}
-              </span>
-            </div>
           </div>
         </>
       )}

@@ -21,7 +21,7 @@ export function ExecutiveKpiGrid({ metrics = [], ariaLabel = 'Indicadores execut
         >
           <h2>{m.title}</h2>
           <div className="reference-kpi-bottom">
-            <strong>
+            <strong className={typeof m.displayValue === 'string' && m.displayValue.startsWith('R$') ? 'is-currency' : undefined}>
               {m.displayValue !== undefined ? (
                 m.displayValue
               ) : (

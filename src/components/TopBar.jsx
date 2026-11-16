@@ -105,9 +105,9 @@ export default function TopBar({
 
         {/* Seletor de Escopo Regional no Topo (Acessível, Rápido e Sem Quebra) */}
         <div className="reference-sidebar-scope-box">
-          <label className="scope-label">
+          <span className="scope-label">
             Unidade Regional
-          </label>
+          </span>
           <ScopeSelector
             value={selectedTenantId}
             onChange={onTenantChange}
@@ -117,7 +117,7 @@ export default function TopBar({
         </div>
 
         <nav className="reference-desktop-nav">
-          {navItems.map((item, i) => {
+          {navItems.map((item) => {
             const isActive = currentTab === item.key;
             return (
               <motion.button
@@ -135,7 +135,7 @@ export default function TopBar({
                     aria-hidden="true"
                   />
                 )}
-                <span className="nav-index">{String(i + 1).padStart(2, '0')}</span>
+                <span className="nav-icon" aria-hidden="true">{item.icon}</span>
                 {item.label}
               </motion.button>
             );

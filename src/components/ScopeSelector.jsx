@@ -84,7 +84,7 @@ export default function ScopeSelector({
       </button>
 
       {isOpen && (
-        <div className="scope-selector-dropdown" role="listbox">
+        <div className="scope-selector-dropdown" role="listbox" aria-label="Unidades regionais">
           <div className="scope-dropdown-list">
             {options.map((opt) => {
               const isSelected = opt.value === value;
@@ -97,10 +97,10 @@ export default function ScopeSelector({
                   role="option"
                   aria-selected={isSelected}
                 >
-                  <span className="scope-option-icon">{opt.icon}</span>
+                  <span className="scope-option-icon" aria-hidden="true">{opt.icon}</span>
                   <span className="scope-option-title">{opt.label}</span>
                   {isSelected && (
-                    <CheckOutlined className="scope-option-check" />
+                    <CheckOutlined className="scope-option-check" aria-hidden="true" />
                   )}
                 </button>
               );

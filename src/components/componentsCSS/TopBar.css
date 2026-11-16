@@ -1,91 +1,38 @@
-/* Mobile-first navigation, based on the supplied Primora references. */
-.sidebar-brand-logo {
-  height: 48px;
-  max-height: 52px;
-  width: auto;
-  max-width: 175px;
-  object-fit: contain;
-  display: block;
-}
+/* Navigation uses the same neutral surfaces and blue selection as the content. */
+.sidebar-brand-logo { height: 44px; width: auto; max-width: 160px; object-fit: contain; display: block; }
 .reference-sidebar { display: none; }
-.reference-brand { display: inline-flex; align-items: center; gap: 9px; color: var(--text-primary); text-decoration: none; }
-.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 3px; background: var(--brand-primary); }
-.brand-mark svg { width: 33px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.brand-word { font: 600 30px/1 var(--font-display); letter-spacing: -1px; }
-.reference-mobile-header {
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 16px;
-  border-bottom: 1px solid var(--border-default);
-  padding-top: env(safe-area-inset-top, 0px);
-  position: relative;
-  z-index: 1001;
-}
-.reference-mobile-header .sidebar-brand-logo { height: 38px; max-height: 40px; max-width: 135px; }
-.reference-theme { display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; font: inherit; }
-.reference-theme .anticon { font-size: 24px; }
+.reference-brand { display: inline-flex; align-items: center; color: var(--text-primary); text-decoration: none; border-radius: 6px; }
+.reference-mobile-header { min-height: 76px; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 14px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); position: relative; z-index: 1001; }
+.reference-mobile-header .sidebar-brand-logo { width: 96px; height: auto; max-height: 40px; }
+.reference-theme { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 44px; min-height: 44px; padding: 10px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; font: 500 13px var(--font-suisse-intl); }
+.reference-theme:hover { color: var(--brand-primary); border-color: var(--brand-primary-border); }
+.reference-theme .anticon { font-size: 18px; }
 .reference-mobile-header .reference-theme span:not(.anticon) { display: none; }
-.reference-sidebar-scope-box {
-  margin: 0 4px 18px 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-  z-index: 20;
+.reference-sidebar-scope-box { margin: 0 0 28px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 20; }
+.reference-sidebar-scope-box .scope-label { color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.mobile-header-controls { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.mobile-header-controls .scope-selector-container { min-width: 0; max-width: 200px; flex: 1; }
+.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-subtle); }
+.reference-bottom-nav button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 52px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); cursor: pointer; }
+.reference-bottom-nav .anticon { font-size: 20px; }
+.reference-bottom-nav button > span:last-child { font: 500 11px/1.5 var(--font-suisse-intl); }
+.reference-bottom-nav button[aria-current] { color: var(--brand-primary); background: var(--brand-primary-soft); }
+@media (max-width: 359px) {
+  .reference-mobile-header { grid-template-columns: 80px minmax(0, 1fr); gap: 10px; padding-inline: 12px; }
+  .reference-mobile-header .sidebar-brand-logo { width: 80px; }
+  .mobile-header-controls { gap: 6px; }
 }
-
-.reference-sidebar-scope-box .scope-label {
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  font-family: var(--font-roboto-mono);
-}
-
-.mobile-header-controls {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.reference-bottom-nav { position: fixed; z-index: 1000; bottom: 0; inset-inline: 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--bg-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-default); }
-.reference-bottom-nav button { display: flex; position: relative; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 62px; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }
-.reference-bottom-nav .anticon { font-size: 25px; }
-.reference-bottom-nav button > span:last-child { font: 600 10px/1.5 var(--font-suisse-intl); text-transform: uppercase; letter-spacing: .06em; }
-.reference-bottom-nav button[aria-current] { color: var(--brand-primary); }
-.reference-bottom-nav button[aria-current]::after { content: ''; height: 3px; background: var(--brand-primary); border-radius: 9px; position: absolute; bottom: -3px; left: 16%; right: 16%; }
 @media (min-width: 1024px) {
-  .reference-mobile-header, .reference-mobile-scope, .reference-bottom-nav { display: none; }
-  .reference-sidebar {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 100;
-    width: 242px;
-    padding: 24px 14px;
-    background: var(--bg-surface);
-    border-right: 1px solid var(--border-default);
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+  .reference-mobile-header, .reference-bottom-nav { display: none; }
+  .reference-sidebar { display: flex; flex-direction: column; justify-content: space-between; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 244px; padding: 32px 18px 20px; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); overflow-y: auto; overflow-x: hidden; }
   .reference-sidebar .reference-brand { margin: 0 10px; }
-  .reference-sidebar .brand-word { font-size: 35px; }
-  .reference-company { margin: 18px 10px 24px; padding-bottom: 25px; border-bottom: 1px solid var(--border-default); color: var(--text-secondary); font-size: 10px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
+  .reference-company { margin: 16px 10px 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 12px; font-weight: 500; }
   .reference-desktop-nav { display: grid; gap: 6px; }
-  .reference-desktop-nav button { position: relative; z-index: 1; display: flex; align-items: center; gap: 13px; min-height: 46px; padding: 11px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--text-primary); text-align: left; font: 500 13px/1.4 var(--font-suisse-intl); cursor: pointer; transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
-  .reference-desktop-nav button[aria-current] { color: #fff; }
-  .reference-desktop-nav button:hover:not([aria-current]) { background: var(--bg-subtle); }
-  .reference-desktop-nav button > span.nav-index { font-family: var(--font-mono); font-size: 11px; opacity: 0.78; }
-  .sidebar-nav-pill { position: absolute; inset: 0; border-radius: 10px; background: var(--brand-primary); z-index: -1; }
-  .reference-sidebar-bottom {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid var(--border-default);
-    padding: 12px 6px 0;
-  }
+  .reference-desktop-nav button { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; min-height: 46px; padding: 12px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); text-align: left; font: 500 12px/1.5 var(--font-suisse-intl); cursor: pointer; }
+  .reference-desktop-nav button[aria-current] { color: var(--brand-primary); font-weight: 600; }
+  .reference-desktop-nav button:hover:not([aria-current]) { background: var(--bg-elevated); color: var(--text-primary); }
+  .nav-icon { display: inline-flex; font-size: 18px; }
+  .sidebar-nav-pill { position: absolute; inset: 0; border-radius: 10px; background: var(--brand-primary-soft); z-index: -1; }
+  .reference-sidebar-bottom { display: flex; align-items: center; border-top: 1px solid var(--border-subtle); padding: 20px 0 0; }
+  .reference-sidebar-bottom .reference-theme { justify-content: flex-start; width: 100%; }
 }

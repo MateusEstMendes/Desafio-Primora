@@ -86,17 +86,14 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     ? (selected[0].historicoTendencia.at(-1)?.engajamento || 0) - (selected[0].historicoTendencia[0]?.engajamento || 0)
     : 0;
   const metrics = [
-    { title: 'Exposição a risco', rawValue: total ? (risk / total) * 100 : 0, isPercent: true, note: formatarNumero(risk) + ' contas sob risco', color: '#EF4444' },
-    { title: 'Conversão do funil', rawValue: conversion, isPercent: true, note: '90 dias · tarefas', color: '#00CDE5' },
-    { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: '#0074FF' },
-    { title: 'Carteira ativa', rawValue: total, isPercent: false, note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: '#38BDF8' }
+    { title: 'Exposição a risco', rawValue: total ? (risk / total) * 100 : 0, isPercent: true, note: formatarNumero(risk) + ' contas sob risco', color: themeTokens.statusCritical },
+    { title: 'Conversão do funil', rawValue: conversion, isPercent: true, note: '90 dias · tarefas', color: themeTokens.brandCyan },
+    { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement >= 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: themeTokens.brandPrimary },
+    { title: 'Carteira ativa', rawValue: total, isPercent: false, note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: themeTokens.textSecondary }
   ];
   return <div className="executive-dashboard">
-    <header className="executive-heading">
-      <div>
-        <span className="executive-eyebrow">Distribuidora Vetor · Camada Estratégica</span>
-        <h1>Visão Executiva</h1>
-      </div>
+    <div className="executive-heading">
+      <h2 className="section-caption">Indicadores da operação</h2>
       <div className="period-control" role="group" aria-label="Período das tendências">
         {[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => {
           const isActive = period === p.value;
@@ -115,24 +112,24 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
           );
         })}
       </div>
-    </header>
+    </div>
     <ExecutiveKpiGrid metrics={metrics} ariaLabel="Indicadores executivos" />
     <ExecutivePanel className="reference-panel pulse-panel" delay={0.14} aria-labelledby="pulse-title">
-      <h2 id="pulse-title">Pulso da <em>operação</em></h2>
+      <h2 id="pulse-title">Pulso da operação</h2>
       {[
-        { key: 'engajamento', label: 'Engajamento médio', value: formatarPercentual(engagement), isPercent: true, color: '#EF4444' },
-        { key: 'sucessoFunil', label: 'Conversão do funil', value: formatarPercentual(conversion), isPercent: true, color: '#0074FF' }
+        { key: 'engajamento', label: 'Engajamento médio', value: formatarPercentual(engagement), isPercent: true, color: themeTokens.brandPrimary },
+        { key: 'sucessoFunil', label: 'Conversão do funil', value: formatarPercentual(conversion), isPercent: true, color: themeTokens.brandCyan }
       ].map(row => (
         <div className="pulse-row" key={row.key} style={{ '--metric-accent': row.color }}>
           <span className="signal-label">{row.label}</span>
-          <strong style={{ color: row.color === '#EF4444' ? 'var(--status-critical-text, #F87171)' : 'inherit' }}>{row.value}</strong>
+          <strong>{row.value}</strong>
           <Sparkline data={series} dataKey={row.key} color={row.color} label={row.label} isPercent={row.isPercent} themeTokens={themeTokens} />
         </div>
       ))}
       <p className="chart-context">Histórico de engajamento e conversão · {period === 1 ? 'Último mês vs. anterior' : 'Últimas ' + period + ' amostras mensais'} ({series[0]?.mes} a {series.at(-1)?.mes}).</p>
     </ExecutivePanel>
     <div className="reference-middle-grid">
-      <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">
+      <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Distribuição da carteira</h2><div className="reference-territories">
         <div
           ref={donutReset.containerRef}
           className="reference-donut"
@@ -182,7 +179,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         </div>
         <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
       </div><p className="chart-context">Total: {formatarNumero(nationalTotal)} contas · toque em uma regional para filtrar.</p></section>
-      <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores <em>mudanças</em></h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
+      <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores mudanças</h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
         {changes.map(t => <div className="change-row" key={t.id} style={{ '--metric-accent': t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan }}><button type="button" className="signal-label" onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}>{t.regiao}</button><Sparkline data={t.points} dataKey="engajamento" color={t.change >= 0 ? themeTokens.brandPrimary : themeTokens.brandCyan} label={t.regiao + ': engajamento'} themeTokens={themeTokens} /><strong className={t.change >= 0 ? 'is-positive' : 'is-negative'}>{t.change >= 0 ? '+' : ''}{t.change.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}<small> p.p.</small></strong></div>)}
         <p className="chart-context">Variação do engajamento no período.</p>
       </section>

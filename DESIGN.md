@@ -1,3 +1,35 @@
+# Painel Vetor — Diretrizes visuais atuais
+
+A interface foi adaptada para consulta de indicadores B2B. A referência editorial do Origin, preservada abaixo, serve como inspiração; as decisões deste bloco descrevem a implementação atual.
+
+## Princípios e aplicação
+
+- **Hierarquia:** um título e uma descrição por tela; números em destaque; títulos de seção menores; notas em segundo plano. O NN/g recomenda usar escala, contraste e agrupamento para orientar a leitura: [5 Principles of Visual Design](https://www.nngroup.com/articles/principles-visual-design/).
+- **Cores por função:** superfícies neutras, azul para ações e seleção, verde para saúde, âmbar para atenção e vermelho para situações críticas. As cores regionais são categóricas e mantêm o mesmo mapeamento nas telas. Referência: [Material Design — Color roles](https://m3.material.io/styles/color/the-color-system/).
+- **Legibilidade:** os pares de texto da paleta são avaliados com a fórmula WCAG, buscando pelo menos 4,5:1, inclusive nas notas. Isso verifica a paleta, não certifica a acessibilidade de toda a aplicação. Referência: [W3C — Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
+- **Consistência:** mesma geometria de cards, controles de filtro e espaçamentos entre módulos; superfícies estáticas não se elevam ao passar o mouse.
+- **Concisão:** a faixa de identificação do cliente apresenta nome/código, regional e contrato. Score, variação, eventos e ticket aparecem na grade de indicadores, evitando repetir os mesmos dados em três blocos.
+- **Semântica:** engajamento usa azul; conversão usa verde azulado; o gráfico de participação se chama “Distribuição da carteira”. A cor do score de uma conta acompanha seu status de saúde, enquanto o risco regional usa sua própria taxa.
+
+## Paleta principal
+
+| Função | Claro | Escuro |
+| --- | --- | --- |
+| Fundo | `#F4F6FA` | `#101722` |
+| Superfície | `#FFFFFF` | `#182231` |
+| Texto principal | `#17243B` | `#EDF2FA` |
+| Texto secundário | `#52627A` | `#B3C1D4` |
+| Texto de apoio | `#5C6D84` | `#95A7C0` |
+| Azul para texto e dados | `#2563EB` | `#8AB4FF` |
+| Azul de controles preenchidos | `#2563EB` | `#2563EB` |
+| Conversão / sinal secundário | `#0F766E` | `#5FD3C4` |
+
+A fonte única das cores está em `src/utils/themeTokens.js`. `applyThemeTokens` publica as variáveis CSS no documento; Ant Design e gráficos recebem a mesma paleta. Alterar um tema nesse arquivo atualiza também os componentes renderizados em portais.
+
+A tipografia utiliza Plus Jakarta Sans nos títulos e Inter na interface, com números tabulares. O espaçamento segue múltiplos de 4 px, com 20–24 px no interior dos painéis e 16–20 px entre blocos. Cards usam raio de 16 px; controles, 8–12 px. No celular, a navegação inferior permanece acessível, os indicadores formam duas colunas e os valores monetários têm escala própria.
+
+## Referência original
+
 # Origin Financial — Style Reference
 > midnight gallery of quiet wealth. A hushed, near-black room where oversized serif whispers and a few luminous color panels make finance feel like curated art.
 

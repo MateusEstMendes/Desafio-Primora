@@ -1,164 +1,67 @@
-/**
- * Sistema de Design Tokens — Origin Gallery Style Reference (DESIGN.md)
- * Edição Blue & Bright Blue (Zero Roxo / Zero Violeta)
- * Superfícies por contraste de camada (#0f1011 Obsidian → #2e2e2e Graphite → #cacaca Silver)
- */
-
+/** Paleta semântica compartilhada pelo CSS, Ant Design e gráficos. */
 export const THEME_TOKENS = {
-  dark: {
-    mode: 'dark',
-    label: 'Obsidian Gallery',
-    // Superfícies DESIGN.md
-    bgCanvas: '#0F1011',     // Obsidian Canvas
-    bgAbyss: '#090A0B',      // Abyss
-    bgSurface: '#181A1C',    // Elevated Obsidian Panel
-    bgSubtle: '#222427',     // Mid-Dark Interactive
-    bgElevated: '#2E2E2E',   // Graphite Card
-    bgSteel: '#3F4041',      // Steel Hover
-    bgSilver: '#CACACA',     // Silver Inverted Card
-    bgHeader: 'rgba(15, 16, 17, 0.78)',
-    bgFooter: '#090A0B',
-
-    // Bordas Flat de Precisão
-    borderDefault: '#2E2E2E',
-    borderSubtle: '#222427',
-    borderStrong: '#3F4041',
-    borderFocus: '#2970FF',
-
-    // Tipografia DESIGN.md (Pure #ffffff, Cloud #f5f5f7, Ash #9f9fa0, Fog #6a6b6b)
-    textPrimary: '#FFFFFF',
-    textCloud: '#F5F5F7',
-    textSecondary: '#9F9FA0',
-    textMuted: '#6A6B6B',
-    textOnBrand: '#FFFFFF',
-
-    // Acento Cromático Principal: Bright Blue & Cyan Signal (Substituindo qualquer roxo)
-    brandPrimary: '#0074FF',
-    brandPrimaryHover: '#3B82F6',
-    brandPrimarySoft: '#102347',
-    brandPrimaryBorder: '#1D4ED8',
-
-    brandCyan: '#00CDE5',
-    brandCyanText: '#38BDF8',
-    brandCyanSoft: '#092832',
-    brandCyanBorder: '#0086A8',
-
-    // Semânticas de Decisão Calibradas sobre Obsidian/Graphite
-    statusSuccess: '#10B981',
-    statusSuccessText: '#34D399',
-    statusSuccessSoft: '#0D2821',
-    statusSuccessBorder: '#065F46',
-
-    statusWarning: '#F59E0B',
-    statusWarningText: '#FBBF24',
-    statusWarningSoft: '#281F10',
-    statusWarningBorder: '#78350F',
-
-    statusRisk: '#F97316',
-    statusRiskText: '#FB923C',
-    statusRiskSoft: '#2A1810',
-    statusRiskBorder: '#7C2D12',
-
-    statusCritical: '#EF4444',
-    statusCriticalText: '#F87171',
-    statusCriticalSoft: '#2A1417',
-    statusCriticalBorder: '#7F1D1D',
-
-    // Paleta Categórica Vibrante e Distinta (Cores do Modo Claro preservadas no Modo Escuro)
-    category1: '#0074FF', // Bright Royal Blue / Sudeste
-    category2: '#00CDE5', // Cyan Signal / Sul
-    category3: '#FFBD00', // Amber Gold / Nordeste
-    category4: '#FF5864', // Coral Red / Centro-Oeste
-
-    // Gráficos
-    chartGrid: '#262729',
-    chartAxis: '#9F9FA0',
-    chartTooltipBg: '#090A0B',
-    chartTooltipBorder: '#3F4041'
-  },
-
   light: {
-    mode: 'light',
-    label: 'Silver Day Gallery',
-    // Superfícies Claras Inspiradas em Cloud (#f5f5f7) e Silver (#cacaca)
-    bgCanvas: '#F5F5F7',
-    bgAbyss: '#EAECEF',
-    bgSurface: '#FFFFFF',
-    bgSubtle: '#ECEEF2',
-    bgElevated: '#F8FAFC',
-    bgSteel: '#CACACA',
-    bgSilver: '#0F1011',
-    bgHeader: 'rgba(245, 245, 247, 0.84)',
-    bgFooter: '#EAECEF',
-
-    // Bordas
-    borderDefault: '#CDD5E4',
-    borderSubtle: '#E4E7EC',
-    borderStrong: '#6A6B6B',
-    borderFocus: '#2563EB',
-
-    // Tipografia
-    textPrimary: '#0B1835',
-    textCloud: '#090A0B',
-    textSecondary: '#53607B',
-    textMuted: '#6A6B6B',
-    textOnBrand: '#FFFFFF',
-
-    // Identidade Azul Brilhante (Sem Roxo)
-    brandPrimary: '#0074FF',
-    brandPrimaryHover: '#1D4ED8',
-    brandPrimarySoft: '#EFF6FF',
-    brandPrimaryBorder: '#BFDBFE',
-
-    brandCyan: '#00CDE5',
-    brandCyanText: '#007794',
-    brandCyanSoft: '#ECFEFF',
-    brandCyanBorder: '#A5F3FC',
-
-    // Semânticas de Decisão
-    statusSuccess: '#059669',
-    statusSuccessText: '#047857',
-    statusSuccessSoft: '#ECFDF5',
-    statusSuccessBorder: '#6EE7B7',
-
-    statusWarning: '#D97706',
-    statusWarningText: '#92400E',
-    statusWarningSoft: '#FFFBEB',
-    statusWarningBorder: '#FCD34D',
-
-    statusRisk: '#EA580C',
-    statusRiskText: '#C2410C',
-    statusRiskSoft: '#FFF7ED',
-    statusRiskBorder: '#FDBA74',
-
-    statusCritical: '#DC2626',
-    statusCriticalText: '#B91C1C',
-    statusCriticalSoft: '#FEF2F2',
-    statusCriticalBorder: '#FCA5A5',
-
-    // Paleta Categórica Azul & Ciano (Sem Roxo)
-    category1: '#0074FF', // Bright Royal Blue (Sudeste)
-    category2: '#00CDE5', // Cyan Signal (Sul)
-    category3: '#FFBD00', // Electric Sky Blue (Nordeste)
-    category4: '#FF5864', // Deep Sapphire Blue (Centro-Oeste)
-
-    // Gráficos
-    chartGrid: '#E2E8F0',
-    chartAxis: '#6A6B6B',
-    chartTooltipBg: '#FFFFFF',
-    chartTooltipBorder: '#CACACA'
+    mode: 'light', label: 'Claro',
+    bgCanvas: '#F4F6FA', bgAbyss: '#E9EEF5', bgSurface: '#FFFFFF',
+    bgSubtle: '#EDF1F7', bgElevated: '#F8FAFC', bgSteel: '#D6DEEA',
+    bgSilver: '#17243B', bgHeader: 'rgba(255, 255, 255, 0.94)', bgFooter: '#EDF1F7',
+    borderDefault: '#D6DEEA', borderSubtle: '#E3E9F1', borderStrong: '#8795AA', borderFocus: '#2563EB',
+    textPrimary: '#17243B', textCloud: '#17243B', textSecondary: '#52627A', textMuted: '#5C6D84', textOnBrand: '#FFFFFF',
+    brandPrimary: '#2563EB', brandPrimaryHover: '#1D4ED8', brandSolid: '#2563EB',
+    brandPrimarySoft: '#EDF3FF', brandPrimaryBorder: '#C5D6FB',
+    brandCyan: '#0F766E', brandCyanText: '#0F766E', brandCyanSoft: '#EAF7F5', brandCyanBorder: '#AADBD5',
+    statusSuccess: '#15803D', statusSuccessText: '#166534', statusSuccessSoft: '#EDF8F0', statusSuccessBorder: '#B5DFC1',
+    statusWarning: '#A16207', statusWarningText: '#854D0E', statusWarningSoft: '#FFF8E7', statusWarningBorder: '#EAD39A',
+    statusRisk: '#C2410C', statusRiskText: '#9A3412', statusRiskSoft: '#FFF3EB', statusRiskBorder: '#F2C8AE',
+    statusCritical: '#DC2626', statusCriticalText: '#B91C1C', statusCriticalSoft: '#FEF0F0', statusCriticalBorder: '#F0BBBB',
+    category1: '#2563EB', category2: '#0F766E', category3: '#A16207', category4: '#64748B',
+    chartGrid: '#E3E9F1', chartAxis: '#5C6D84', chartTooltipBg: '#FFFFFF', chartTooltipBorder: '#D6DEEA',
+    shadowCard: '0 2px 5px rgba(23, 36, 59, 0.025)',
+    shadowCardHover: '0 6px 18px rgba(23, 36, 59, 0.07)'
+  },
+  dark: {
+    mode: 'dark', label: 'Escuro',
+    bgCanvas: '#101722', bgAbyss: '#0C121C', bgSurface: '#182231',
+    bgSubtle: '#222F42', bgElevated: '#1D293A', bgSteel: '#34445C',
+    bgSilver: '#D6DEEA', bgHeader: 'rgba(24, 34, 49, 0.94)', bgFooter: '#0C121C',
+    borderDefault: '#35455D', borderSubtle: '#2B394D', borderStrong: '#70839D', borderFocus: '#8AB4FF',
+    textPrimary: '#EDF2FA', textCloud: '#EDF2FA', textSecondary: '#B3C1D4', textMuted: '#95A7C0', textOnBrand: '#FFFFFF',
+    brandPrimary: '#8AB4FF', brandPrimaryHover: '#BAD2FF', brandSolid: '#2563EB',
+    brandPrimarySoft: '#203658', brandPrimaryBorder: '#3C5E94',
+    brandCyan: '#5FD3C4', brandCyanText: '#5FD3C4', brandCyanSoft: '#163A3B', brandCyanBorder: '#32645F',
+    statusSuccess: '#6DD69A', statusSuccessText: '#6DD69A', statusSuccessSoft: '#19392D', statusSuccessBorder: '#34664C',
+    statusWarning: '#F2C568', statusWarningText: '#F2C568', statusWarningSoft: '#3B321D', statusWarningBorder: '#756039',
+    statusRisk: '#FBAD7B', statusRiskText: '#FBAD7B', statusRiskSoft: '#402B23', statusRiskBorder: '#80533C',
+    statusCritical: '#FF9494', statusCriticalText: '#FF9494', statusCriticalSoft: '#40272F', statusCriticalBorder: '#80434F',
+    category1: '#8AB4FF', category2: '#5FD3C4', category3: '#F2C568', category4: '#95A7C0',
+    chartGrid: '#2B394D', chartAxis: '#95A7C0', chartTooltipBg: '#182231', chartTooltipBorder: '#35455D',
+    shadowCard: '0 2px 5px rgba(0, 0, 0, 0.08)',
+    shadowCardHover: '0 6px 18px rgba(0, 0, 0, 0.16)'
   }
 };
 
+/** Aplica a mesma fonte de cores ao documento, inclusive componentes em portais. */
+export function applyThemeTokens(mode) {
+  const tokens = THEME_TOKENS[mode] || THEME_TOKENS.light;
+  const root = document.documentElement;
+  root.dataset.theme = tokens.mode;
+  root.style.colorScheme = tokens.mode;
+  Object.entries(tokens).forEach(([name, value]) => {
+    if (name === 'mode' || name === 'label') return;
+    const cssName = name.replace(/([a-z])([A-Z0-9])/g, '$1-$2').toLowerCase();
+    root.style.setProperty(`--${cssName}`, value);
+  });
+}
+
 /**
- * Retorna o mapa de cores categóricas por unidade regional (100% espectro Azul/Ciano)
+ * Retorna cores estáveis por regional, compartilhadas entre as telas.
  */
 export function getRegionalColors(tokens) {
   return {
-    'tenant-sudeste': tokens?.category1 || '#2970FF',
-    'tenant-sul': tokens?.category2 || '#00B3DD',
-    'tenant-nordeste': tokens?.category3 || '#90B8F0',
-    'tenant-centro-oeste': tokens?.category4 || '#1D4ED8'
+    'tenant-sudeste': tokens?.category1 || THEME_TOKENS.light.category1,
+    'tenant-sul': tokens?.category2 || THEME_TOKENS.light.category2,
+    'tenant-nordeste': tokens?.category3 || THEME_TOKENS.light.category3,
+    'tenant-centro-oeste': tokens?.category4 || THEME_TOKENS.light.category4
   };
 }
 

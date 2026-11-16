@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Alert, Button, Empty, Spin, ConfigProvider, Grid, theme as antdTheme } from 'antd';
 import ptBR from 'antd/locale/pt_BR';
 import { MotionConfig, AnimatePresence } from 'motion/react';
 
 import { UnidadeDAO, ClienteDAO } from './dao/index.js';
-import { THEME_TOKENS } from './utils/themeTokens';
+import { THEME_TOKENS, applyThemeTokens } from './utils/themeTokens';
 
 import TopBar from './components/TopBar';
 import { PageTransition } from './components/MotionPrimitives';
@@ -14,6 +14,11 @@ import HistoricoClientes from './pages/HistoricoClientes';
 import './components/componentsCSS/ReferenceSystem.css';
 
 const { useBreakpoint } = Grid;
+const MODULES = {
+  'visao-geral': { title: 'Visão Executiva', description: 'Os principais sinais de saúde e desempenho da operação.' },
+  comparativo: { title: 'Comparativo Regional', description: 'Compare exposição a risco, conversão e participação de cada unidade.' },
+  'historico-clientes': { title: 'Jornada de Clientes', description: 'Acompanhe a saúde, o histórico e os eventos de cada conta.' }
+};
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -41,7 +46,7 @@ class ErrorBoundary extends React.Component {
               padding: '8px 16px',
               borderRadius: 6,
               border: 'none',
-              background: 'var(--brand-primary, #0074FF)',
+              background: 'var(--brand-solid, #2563EB)',
               color: '#FFFFFF',
               fontWeight: 600,
               cursor: 'pointer'
@@ -99,8 +104,8 @@ export default function App() {
 
   const activeTokens = THEME_TOKENS[themeMode] || THEME_TOKENS.dark;
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = themeMode;
+  useLayoutEffect(() => {
+    applyThemeTokens(themeMode);
     const meta = document.querySelector('meta[name="color-scheme"]');
     if (meta) {
       meta.content = themeMode;
@@ -132,7 +137,7 @@ export default function App() {
         algorithm:
           themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary: activeTokens.brandPrimary,
+          colorPrimary: activeTokens.brandSolid,
           colorInfo: activeTokens.brandCyan,
           colorSuccess: activeTokens.statusSuccess,
           colorWarning: activeTokens.statusWarning,
@@ -144,8 +149,11 @@ export default function App() {
           colorBorderSecondary: activeTokens.borderSubtle,
           colorText: activeTokens.textPrimary,
           colorTextSecondary: activeTokens.textSecondary,
+          colorTextTertiary: activeTokens.textMuted,
+          colorTextPlaceholder: activeTokens.textMuted,
           borderRadius: 8,
           borderRadiusLG: 16,
+          controlHeight: 40,
           borderRadiusSM: 8,
           boxShadow: 'none',
           boxShadowSecondary: 'none',
@@ -175,6 +183,7 @@ export default function App() {
       }}
     >
       <div className="app-shell">
+        <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
         <TopBar
           isMobile={isMobile}
           currentTab={currentTab}
@@ -186,7 +195,15 @@ export default function App() {
           onToggleTheme={handleToggleTheme}
         />
 
-        <main className="app-main-content">
+        <main id="main-content" className="app-main-content" tabIndex={-1}>
+          <header className="module-heading">
+            <div>
+              <span className="module-eyebrow">Distribuidora Vetor · Painel de gestão</span>
+              <h1>{MODULES[currentTab].title}</h1>
+              <p>{MODULES[currentTab].description}</p>
+            </div>
+            <span className="module-scope"><span aria-hidden="true" />{selectedTenantId === 'todos' ? 'Todas as regionais' : dadosPainel.tenants.find(t => t.id === selectedTenantId)?.regiao || 'Regional selecionada'}</span>
+          </header>
           {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
           : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
           : dadosPainel.tenants.length === 0 && dadosPainel.clientes.length === 0 ? <Empty description="Nenhum resultado encontrado." />

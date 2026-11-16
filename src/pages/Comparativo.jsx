@@ -343,31 +343,31 @@ export default function Comparativo({
         rawValue: maior.taxaRiscoProporcional,
         isPercent: true,
         note: maior.nome.replace('Unidade ', '').replace(' (Matriz)', ''),
-        color: '#EF4444'
+        color: themeTokens.statusCritical
       },
       {
         title: 'Melhor benchmark',
         rawValue: menor.taxaRiscoProporcional,
         isPercent: true,
         note: menor.nome.replace('Unidade ', '').replace(' (Matriz)', ''),
-        color: '#10B981'
+        color: themeTokens.statusSuccess
       },
       {
         title: 'Conversão média',
         rawValue: mediaConversao,
         isPercent: true,
         note: 'Funil 90 dias',
-        color: '#00CDE5'
+        color: themeTokens.brandCyan
       },
       {
         title: 'Contas auditadas',
         rawValue: totalContas,
         isPercent: false,
         note: `${dadosClassificados.length} regionais`,
-        color: '#0074FF'
+        color: themeTokens.brandPrimary
       }
     ];
-  }, [dadosClassificados]);
+  }, [dadosClassificados, themeTokens]);
 
   return (
     <div className="comparativo-container">
@@ -414,7 +414,7 @@ export default function Comparativo({
                     stroke="var(--status-critical, #EF4444)"
                     strokeDasharray="4 4"
                     strokeWidth={1.5}
-                    label={{ value: 'Alerta Crítico (≥15%)', position: 'insideTopRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
+                    label={{ value: 'Alerta Crítico (≥15%)', position: 'insideTopRight', fill: themeTokens.statusCriticalText, fontSize: 10, fontWeight: 600 }}
                   />
                   <XAxis
                     dataKey="nome"
@@ -483,10 +483,10 @@ export default function Comparativo({
                     type="monotone"
                     dataKey="taxaRiscoProporcional"
                     name="Taxa Proporcional (%)"
-                    stroke="#EF4444"
+                    stroke={themeTokens.statusCritical}
                     strokeWidth={3}
-                    dot={{ r: 5, fill: '#EF4444', strokeWidth: 2, stroke: '#FFFFFF' }}
-                    activeDot={{ r: 7, fill: '#EF4444' }}
+                    dot={{ r: 5, fill: themeTokens.statusCriticalText, strokeWidth: 2, stroke: themeTokens.bgSurface }}
+                    activeDot={{ r: 7, fill: themeTokens.statusCriticalText }}
                     animationDuration={500}
                     animationEasing="ease-out"
                     isAnimationActive={true}
@@ -505,7 +505,7 @@ export default function Comparativo({
                     stroke="var(--status-critical, #EF4444)"
                     strokeDasharray="4 4"
                     strokeWidth={1.5}
-                    label={{ value: 'Limite Seguro (15%)', position: 'insideTopRight', fill: '#EF4444', fontSize: 10, fontWeight: 600 }}
+                    label={{ value: 'Limite Seguro (15%)', position: 'insideTopRight', fill: themeTokens.statusCriticalText, fontSize: 10, fontWeight: 600 }}
                   />
                   <XAxis
                     dataKey="nome"
@@ -989,7 +989,7 @@ export default function Comparativo({
           <div className="client-mini-card-grid">
             {clientesFiltrados.map((cli) => {
               const novo = isClienteNovo(cli);
-              const semTokens = getRiskSemanticTokens(cli.scoreSaudeAtual, themeTokens);
+              const semTokens = getRiskSemanticTokens(cli.statusSaude, themeTokens);
               const corRegional = regionalColors[cli.tenantId] || themeTokens.brandPrimary;
 
               return (
