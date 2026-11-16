@@ -62,20 +62,13 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
   const funnel = selected.reduce((sum, t) => ({ gerada: sum.gerada + t.funnel90d.gerada, vista: sum.vista + t.funnel90d.vista, sucesso: sum.sucesso + t.funnel90d.sucesso }), { gerada: 0, vista: 0, sucesso: 0 });
   const conversion = calcularTaxaConversaoFunil(funnel);
   const engagement = selected.reduce((sum, t) => sum + t.engajamentoMedio, 0) / selected.length;
-  // Evolução geral da carteira: volume total e exposição a risco ao longo do histórico
-  const numMeses = (selected[0]?.historicoTendencia || []).length || 6;
-  const history = (selected[0]?.historicoTendencia || []).map((h, i) => {
-    // Curva gradual baseada no histórico de tendência de engajamento para modelar a evolução da carteira
-    const fatorTempo = (i - (numMeses - 1));
-    const fatorCarteira = 1 + (fatorTempo * 0.008);
-    const fatorRisco = 1 + (fatorTempo * -0.015);
-    const carteiraMes = Math.round(total * fatorCarteira);
-    const riscoMes = Math.round(risk * fatorRisco);
+  // Combina somente amostras existentes; o dataset não contém evolução da carteira.
+  const history = (selected[0]?.historicoTendencia || []).map(h => {
+    const amostras = selected.map(t => t.historicoTendencia.find(p => p.mes === h.mes)).filter(Boolean);
     return {
       mes: h.mes,
-      carteiraTotal: carteiraMes,
-      contasRisco: riscoMes,
-      taxaRisco: carteiraMes > 0 ? (riscoMes / carteiraMes) * 100 : 0
+      engajamento: amostras.reduce((soma, ponto) => soma + ponto.engajamento, 0) / amostras.length,
+      sucessoFunil: amostras.reduce((soma, ponto) => soma + ponto.sucessoFunil, 0) / amostras.length
     };
   });
   const series = history.slice(-Math.max(2, period));
@@ -103,7 +96,6 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
       <div>
         <span className="executive-eyebrow">Distribuidora Vetor · Camada Estratégica</span>
         <h1>Visão Executiva</h1>
-        <p>Sua operação em perspectiva macroscópica. Vislumbre rápido (at-a-glance) com alto data-ink ratio.</p>
       </div>
       <div className="period-control" role="group" aria-label="Período das tendências">
         {[{ value: 1, label: '30 dias' }, { value: 3, label: '90 dias' }, { value: 6, label: '6 meses' }].map(p => {
@@ -128,8 +120,8 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     <ExecutivePanel className="reference-panel pulse-panel" delay={0.14} aria-labelledby="pulse-title">
       <h2 id="pulse-title">Pulso da <em>operação</em></h2>
       {[
-        { key: 'taxaRisco', label: 'Exposição a Risco', value: formatarPercentual(total ? (risk / total) * 100 : 0), isPercent: true, color: '#EF4444' },
-        { key: 'carteiraTotal', label: 'Carteira Ativa', value: formatarNumero(total), isPercent: false, color: '#0074FF' }
+        { key: 'engajamento', label: 'Engajamento médio', value: formatarPercentual(engagement), isPercent: true, color: '#EF4444' },
+        { key: 'sucessoFunil', label: 'Conversão do funil', value: formatarPercentual(conversion), isPercent: true, color: '#0074FF' }
       ].map(row => (
         <div className="pulse-row" key={row.key} style={{ '--metric-accent': row.color }}>
           <span className="signal-label">{row.label}</span>
@@ -137,7 +129,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
           <Sparkline data={series} dataKey={row.key} color={row.color} label={row.label} isPercent={row.isPercent} themeTokens={themeTokens} />
         </div>
       ))}
-      <p className="chart-context">Evolução geral da carteira · {period === 1 ? 'Último mês vs. anterior' : 'Últimas ' + period + ' amostras mensais'} ({series[0]?.mes} a {series.at(-1)?.mes}).</p>
+      <p className="chart-context">Histórico de engajamento e conversão · {period === 1 ? 'Último mês vs. anterior' : 'Últimas ' + period + ' amostras mensais'} ({series[0]?.mes} a {series.at(-1)?.mes}).</p>
     </ExecutivePanel>
     <div className="reference-middle-grid">
       <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Territórios <em>críticos</em></h2><div className="reference-territories">

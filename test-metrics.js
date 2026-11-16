@@ -5,7 +5,7 @@ import {
   classificarUnidadesPorRisco
 } from './src/utils/metrics.js';
 import fs from 'fs';
-const dataset = JSON.parse(fs.readFileSync('./src/data/dataset_painel_multitenant.json', 'utf-8'));
+const dataset = JSON.parse(fs.readFileSync('./server/data/dataset_painel_multitenant.json', 'utf-8'));
 
 console.log('🧪 Iniciando Verificação de Cálculos do Painel Vetor...\n');
 

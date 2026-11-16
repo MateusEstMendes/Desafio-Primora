@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Table, Tooltip, Typography, Button, Modal, Form, Input, InputNumber, Select, Tag, Empty, message } from 'antd';
+import { Table, Tooltip, Typography, Input, Select, Tag, Empty } from 'antd';
 import SegmentedPill from '../components/SegmentedPill';
 import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
-import { InfoCircleOutlined, PlusOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
 import {
@@ -37,21 +37,16 @@ export default function Comparativo({
   selectedTenantId = 'todos',
   onSelectTenant,
   themeTokens,
-  onNavigateTab,
-  onAddCliente,
-  onUpdateCliente,
-  onDeleteCliente
+  onNavigateTab
 }) {
   const mainChartReset = useChartAutoReset(3000);
   const donutReset = useChartAutoReset(3000);
   const [tipoGrafico, setTipoGrafico] = useState('composto');
   const [modoDonut, setModoDonut] = useState('risco'); // 'risco' ou 'carteira'
   const [showRationale, setShowRationale] = useState(false);
-  const [modalNovoClienteOpen, setModalNovoClienteOpen] = useState(false);
   const [filtroTipoClientes, setFiltroTipoClientes] = useState('todos'); // 'todos', 'novos', 'risco'
   const [buscaCliente, setBuscaCliente] = useState('');
   const [expandedCardIds, setExpandedCardIds] = useState(() => new Set());
-  const [form] = Form.useForm();
 
   const toggleCardExpanded = (id, e) => {
     if (e) e.stopPropagation();
@@ -307,62 +302,6 @@ export default function Comparativo({
       sucessoFunil: d.taxaConversaoFunil
     }));
   }, [dadosClassificados, isMobile]);
-
-  const handleAbrirModalNovoCliente = () => {
-    form.resetFields();
-    form.setFieldsValue({
-      tenantId: selectedTenantId !== 'todos' ? selectedTenantId : 'tenant-sudeste',
-      segmento: 'Supermercado Regional',
-      ticketMedio: 35000,
-      tempoContratoMeses: 12,
-      scoreSaudeAtual: 80,
-      statusSaude: 'Saudável'
-    });
-    setModalNovoClienteOpen(true);
-  };
-
-  const handleSalvarNovoCliente = (values) => {
-    const tenantObj = tenants.find((t) => t.id === values.tenantId);
-    const score = Number(values.scoreSaudeAtual || 80);
-    const novoId = `CLI-${Date.now().toString().slice(-4)}`;
-
-    const novo = {
-      id: novoId,
-      nome: values.nome,
-      tenantId: values.tenantId,
-      unidadeNome: tenantObj?.nome || 'Unidade Regional',
-      segmento: values.segmento,
-      statusSaude: values.statusSaude || 'Saudável',
-      scoreSaudeAtual: score,
-      tempoContratoMeses: Number(values.tempoContratoMeses || 12),
-      ticketMedioMensal: `R$ ${Number(values.ticketMedio || 35000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      isNovo: true,
-      historicoScore: [
-        { periodo: 'Mai/2026', score: Math.max(20, score - 6) },
-        { periodo: 'Jun/2026', score: Math.max(25, score - 4) },
-        { periodo: 'Jul/2026', score: Math.max(25, score - 3) },
-        { periodo: 'Ago/2026', score: Math.max(25, score - 2) },
-        { periodo: 'Set/2026', score: Math.max(30, score - 1) },
-        { periodo: 'Out/2026', score }
-      ],
-      eventos: [
-        {
-          id: `EVT-${Date.now().toString().slice(-3)}`,
-          data: new Date().toISOString(),
-          tipo: 'Cadastro de Conta',
-          categoria: 'sucesso',
-          descricao: `Conta integrada na ${tenantObj?.nome || 'Regional'} via tela comparativa regional.`
-        }
-      ]
-    };
-
-    if (onAddCliente) {
-      onAddCliente(novo);
-    }
-    setModalNovoClienteOpen(false);
-    form.resetFields();
-    message.success(`Cliente "${novo.nome}" cadastrado com sucesso na ${tenantObj?.nome || 'Regional'}!`);
-  };
 
   const clientesFiltrados = useMemo(() => {
     return todosClientes.filter((cli) => {
@@ -993,26 +932,11 @@ export default function Comparativo({
             </h2>
             <p style={{ margin: '4px 0 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>
               {selectedTenantId === 'todos'
-                ? 'Novos clientes cadastrados aparecem aqui em tempo real e atualizam os indicadores de cada regional.'
-                : 'Exibindo a carteira auditável desta unidade. Novos clientes cadastrados impactam a proporção de risco regional.'}
+                ? 'Consulte os clientes das unidades regionais.'
+                : 'Exibindo os clientes desta unidade retornados pela API.'}
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAbrirModalNovoCliente}
-              style={{
-                borderRadius: 8,
-                fontWeight: 600,
-                backgroundColor: 'var(--brand-primary)',
-                boxShadow: 'none'
-              }}
-            >
-              Novo Cliente Regional
-            </Button>
-          </div>
         </div>
 
         {/* Filtros e Busca */}
@@ -1054,14 +978,12 @@ export default function Comparativo({
             description={
               <span>
                 Nenhum cliente encontrado com os filtros atuais.{' '}
-                {selectedTenantId !== 'todos' && 'Você pode adicionar um novo cliente nesta regional clicando no botão acima.'}
+
               </span>
             }
             style={{ margin: '24px 0' }}
           >
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAbrirModalNovoCliente}>
-              Cadastrar Cliente Agora
-            </Button>
+
           </Empty>
         ) : (
           <div className="client-mini-card-grid">
@@ -1142,112 +1064,7 @@ export default function Comparativo({
       </section>
 
       {/* MODAL DE CADASTRO DE NOVO CLIENTE */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <PlusOutlined style={{ color: 'var(--brand-primary)' }} />
-            <span>Cadastrar Novo Cliente na Regional</span>
-          </div>
-        }
-        open={modalNovoClienteOpen}
-        onCancel={() => setModalNovoClienteOpen(false)}
-        onOk={() => form.submit()}
-        okText="Salvar e Sincronizar Regional"
-        cancelText="Cancelar"
-        destroyOnHidden
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSalvarNovoCliente}
-          style={{ marginTop: 16 }}
-        >
-          <Form.Item
-            name="nome"
-            label="Razão Social / Nome da Empresa"
-            rules={[{ required: true, message: 'Por favor, informe a razão social do cliente.' }]}
-          >
-            <Input placeholder="Ex: Hipermercado Central da Serra Ltda" />
-          </Form.Item>
 
-          <Form.Item
-            name="tenantId"
-            label="Unidade Regional Vinculada"
-            rules={[{ required: true, message: 'Selecione a unidade regional.' }]}
-          >
-            <Select
-              options={tenants.map((t) => ({
-                label: `${t.nome} (${t.regiao} · Porte ${t.porte})`,
-                value: t.id
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="segmento"
-            label="Segmento de Atuação Comercial"
-            rules={[{ required: true, message: 'Selecione o segmento.' }]}
-          >
-            <Select
-              options={[
-                { label: 'Supermercado Regional', value: 'Supermercado Regional' },
-                { label: 'Atacado Distribuidor', value: 'Atacado Distribuidor' },
-                { label: 'Rede Farmacêutica', value: 'Rede Farmacêutica' },
-                { label: 'Varejo Alimentício', value: 'Varejo Alimentício' },
-                { label: 'Distribuidora de Bebidas', value: 'Distribuidora de Bebidas' },
-                { label: 'Outros Segmentos', value: 'Outros Segmentos' }
-              ]}
-            />
-          </Form.Item>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Form.Item
-              name="ticketMedio"
-              label="Ticket Médio Mensal (R$)"
-              rules={[{ required: true, message: 'Informe o ticket médio.' }]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                parser={(value) => value.replace(/R\$\s?|(\.*)/g, '')}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="tempoContratoMeses"
-              label="Tempo de Contrato (Meses)"
-              rules={[{ required: true, message: 'Informe a duração do contrato.' }]}
-            >
-              <InputNumber min={1} max={180} style={{ width: '100%' }} />
-            </Form.Item>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Form.Item
-              name="scoreSaudeAtual"
-              label="Score de Saúde Inicial (0 a 100)"
-              rules={[{ required: true, message: 'Informe o score inicial.' }]}
-            >
-              <InputNumber min={0} max={100} style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="statusSaude"
-              label="Classificação de Saúde"
-              rules={[{ required: true, message: 'Selecione o status de saúde.' }]}
-            >
-              <Select
-                options={[
-                  { label: 'Saudável (Score 80-100)', value: 'Saudável' },
-                  { label: 'Atenção (Score 60-79)', value: 'Atenção' },
-                  { label: 'Risco (Score 40-59)', value: 'Risco' },
-                  { label: 'Crítico (Score 0-39)', value: 'Crítico' }
-                ]}
-              />
-            </Form.Item>
-          </div>
-        </Form>
-      </Modal>
 
       {/* 4. FUNDAMENTAÇÃO METODOLÓGICA COLAPSÁVEL (Inicia recolhida para manter minimalismo) */}
       <section className="flat-card" aria-labelledby="ux-rationale-heading">

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ConfigProvider, Grid, theme as antdTheme } from 'antd';
+import { Alert, Button, Empty, Spin, ConfigProvider, Grid, theme as antdTheme } from 'antd';
 import ptBR from 'antd/locale/pt_BR';
 import { MotionConfig, AnimatePresence } from 'motion/react';
 
-import datasetLocal from './data/dataset_painel_multitenant.json';
+import { UnidadeDAO, ClienteDAO } from './dao/index.js';
 import { THEME_TOKENS } from './utils/themeTokens';
 
 import TopBar from './components/TopBar';
@@ -18,7 +18,7 @@ const { useBreakpoint } = Grid;
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, erro: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -47,7 +47,7 @@ class ErrorBoundary extends React.Component {
               cursor: 'pointer'
             }}
             onClick={() => {
-              this.setState({ hasError: false, error: null });
+              this.setState({ hasError: false, erro: null });
               if (this.props.onReset) this.props.onReset();
             }}
           >
@@ -70,90 +70,29 @@ function getInitialThemeMode() {
   return 'light';
 }
 
-function getInitialClients() {
-  try {
-    const stored = localStorage.getItem('painel_vetor_clientes');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (e) {}
-  return datasetLocal.clientes || [];
-}
-
 export default function App() {
   const [currentTab, setCurrentTab] = useState('visao-geral');
   const [selectedTenantId, setSelectedTenantId] = useState('todos');
   const [themeMode, setThemeMode] = useState(getInitialThemeMode);
-  const [clientes, setClientes] = useState(getInitialClients);
+  const [dadosPainel, definirDados] = useState({ tenants: [], clientes: [] });
+  const [estadoCarga, definirEstadoCarga] = useState({ carregando: true, erro: null });
+  const [tentativa, definirTentativa] = useState(0);
   const [focusedClientId, setFocusedClientId] = useState(null);
 
-  // Operações de CRUD para Clientes (Create, Read, Update, Delete) com persistência
-  const handleAddCliente = (novoCliente) => {
-    setClientes((prev) => {
-      const updated = [novoCliente, ...prev];
-      try {
-        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
-      } catch (e) {}
-      return updated;
-    });
-  };
-
-  const handleUpdateCliente = (clienteAtualizado) => {
-    setClientes((prev) => {
-      const updated = prev.map((c) =>
-        c.id === clienteAtualizado.id ? { ...c, ...clienteAtualizado } : c
-      );
-      try {
-        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
-      } catch (e) {}
-      return updated;
-    });
-  };
-
-  const handleDeleteCliente = (clienteId) => {
-    setClientes((prev) => {
-      const updated = prev.filter((c) => c.id !== clienteId);
-      try {
-        localStorage.setItem('painel_vetor_clientes', JSON.stringify(updated));
-      } catch (e) {}
-      return updated;
-    });
-  };
-
-  const dynamicDataset = React.useMemo(() => {
-    const baseClientIds = new Set((datasetLocal.clientes || []).map((c) => c.id));
-    const addedClients = (clientes || []).filter((c) => !baseClientIds.has(c.id));
-
-    const enrichedTenants = (datasetLocal.tenants || []).map((t) => {
-      const extraForThisTenant = addedClients.filter((c) => c.tenantId === t.id);
-      if (extraForThisTenant.length === 0) return t;
-
-      const saudeUpdated = { ...(t.saudeCarteira || { saudavel: 0, atencao: 0, risco: 0, critico: 0 }) };
-      extraForThisTenant.forEach((c) => {
-        const status = (c.statusSaude || '').toLowerCase();
-        if (status.includes('saud')) saudeUpdated.saudavel = (saudeUpdated.saudavel || 0) + 1;
-        else if (status.includes('aten')) saudeUpdated.atencao = (saudeUpdated.atencao || 0) + 1;
-        else if (status.includes('crit')) saudeUpdated.critico = (saudeUpdated.critico || 0) + 1;
-        else saudeUpdated.risco = (saudeUpdated.risco || 0) + 1;
-      });
-
-      return {
-        ...t,
-        carteiraTotalClientes: (t.carteiraTotalClientes || 0) + extraForThisTenant.length,
-        saudeCarteira: saudeUpdated,
-        novosClientesAdicionados: extraForThisTenant.length
-      };
-    });
-
-    return {
-      ...datasetLocal,
-      tenants: enrichedTenants,
-      clientes
-    };
-  }, [clientes]);
+  useEffect(() => {
+    // O cleanup impede que uma resposta antiga substitua a carga mais recente.
+    let cargaAtual = true;
+    definirEstadoCarga({ carregando: true, erro: null });
+    // Publica o painel somente quando as duas coleções estiverem disponíveis.
+    Promise.all([new UnidadeDAO().listar(), new ClienteDAO().listar()])
+      .then(([unidades, clientes]) => {
+        if (!cargaAtual) return;
+        definirDados({ tenants: unidades.map(u => u.toJSON()), clientes: clientes.map(c => c.toJSON()) });
+        definirEstadoCarga({ carregando: false, erro: null });
+      })
+      .catch(error => { if (cargaAtual) definirEstadoCarga({ carregando: false, erro: error.message }); });
+    return () => { cargaAtual = false; };
+  }, [tentativa]);
 
   const screens = useBreakpoint();
   const isMobile = screens.lg !== undefined ? !screens.lg : (typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
@@ -242,25 +181,21 @@ export default function App() {
           onTabChange={setCurrentTab}
           selectedTenantId={selectedTenantId}
           onTenantChange={setSelectedTenantId}
-          tenants={dynamicDataset.tenants}
+          tenants={dadosPainel.tenants}
           themeMode={themeMode}
           onToggleTheme={handleToggleTheme}
         />
 
         <main className="app-main-content">
-          <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
+          {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
+          : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
+          : dadosPainel.tenants.length === 0 && dadosPainel.clientes.length === 0 ? <Empty description="Nenhum resultado encontrado." />
+          : <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
             <AnimatePresence mode="wait">
               <PageTransition pageKey={currentTab}>
-                {currentTab !== 'visao-geral' && (
-                  <header className="module-heading">
-                    <span>{currentTab === 'comparativo' ? 'Distribuidora Vetor · Camada Tática (Benchmarking)' : 'Distribuidora Vetor · Camada Operacional (Supervisão & Ação)'}</span>
-                    <h1>{currentTab === 'comparativo' ? 'Comparativo Regional' : 'Jornada de Clientes'}</h1>
-                    <p>{currentTab === 'comparativo' ? 'Metamorfose adaptativa de matriz tabular para cartões autônomos contextuais.' : 'Triagem cronológica de eventos em tempo real e mitigação de risco da carteira.'}</p>
-                  </header>
-                )}
                 {currentTab === 'visao-geral' && (
                   <VisaoGeral
-                    dataset={dynamicDataset}
+                    dataset={dadosPainel}
                     isMobile={isMobile}
                     selectedTenantId={selectedTenantId}
                     onSelectTenant={setSelectedTenantId}
@@ -276,34 +211,28 @@ export default function App() {
 
                 {currentTab === 'comparativo' && (
                   <Comparativo
-                    dataset={dynamicDataset}
+                    dataset={dadosPainel}
                     isMobile={isMobile}
                     selectedTenantId={selectedTenantId}
                     onSelectTenant={setSelectedTenantId}
                     themeTokens={activeTokens}
                     onNavigateTab={setCurrentTab}
-                    onAddCliente={handleAddCliente}
-                    onUpdateCliente={handleUpdateCliente}
-                    onDeleteCliente={handleDeleteCliente}
                   />
                 )}
 
                 {currentTab === 'historico-clientes' && (
                   <HistoricoClientes
                     initialClientId={focusedClientId}
-                    dataset={dynamicDataset}
+                    dataset={dadosPainel}
                     isMobile={isMobile}
                     selectedTenantId={selectedTenantId}
                     onSelectTenant={setSelectedTenantId}
                     themeTokens={activeTokens}
-                    onAddCliente={handleAddCliente}
-                    onUpdateCliente={handleUpdateCliente}
-                    onDeleteCliente={handleDeleteCliente}
                   />
                 )}
               </PageTransition>
             </AnimatePresence>
-          </ErrorBoundary>
+          </ErrorBoundary>}
         </main>
 
       </div>

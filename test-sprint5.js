@@ -12,6 +12,11 @@
 
 import { Unidade, Cliente, Evento, RegistroSaude } from './src/models/index.js';
 import { UnidadeDAO, ClienteDAO } from './src/dao/index.js';
+import { criarAplicativo } from './server/app.js';
+import { criarClienteHttp } from './src/config/api.js';
+const server = criarAplicativo().listen(0, '127.0.0.1');
+await new Promise(resolve => server.once('listening', resolve));
+const http = criarClienteHttp({ urlBase: `http://127.0.0.1:${server.address().port}/api/v1` });
 
 let totalTests = 0;
 let passedTests = 0;
@@ -123,7 +128,7 @@ async function runTests() {
   // 2. TESTES DE UnidadeDAO (CONTRATO PEDAGÓGICO DE CONSULTA)
   // ---------------------------------------------------------------------------
   console.log('\n🏢 2. Testando UnidadeDAO (Consultas Assíncronas)...');
-  const unidadeDAO = new UnidadeDAO();
+  const unidadeDAO = new UnidadeDAO(http);
 
   // 2.1 listar()
   const unidades = await unidadeDAO.listar();
@@ -150,7 +155,7 @@ async function runTests() {
   // 3. TESTES DE ClienteDAO (CONTRATO PEDAGÓGICO DE CONSULTA)
   // ---------------------------------------------------------------------------
   console.log('\n👥 3. Testando ClienteDAO (Consultas Assíncronas)...');
-  const clienteDAO = new ClienteDAO();
+  const clienteDAO = new ClienteDAO(http);
 
   // 3.1 listar()
   const clientes = await clienteDAO.listar();
@@ -214,8 +219,8 @@ async function runTests() {
   }
   assert(rejeita(() => new Unidade({ id: 'x', nome: 'X', carteiraTotalClientes: Infinity })), 'Rejeita carteira infinita.');
   assert(rejeita(() => new Unidade({ id: 'x', nome: 'X', activeUsers7d: -1 })), 'Rejeita contagem negativa.');
-  assert((await new UnidadeDAO({ tenants: [] }).listar()).length === 0, 'Fonte sem unidades retorna [].');
-  assert((await new ClienteDAO({ clientes: [] }).listar()).length === 0, 'Fonte sem clientes retorna [].');
+  assert((await new UnidadeDAO(async () => []).listar()).length === 0, 'Fonte sem unidades retorna [].');
+  assert((await new ClienteDAO(async () => []).listar()).length === 0, 'Fonte sem clientes retorna [].');
   assert(rejeita(() => eventosProtegidos.push(evt)), 'Impede alteração da coleção de eventos.');
   assert(rejeita(() => { historicoProtegido[0].score = 0; }), 'Impede alteração do score pelo getter.');
   const entrada = { id: 'copia', nome: 'Cópia', funnel90d: { gerada: 10, vista: 5, sucesso: 2 }, riscoDrivers: ['Original'] };
@@ -236,7 +241,7 @@ async function runTests() {
   console.log('='.repeat(75) + '\n');
 }
 
-runTests().catch((err) => {
+runTests().finally(() => server.close()).catch((err) => {
   console.error('Erro fatal durante a execução dos testes:', err);
   process.exit(1);
 });

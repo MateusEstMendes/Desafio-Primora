@@ -12,23 +12,10 @@ import {
   Statistic,
   Radio,
   Empty,
-  Modal,
-  Form,
-  Input,
-  InputNumber,
   Select,
-  Button,
-  Space,
-  Popconfirm,
   Tooltip,
-  Divider,
-  message
 } from 'antd';
 import {
-  UserAddOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
   CheckCircleOutlined,
   AlertOutlined,
   ExclamationCircleOutlined,
@@ -55,31 +42,16 @@ import { getRiskSemanticTokens } from '../utils/themeTokens';
 import { useChartAutoReset } from '../utils/useChartAutoReset';
 import '../components/componentsCSS/HistoricoClientes.css';
 
-function extrairNumeroTicket(ticketStr) {
-  if (typeof ticketStr === 'number') return ticketStr;
-  if (!ticketStr) return 35000;
-  const limpo = String(ticketStr).replace(/[^\d]/g, '');
-  const num = parseInt(limpo, 10);
-  return isNaN(num) ? 35000 : Math.round(num / 100);
-}
-
 export default function HistoricoClientes({
   initialClientId,
   dataset,
   isMobile = false,
   selectedTenantId = 'todos',
   onSelectTenant,
-  themeTokens,
-  onAddCliente,
-  onUpdateCliente,
-  onDeleteCliente
+  themeTokens
 }) {
   const scoreChartReset = useChartAutoReset(3000);
   const eventosDonutReset = useChartAutoReset(3000);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [form] = Form.useForm();
-  const [editForm] = Form.useForm();
   const todosClientes = dataset?.clientes || [];
   const tenants = dataset?.tenants || [];
 
@@ -285,139 +257,6 @@ export default function HistoricoClientes({
       .sort((a, b) => b.value - a.value);
   }, [clienteSelecionado, themeTokens]);
 
-  const handleSalvarNovoCliente = (values) => {
-    const tenantObj = tenants.find((t) => t.id === values.tenantId);
-    const score = Number(values.scoreSaudeAtual || 80);
-    let status = values.statusSaude;
-    if (!status) {
-      if (score < 40) status = 'Crítico';
-      else if (score < 60) status = 'Risco';
-      else if (score < 75) status = 'Atenção';
-      else status = 'Saudável';
-    }
-
-    const novoId = `CLI-${Date.now().toString().slice(-4)}`;
-    const novo = {
-      id: novoId,
-      nome: values.nome,
-      tenantId: values.tenantId,
-      unidadeNome: tenantObj ? tenantObj.nome : 'Unidade',
-      segmento: values.segmento || 'Supermercado Regional',
-      statusSaude: status,
-      scoreSaudeAtual: score,
-      tempoContratoMeses: Number(values.tempoContratoMeses || 12),
-      ticketMedioMensal: `R$ ${Number(values.ticketMedio || 35000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      isNovo: true,
-      historicoScore: [
-        { periodo: 'Mai/2026', score: Math.max(10, score - 8) },
-        { periodo: 'Jun/2026', score: Math.max(10, score - 6) },
-        { periodo: 'Jul/2026', score: Math.max(10, score - 4) },
-        { periodo: 'Ago/2026', score: Math.max(10, score - 2) },
-        { periodo: 'Set/2026', score: Math.max(10, score - 1) },
-        { periodo: 'Out/2026', score }
-      ],
-      eventos: [
-        {
-          id: `EVT-${Date.now().toString().slice(-3)}`,
-          data: new Date().toISOString(),
-          tipo: 'Cadastro de Conta',
-          categoria: 'comercial',
-          descricao: `Conta ${values.nome} cadastrada no ecossistema comercial sob gestão da regional ${tenantObj ? tenantObj.nome : ''}.`
-        }
-      ]
-    };
-
-    if (onAddCliente) {
-      onAddCliente(novo);
-    }
-    setSelectedClienteId(novoId);
-    setModalOpen(false);
-    form.resetFields();
-    message.success(`Cliente "${novo.nome}" cadastrado com sucesso!`);
-  };
-
-  const handleAbrirEdicao = () => {
-    if (!clienteSelecionado) return;
-    editForm.setFieldsValue({
-      nome: clienteSelecionado.nome,
-      tenantId: clienteSelecionado.tenantId,
-      segmento: clienteSelecionado.segmento,
-      tempoContratoMeses: clienteSelecionado.tempoContratoMeses,
-      ticketMedio: extrairNumeroTicket(clienteSelecionado.ticketMedioMensal),
-      scoreSaudeAtual: clienteSelecionado.scoreSaudeAtual,
-      statusSaude: clienteSelecionado.statusSaude
-    });
-    setEditModalOpen(true);
-  };
-
-  const handleSalvarEdicaoCliente = (values) => {
-    if (!clienteSelecionado) return;
-    const tenantObj = tenants.find((t) => t.id === values.tenantId);
-    const score = Number(values.scoreSaudeAtual ?? clienteSelecionado.scoreSaudeAtual);
-    let status = values.statusSaude;
-    if (!status) {
-      if (score < 40) status = 'Crítico';
-      else if (score < 60) status = 'Risco';
-      else if (score < 75) status = 'Atenção';
-      else status = 'Saudável';
-    }
-
-    const hist = [...(clienteSelecionado.historicoScore || [])];
-    if (hist.length > 0) {
-      hist[hist.length - 1] = { ...hist[hist.length - 1], score };
-    }
-
-    const novosEventos = [
-      ...(clienteSelecionado.eventos || []),
-      {
-        id: `EVT-${Date.now().toString().slice(-4)}`,
-        data: new Date().toISOString(),
-        tipo: 'Atualização Cadastral',
-        categoria: 'comercial',
-        descricao: `Dados cadastrais da conta atualizados: Segmento "${values.segmento}", Regional "${tenantObj?.nome || clienteSelecionado.unidadeNome}" e Score ${score} pts.`
-      }
-    ];
-
-    const clienteAtualizado = {
-      ...clienteSelecionado,
-      nome: values.nome,
-      tenantId: values.tenantId,
-      unidadeNome: tenantObj ? tenantObj.nome : clienteSelecionado.unidadeNome,
-      segmento: values.segmento,
-      statusSaude: status,
-      scoreSaudeAtual: score,
-      tempoContratoMeses: Number(values.tempoContratoMeses || clienteSelecionado.tempoContratoMeses),
-      ticketMedioMensal: `R$ ${Number(values.ticketMedio || 35000).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      historicoScore: hist,
-      eventos: novosEventos
-    };
-
-    if (onUpdateCliente) {
-      onUpdateCliente(clienteAtualizado);
-    }
-    setEditModalOpen(false);
-    message.success(`Conta "${values.nome}" atualizada com sucesso!`);
-  };
-
-  const handleExcluirCliente = () => {
-    if (!clienteSelecionado) return;
-    const idParaExcluir = clienteSelecionado.id;
-    const nomeExcluido = clienteSelecionado.nome;
-
-    if (onDeleteCliente) {
-      onDeleteCliente(idParaExcluir);
-    }
-
-    const restantes = todosClientes.filter((c) => c.id !== idParaExcluir);
-    if (restantes.length > 0) {
-      setSelectedClienteId(restantes[0].id);
-    } else {
-      setSelectedClienteId(null);
-    }
-
-    message.success(`Conta "${nomeExcluido}" excluída da carteira.`);
-  };
-
   if (!todosClientes.length) {
     return (
       <div className="clientes-container">
@@ -426,13 +265,7 @@ export default function HistoricoClientes({
             <span className="flat-section-eyebrow">AUDITORIA DE CONTAS B2B</span>
             <h2 className="flat-card-title" style={{ margin: 0 }}>Jornada e Monitoramento de Clientes</h2>
           </div>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setModalOpen(true)}
-          >
-            + Adicionar Cliente
-          </Button>
+
         </div>
 
         <div className="flat-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
@@ -443,117 +276,14 @@ export default function HistoricoClientes({
                   Nenhum cliente cadastrado no momento
                 </Typography.Title>
                 <Typography.Text type="secondary">
-                  Todas as contas foram removidas ou o dataset está vazio. Cadastre uma nova conta para iniciar o monitoramento.
+                  A API não retornou clientes para consulta.
                 </Typography.Text>
               </div>
             }
           />
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            size="large"
-            onClick={() => setModalOpen(true)}
-            style={{ marginTop: 20 }}
-          >
-            Cadastrar Novo Cliente
-          </Button>
+
         </div>
 
-        {/* Modal para Adicionar Novo Cliente */}
-        <Modal
-          title="Cadastrar Nova Conta B2B à Carteira"
-          open={modalOpen}
-          onCancel={() => {
-            setModalOpen(false);
-            form.resetFields();
-          }}
-          onOk={() => form.submit()}
-          okText="Salvar Conta"
-          cancelText="Cancelar"
-          destroyOnHidden
-        >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSalvarNovoCliente}
-            initialValues={{
-              tenantId: tenants[0]?.id || 'tenant-sudeste',
-              segmento: 'Supermercado Regional',
-              scoreSaudeAtual: 85,
-              tempoContratoMeses: 12,
-              ticketMedio: 35000
-            }}
-            style={{ marginTop: 16 }}
-          >
-            <Form.Item
-              name="nome"
-              label="Razão Social / Nome Fantasia do Cliente"
-              rules={[{ required: true, message: 'Por favor, informe o nome do cliente.' }]}
-            >
-              <Input placeholder="Ex: Hipermercados Brasil S/A" />
-            </Form.Item>
-
-            <Form.Item
-              name="tenantId"
-              label="Regional / Unidade Operacional"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={tenants.map((t) => ({
-                  value: t.id,
-                  label: `${t.nome} (Porte ${t.porte})`
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="segmento"
-              label="Segmento de Mercado"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={[
-                  { value: 'Supermercado Regional', label: 'Supermercado Regional' },
-                  { value: 'Atacarejo & Distribuição', label: 'Atacarejo & Distribuição' },
-                  { value: 'Rede de Frigoríficos', label: 'Rede de Frigoríficos' },
-                  { value: 'Conveniência & Varejo', label: 'Conveniência & Varejo' },
-                  { value: 'Operador Logístico B2B', label: 'Operador Logístico B2B' }
-                ]}
-              />
-            </Form.Item>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Form.Item
-                name="ticketMedio"
-                label="Ticket Médio Mensal (R$)"
-                rules={[{ required: true }]}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                  parser={(value) => value.replace(/R\$\s?|(\.*)/g, '')}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="tempoContratoMeses"
-                label="Tempo de Contrato (Meses)"
-                rules={[{ required: true }]}
-              >
-                <InputNumber min={1} max={120} style={{ width: '100%' }} />
-              </Form.Item>
-            </div>
-
-            <Form.Item
-              name="scoreSaudeAtual"
-              label="Score de Saúde Inicial (0 a 100)"
-              extra="Scores < 40 = Crítico, 40-59 = Risco, 60-74 = Atenção, >= 75 = Saudável."
-              rules={[{ required: true }]}
-            >
-              <InputNumber min={0} max={100} style={{ width: '100%' }} />
-            </Form.Item>
-          </Form>
-        </Modal>
       </div>
     );
   }
@@ -592,22 +322,6 @@ export default function HistoricoClientes({
 
   return (
     <div className="clientes-container">
-      {/* Barra de Ações Superior do Módulo de Clientes */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-        <div>
-          <span className="flat-section-eyebrow">AUDITORIA DE CONTAS B2B</span>
-          <h2 className="flat-card-title" style={{ margin: 0 }}>Jornada e Monitoramento de Clientes</h2>
-        </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setModalOpen(true)}
-          >
-            + Adicionar Cliente
-          </Button>
-        </div>
-      </div>
 
       {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS (MOBILE-FIRST) */}
       {isMobile ? (
@@ -654,8 +368,6 @@ export default function HistoricoClientes({
           {todosClientes.map((c, idx) => {
             const active = c.id === clienteSelecionado?.id;
             const st = getStatusTokens(c.statusSaude);
-            const h = c.historicoScore || [];
-            const d = h.length >= 2 ? h[h.length - 1].score - h[0].score : 0;
 
             return (
               <button
@@ -673,33 +385,16 @@ export default function HistoricoClientes({
                 onKeyDown={(e) => handleTabKeyDown(e, idx)}
                 className={`client-tab-item ${active ? 'client-tab-item--active' : ''}`}
               >
-                <div>
-                  <div className="client-tab-title-row">
-                    <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
-                    <span>{c.nome}</span>
-                    {(c.isNovo || !['CLI-001', 'CLI-002', 'CLI-003'].includes(c.id)) && (
-                      <span className="badge-novo-cliente" style={{ fontSize: 9, padding: '1px 6px' }}>✨ Novo</span>
-                    )}
-                  </div>
-                  <span className="client-tab-subtitle">
-                    {c.unidadeNome.replace('Unidade ', '')} · {c.segmento}
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span
-                    className="client-tab-score"
-                    style={{ color: st.color }}
-                  >
-                    {c.scoreSaudeAtual}/100
-                  </span>
-                  <span
-                    className={`geo-delta ${
-                      d >= 0 ? 'geo-delta--positive' : 'geo-delta--negative'
-                    }`}
-                  >
-                    {d >= 0 ? `▲ +${d}` : `▼ ${d}`} pts
-                  </span>
-                </div>
+                <span className="client-tab-title-row">
+                  <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
+                  <span className="client-tab-name">{c.nome}</span>
+                </span>
+                <span
+                  className="client-tab-score tabular-nums"
+                  style={{ color: st.color }}
+                >
+                  {c.scoreSaudeAtual}
+                </span>
               </button>
             );
           })}
@@ -1016,253 +711,19 @@ export default function HistoricoClientes({
               )}
             </ExecutivePanel>
           </div>
-
-          {/* 3. AÇÕES DE GESTÃO DA CONTA (FIM DA PÁGINA) */}
           <div className="client-footer-actions-bar">
             <div className="client-footer-actions-info">
               <span className="client-footer-account-title">
-                Gerenciamento da Conta: <strong>{clienteSelecionado.nome}</strong>
+                Dados da Conta: <strong>{clienteSelecionado.nome}</strong>
               </span>
               <span className="client-footer-account-sub">
                 Código: {clienteSelecionado.id} · {clienteSelecionado.unidadeNome} · {clienteSelecionado.ticketMedioMensal}
               </span>
             </div>
-
-            <Space wrap size="middle">
-              <Button
-                icon={<EditOutlined />}
-                onClick={handleAbrirEdicao}
-                size="middle"
-              >
-                Editar Conta
-              </Button>
-
-              <Popconfirm
-                title="Excluir Conta B2B"
-                description={`Tem certeza de que deseja remover "${clienteSelecionado.nome}" da carteira?`}
-                onConfirm={handleExcluirCliente}
-                okText="Sim, excluir"
-                cancelText="Cancelar"
-                okButtonProps={{ danger: true }}
-              >
-                <Button danger icon={<DeleteOutlined />} size="middle">
-                  Excluir Conta
-                </Button>
-              </Popconfirm>
-            </Space>
           </div>
         </>
       )}
 
-      {/* MODAL PARA ADICIONAR NOVO CLIENTE */}
-      <Modal
-        title="Adicionar Nova Conta B2B à Carteira"
-        open={modalOpen}
-        onCancel={() => {
-          setModalOpen(false);
-          form.resetFields();
-        }}
-        onOk={() => form.submit()}
-        okText="Salvar Conta"
-        cancelText="Cancelar"
-        destroyOnHidden
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSalvarNovoCliente}
-          initialValues={{
-            tenantId: tenants[0]?.id || 'tenant-sudeste',
-            segmento: 'Supermercado Regional',
-            scoreSaudeAtual: 85,
-            tempoContratoMeses: 12,
-            ticketMedio: 35000
-          }}
-          style={{ marginTop: 16 }}
-        >
-          <Form.Item
-            name="nome"
-            label="Razão Social / Nome Fantasia do Cliente"
-            rules={[{ required: true, message: 'Por favor, informe o nome do cliente.' }]}
-          >
-            <Input placeholder="Ex: Hipermercados Brasil S/A" />
-          </Form.Item>
-
-          <Form.Item
-            name="tenantId"
-            label="Regional / Unidade Operacional"
-            rules={[{ required: true }]}
-          >
-            <Select
-              options={tenants.map((t) => ({
-                value: t.id,
-                label: `${t.nome} (Porte ${t.porte})`
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="segmento"
-            label="Segmento de Mercado"
-            rules={[{ required: true }]}
-          >
-            <Select
-              options={[
-                { value: 'Supermercado Regional', label: 'Supermercado Regional' },
-                { value: 'Atacarejo & Distribuição', label: 'Atacarejo & Distribuição' },
-                { value: 'Rede de Frigoríficos', label: 'Rede de Frigoríficos' },
-                { value: 'Conveniência & Varejo', label: 'Conveniência & Varejo' },
-                { value: 'Operador Logístico B2B', label: 'Operador Logístico B2B' }
-              ]}
-            />
-          </Form.Item>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Form.Item
-              name="ticketMedio"
-              label="Ticket Médio Mensal (R$)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                parser={(value) => value.replace(/R\$\s?|(\.*)/g, '')}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="tempoContratoMeses"
-              label="Tempo de Contrato (Meses)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber min={1} max={120} style={{ width: '100%' }} />
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            name="scoreSaudeAtual"
-            label="Score de Saúde Inicial (0 a 100)"
-            extra="Scores < 40 = Crítico, 40-59 = Risco, 60-74 = Atenção, >= 75 = Saudável."
-            rules={[{ required: true }]}
-          >
-            <InputNumber min={0} max={100} style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* MODAL PARA EDITAR CONTA B2B EXISTENTE (UPDATE - CRUD) */}
-      <Modal
-        title={
-          <div>
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
-              Editar Conta B2B: {clienteSelecionado?.nome || ''}
-            </span>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 400 }}>
-              Atualização de cadastro, porte, regional e score de saúde
-            </div>
-          </div>
-        }
-        open={editModalOpen}
-        onCancel={() => {
-          setEditModalOpen(false);
-          editForm.resetFields();
-        }}
-        onOk={() => editForm.submit()}
-        okText="Salvar Alterações"
-        cancelText="Cancelar"
-        destroyOnHidden
-      >
-        <Form
-          form={editForm}
-          layout="vertical"
-          onFinish={handleSalvarEdicaoCliente}
-          style={{ marginTop: 16 }}
-        >
-          <Form.Item
-            name="nome"
-            label="Razão Social / Nome da Empresa"
-            rules={[{ required: true, message: 'Por favor, informe a razão social.' }]}
-          >
-            <Input placeholder="Ex: Supermercado Alvorada Ltda" />
-          </Form.Item>
-
-          <Form.Item
-            name="tenantId"
-            label="Unidade Regional Vinculada"
-            rules={[{ required: true }]}
-          >
-            <Select
-              options={tenants.map((t) => ({
-                value: t.id,
-                label: `${t.nome} (Porte ${t.porte})`
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="segmento"
-            label="Segmento de Atuação Comercial"
-            rules={[{ required: true }]}
-          >
-            <Select
-              options={[
-                { value: 'Supermercado Regional', label: 'Supermercado Regional' },
-                { value: 'Atacarejo & Distribuição', label: 'Atacarejo & Distribuição' },
-                { value: 'Rede de Frigoríficos', label: 'Rede de Frigoríficos' },
-                { value: 'Conveniência & Varejo', label: 'Conveniência & Varejo' },
-                { value: 'Operador Logístico B2B', label: 'Operador Logístico B2B' }
-              ]}
-            />
-          </Form.Item>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Form.Item
-              name="ticketMedio"
-              label="Ticket Médio Mensal (R$)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                parser={(value) => value.replace(/R\$\s?|(\.*)/g, '')}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="tempoContratoMeses"
-              label="Tempo de Contrato (Meses)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber min={1} max={180} style={{ width: '100%' }} />
-            </Form.Item>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Form.Item
-              name="scoreSaudeAtual"
-              label="Score de Saúde Atual (0 a 100)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber min={0} max={100} style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="statusSaude"
-              label="Classificação de Saúde"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={[
-                  { value: 'Saudável', label: '● Saudável (Score >= 75)' },
-                  { value: 'Atenção', label: '▲ Atenção (Score 60-74)' },
-                  { value: 'Risco', label: '▲ Risco (Score 40-59)' },
-                  { value: 'Crítico', label: '▲ Crítico (Score < 40)' }
-                ]}
-              />
-            </Form.Item>
-          </div>
-        </Form>
-      </Modal>
     </div>
   );
 }
