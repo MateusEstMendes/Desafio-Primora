@@ -129,7 +129,7 @@ export default function FlatFunnelHealth({ estatisticas, themeTokens }) {
                       key={entry.key}
                       fill={entry.color}
                       cursor="pointer"
-                      opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : 0.35}
+                      opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : (themeTokens?.mode === 'dark' ? 0.65 : 0.35)}
                     />
                   ))}
                 </Pie>

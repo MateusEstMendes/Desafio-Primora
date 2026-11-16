@@ -444,6 +444,7 @@ export default function HistoricoClientes({
                         cursor={{ stroke: statusMeta.color, strokeWidth: 1.5, strokeDasharray: '4 4' }}
                         content={
                           <ExecutiveChartTooltip
+                            anchorRef={scoreChartReset.containerRef}
                             valueFormatter={(val) => [`${Number(val).toLocaleString('pt-BR')} pts`, 'Score']}
                           />
                         }
@@ -506,7 +507,7 @@ export default function HistoricoClientes({
                               key={entry.name}
                               fill={entry.color}
                               cursor="pointer"
-                              opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : 0.35}
+                              opacity={activePieSlice === -1 || activePieSlice === idx ? 1 : (themeTokens?.mode === 'dark' ? 0.65 : 0.35)}
                             />
                           ))}
                         </Pie>
@@ -516,6 +517,7 @@ export default function HistoricoClientes({
                           wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                           content={
                             <ExecutiveChartTooltip
+                              anchorRef={eventosDonutReset.containerRef}
                               valueFormatter={(val, name, props) => [
                                 `${formatarNumero(val)} eventos (${formatarPercentual(props.payload.pct)})`,
                                 name

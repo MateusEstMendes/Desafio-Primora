@@ -41,6 +41,7 @@ function Sparkline({ data, dataKey, color, label, isPercent = false, full = fals
             cursor={{ stroke: color, strokeWidth: 1.5, strokeDasharray: '3 3' }}
             content={
               <ExecutiveChartTooltip
+                anchorRef={containerRef}
                 valueFormatter={v => [isPercent || dataKey === 'engajamento' ? formatarPercentual(v) : `${formatarNumero(v)} pts`, label]}
                 labelFormatter={(_, payload) => payload?.[0]?.payload?.mes || payload?.[0]?.payload?.periodo || ''}
               />
@@ -163,7 +164,7 @@ export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId
                     key={t.id}
                     fill={t.color}
                     cursor="pointer"
-                    opacity={selectedTenantId === 'todos' || selectedTenantId === t.id ? 1 : 0.3}
+                    opacity={selectedTenantId === 'todos' || selectedTenantId === t.id ? 1 : (themeTokens?.mode === 'dark' ? 0.65 : 0.3)}
                   />
                 ))}
               </Pie>
@@ -173,6 +174,7 @@ export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId
                 wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                 content={
                   <ExecutiveChartTooltip
+                    anchorRef={donutReset.containerRef}
                     valueFormatter={(value, name) => [`${formatarNumero(value)} contas`, name || 'Contas']}
                   />
                 }

@@ -74,7 +74,7 @@
 .exec-chart-tooltip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .exec-chart-tooltip-name { color: var(--text-secondary); font-weight: 500; margin-right: auto; }
 .exec-chart-tooltip-val { color: var(--text-primary); font-weight: 700; padding-left: 8px; }
-.recharts-pie-sector:hover path { opacity: .9; }
+:root:not([data-theme='dark']) .recharts-pie-sector:hover path { opacity: .9; }
 .skip-link { position: fixed; left: 16px; top: 12px; z-index: 2000; padding: 12px 16px; border-radius: 8px; background: var(--brand-solid); color: var(--text-on-brand); transform: translateY(-160%); text-decoration: none; }
 .skip-link:focus { transform: translateY(0); }
 
@@ -161,3 +161,12 @@
 }
 
 .regional-share-table td:first-child { font-size: 12px; }
+
+/* Portal no body evita recorte pelos painéis e deixa o desenho livre. */
+.exec-chart-tooltip--floating {
+  position: fixed;
+  z-index: 2000;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
+  pointer-events: none;
+}

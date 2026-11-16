@@ -18,12 +18,18 @@ Atualizado em 16/11/2026. Este bloco descreve a interface implementada e as deci
 | --- | --- | --- |
 | Fundo principal | `#FAFBFD` | `#101722` |
 | Superfície | `#FFFFFF` | `#182231` |
-| Texto principal | `#17243B` | `#EDF2FA` |
-| Texto secundário | `#52627A` | `#B3C1D4` |
-| Texto de apoio | `#5C6D84` | `#95A7C0` |
-| Azul para texto e dados | `#2563EB` | `#8AB4FF` |
+| Texto principal | `#17243B` | `#F5F8FF` |
+| Texto secundário | `#52627A` | `#CDDAEB` |
+| Texto de apoio | `#5C6D84` | `#AABBD1` |
+| Azul para texto e dados | `#2563EB` | `#9CC0FF` |
 | Azul de controles preenchidos | `#2563EB` | `#2563EB` |
-| Conversão / sinal secundário | `#0F766E` | `#5FD3C4` |
+| Conversão / sinal secundário | `#0F766E` | `#70E0D0` |
+| Saudável | `#15803D` | `#22C55E` |
+| Atenção | `#A16207` | `#FFD27A` |
+| Risco | `#C2410C` | `#FFB98D` |
+| Crítico | `#DC2626` | `#FF6B6B` |
+| Centro-Oeste (categórica) | `#64748B` | `#B0C2DB` |
+| Superfície da tooltip | `#FFFFFF` | `#24344A` |
 | Sombra de superfície | `0 2px 10px rgba(23,36,59,.10)` | `0 3px 12px rgba(0,0,0,.26)` |
 | Sombra de hover, onde aplicada | `0 6px 18px rgba(23,36,59,.12)` | `0 6px 18px rgba(0,0,0,.30)` |
 
@@ -60,6 +66,7 @@ Títulos usam Plus Jakarta Sans; a interface usa Inter e números tabulares. Car
 ## Gráficos e interações
 
 - As três telas compartilham `useChartMotion`, `ExecutiveChartTooltip` e `usePieSliceRenderer`. Entradas do Recharts usam 450 ms com `ease-out`; destaques usam 180 ms; navegação e pílulas usam tween de 220 ms, sem mola. Preferência de movimento reduzido desativa a animação do Recharts, a expansão interpolada e as transições CSS.
+- O tooltip flutua em uma camada fixa fora dos painéis (portal no `body`), com 12 px de distância do gráfico. Prefere acima, depois abaixo ou nas laterais, conforme o espaço disponível; respeita o viewport e a navegação móvel, sem cobrir o gráfico consultado. A posição é recalculada ao rolar ou redimensionar; quando não há espaço externo, a caixa fica oculta até haver espaço.
 - O tooltip entra por opacidade e escala de 0,98 a 1 em 140 ms. O conteúdo muda no mesmo elemento ao passar entre pontos; a posição não recebe interpolação. Título, série, valores e unidades usam formato brasileiro e números tabulares; valores têm 13 px, eixos e legendas têm 12 px.
 - `useChartAutoReset` fecha o tooltip por toque fora, saída de foco ou Escape, sem trocar a chave nem remontar o gráfico. Após toque, três segundos de inatividade também encerram a interação; o foco gerado pelo toque preserva esse temporizador. Mouse e teclado não expiram enquanto o usuário consulta o gráfico.
 - A seleção regional permanece até selecionar/desselecionar explicitamente. As pizzas usam renderização de fatias compatível com Recharts 3, independente do antigo `activeIndex`; o realce por hover é temporário e o realce selecionado persiste. A expansão radial máxima é 6 px, com contorno da superfície do tema e folga no raio. Interrupções continuam do raio visível, inclusive quando o Recharts substitui seu wrapper interno.
@@ -78,6 +85,18 @@ A proposta de recolher a lista após selecionar, separar escolha e consulta em d
 As verificações realizadas durante a implementação incluíram os dois temas; desktop em 1440×900, 1366×768 e 1024×720; celular de 390 px; janelas abaixo do limite de altura; filtros e estados vazios; paginação e acesso ao último cliente; seleção e foco por teclado. A rolagem suave foi verificada com e sem movimento reduzido. O build passou após a última alteração de código, com avisos de chunks vazios e tamanho de bundles.
 
 Mudanças futuras devem preservar APIs, dados e cálculos, e verificar as dimensões e fluxos afetados. O refinamento dos gráficos descrito acima sucede a rodada documental anterior.
+
+## Contraste do tema escuro
+
+Ajuste posterior: verde `#22C55E` e vermelho `#FF6B6B`, mais saturados, substituem os tons claros anteriores. Textos e dados usam os mesmos tokens. Contrastes desses tons sobre card: 7,02:1 e 5,77:1; sobre tooltip: 5,53:1 e 4,54:1.
+
+A rodada de contraste preserva os fundos principal e dos cards, sombras, semântica regional, grades discretas e botões preenchidos azuis com texto branco. Dados e textos semânticos compartilham as cores acima; Sudeste usa azul, Sul verde azulado e Nordeste âmbar. Foco usa `#9CC0FF`. A tooltip mantém portal, posição externa, sombra e comportamento, com superfície própria `#24344A`.
+
+Nas barras e pizzas, séries não selecionadas usam opacidade 0,65 no escuro. Textos de legendas e linhas interativas permanecem opacos; seleção continua indicada por fundo/destaque. O cursor do Comparativo deriva do azul do tema escuro a 6%. O número da página ativa da lista de clientes usa o azul claro para evitar a cor escura gerada pelo Ant Design. Todos esses ajustes são restritos ao tema escuro; tokens e estados do claro foram preservados.
+
+Medição WCAG por luminância sRGB e composição de alfa: textos principal/secundário/apoio têm mínimos de 11,42:1 / 8,57:1 / 6,21:1 entre superfícies principal, card, sutil, elevada, tooltip e seleção azul. Textos semânticos em fundos próprios ficam entre 4,88:1 e 8,89:1. Botões brancos sobre azul preenchido: 5,17:1. Séries a 0,65 sobre card: mínimo 3,15:1; no escuro, hover preserva a opacidade da série. Eixos usam a cor de apoio opaca. Grades e preenchimentos suaves são auxiliares, não a única indicação dos dados.
+
+Verificações desta rodada: build e testes existentes aprovados; Chromium nas três telas, nos dois temas, em 1440×900, 1366×768, 1024×720, 390×844 e 1440×650, sem overflow horizontal ou gráficos com dimensão zero. Seleção/desseleção, hover, teclado, Escape, troca de cliente, toque e tooltip flutuante verificados. Na rodada anterior, a inspeção de textos HTML nos estados selecionados das três telas encontrou mínimo de 5,17:1; eixos e cores de séries foram medidos separadamente. Detalhes e limites no handoff.
 
 ## Referência original
 

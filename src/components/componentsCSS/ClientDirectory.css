@@ -5,6 +5,7 @@
 .client-directory-pagination .ant-pagination { margin: 0; }
 .client-directory-pagination .ant-pagination-item { border: 0; box-shadow: var(--shadow-card); }
 .client-directory-pagination .ant-pagination-item-active { background: var(--brand-primary-soft); }
+[data-theme='dark'] .client-directory-pagination .ant-pagination-item-active a { color: var(--brand-primary); }
 .client-mini-name { overflow-wrap: anywhere; }
 @media (max-width: 599px) { .client-directory-pagination { flex-direction: column; align-items: flex-start; } }
 

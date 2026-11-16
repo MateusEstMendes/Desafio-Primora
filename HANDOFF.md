@@ -1,12 +1,32 @@
-# Handoff — animações e leitura dos gráficos
+# Handoff — contraste do tema escuro
 
 Atualizado em 16/11/2026. Leia também [DESIGN.md](DESIGN.md), cuja primeira parte descreve a interface atual. A referência Origin preservada ao final desse arquivo é apenas histórica.
 
 ## Pedido atual e ponto de parada
 
-O pedido atual autoriza o plano “Refinar animações e leitura dos gráficos”, implementado nas três telas. A restrição anterior sobre a lista de clientes continua válida: a lista permanece aberta, a Jornada e o Comparativo mantêm rolagem natural, e o layout compacto da Visão Executiva foi preservado. Não há mudanças de API, modelos, dados ou cálculos.
+O pedido atual autoriza aumentar o contraste de todo o tema escuro, implementado nas três telas. O refinamento anterior dos gráficos foi preservado. A restrição anterior sobre a lista de clientes continua válida: a lista permanece aberta, a Jornada e o Comparativo mantêm rolagem natural, e o layout compacto da Visão Executiva foi preservado. Não há mudanças de API, modelos, dados ou cálculos.
 
-## Refinamento entregue nesta rodada
+## Contraste entregue
+
+- Paleta centralizada em `src/utils/themeTokens.js`: principal `#F5F8FF`, secundário `#CDDAEB`, apoio/eixos `#AABBD1`, azul/foco `#9CC0FF`, verde azulado `#70E0D0`, verde `#22C55E`, âmbar `#FFD27A`, laranja `#FFB98D` e vermelho `#FF6B6B`. Tokens de dados e texto atualizados juntos.
+- Regionais: Sudeste azul, Sul verde azulado, Nordeste âmbar e Centro-Oeste `#B0C2DB`. Tooltip `#24344A`, com portal e posicionamento preservados.
+- Pizzas e barras não selecionadas a 0,65 no escuro, inclusive no componente compartilhado `FlatFunnelHealth`. Tabela interativa do Comparativo e legendas mantêm texto opaco. Cursor do Comparativo usa azul do tema a 6% no escuro.
+- Corrigido o número da página ativa da Jornada: o azul derivado pelo Ant Design tinha apenas 1,90:1 no fundo selecionado. CSS restrito ao escuro aplica `--brand-primary`.
+- Fundos, KPIs neutros, sombras, layouts, animações, dados, cálculos e tema claro preservados. Nenhuma dependência nova.
+
+## Verificação de contraste
+
+Ajuste posterior solicitado: verde e vermelho mais fortes, agora `#22C55E` / `#FF6B6B`. Contrastes medidos: sobre card 7,02:1 / 5,77:1, sobre tooltip 5,53:1 / 4,54:1, sobre fundos semânticos próprios 5,54:1 / 4,88:1 e a 0,65 sobre card 3,75:1 / 3,15:1. Removida a atenuação adicional de hover apenas no escuro para preservar o mínimo gráfico. Build reexecutado.
+
+- Luminância relativa sRGB e composição alfa: mínimos de texto principal/secundário/apoio de 11,42:1 / 8,57:1 / 6,21:1 entre superfícies usadas; textos semânticos sobre fundos próprios ≥4,88:1; botões preenchidos com texto branco 5,17:1.
+- Séries sobre card com opacidade 0,65 ≥3,15:1; hover no escuro preserva a opacidade da série. Superam o mínimo gráfico de 3:1. Eixos opacos seguem o token de apoio. Grades permanecem auxiliares e discretas.
+- Chromium: três telas e dois temas nas cinco dimensões previstas (1440×900, 1366×768, 1024×720, 390×844, 1440×650); seleção/desseleção, hover, foco, Escape, troca de cliente, filtros reiniciados, toque e tooltip externa. Console sem erros nos fluxos verificados.
+- Na rodada anterior, inspeção programática de textos HTML nos estados selecionados, com composição dos fundos renderizados: 61/131/87 elementos nas três telas, nenhum abaixo de 4,5:1; mínimo 5,17:1. Medição de tokens complementa eixos SVG e séries; não equivale a uma auditoria completa de acessibilidade ou uso com leitor de tela.
+- `npm test` aprovado: cálculos, 77 verificações de domínio/DAO e seis testes de API. Build aprovado com avisos preexistentes de chunks vazios e bundles maiores que 500 kB.
+- Playwright e Chromium usados fora do projeto em `/tmp/primora-browser`, com `PLAYWRIGHT_BROWSERS_PATH=/tmp/primora-browser/browsers`. Scripts: `dark-contrast.mjs`, `charts-matrix.mjs`, `charts-interaction.mjs`, `client-switch.mjs` e `floating-tooltip.mjs`. Artefatos temporários; toque emulado, sem aparelho físico. Tokens claros conferidos contra a versão anterior, e todos os novos estilos/estados condicionados ao escuro.
+
+## Refinamento anterior dos gráficos
+
 
 - `src/utils/chartMotion.js`: durações compartilhadas, configuração do Recharts com movimento reduzido e estilo dos pontos ativos.
 - `ExecutiveChartTooltip`: apresentação unificada e expansão radial de até 6 px. `usePieSliceRenderer` guarda o raio visível por fatia para continuar animações interrompidas mesmo quando o Recharts substitui seus wrappers. Substitui o `activeIndex` obsoleto do Recharts 3 por seleção explícita na shape.
@@ -25,6 +45,12 @@ O pedido atual autoriza o plano “Refinar animações e leitura dos gráficos�
 - Limites dos tooltips verificados nas três telas, nos dois temas, em 390 e 1440 px: sem ultrapassar o viewport ou ancestrais com recorte. Foco visível, unidades por teclado e geometria completa do Recharts com movimento reduzido também passaram.
 - Console sem erros de carregamento, chaves ou dimensões. Ao emular movimento reduzido, Motion pode emitir seu aviso informativo de desenvolvimento sobre animações desativadas; esse aviso esperado foi separado dos erros.
 - Capturas e scripts desta sessão ficam em `/tmp/primora-browser/charts-*`, `chart-access.mjs`, `tooltip-bounds.mjs` e `paint-check.mjs`; são artefatos temporários, não dependências do repositório. Toque foi emulado no Chromium; não houve ensaio em aparelho físico nem leitor de tela.
+
+## Correção posterior: tooltip flutuante
+
+O usuário apontou que a caixa sobre o desenho impedia a leitura do gráfico. `ExecutiveChartTooltip` agora usa portal no `body` e posição fixa, ancorada ao contêiner de cada gráfico. Mantém distância de 12 px e procura espaço acima, abaixo ou nas laterais, sem sobreposição ao gráfico, recorte por painéis ou interceptação do mouse. Respeita a navegação móvel e acompanha rolagem/redimensionamento. Se não houver espaço externo visível, oculta a caixa em vez de encobrir o desenho.
+
+Verificação específica: Chromium em 1440×900 e 390×844, três telas e dois temas, com assertivas de ausência de interseção entre tooltip e gráfico, limites do viewport e portal no `body`; teclado, Escape e encerramento por toque após três segundos. Script temporário: `/tmp/primora-browser/floating-tooltip.mjs`. Build aprovado, com os mesmos avisos de bundles/chunks já registrados.
 
 ## Histórico das etapas e decisões
 

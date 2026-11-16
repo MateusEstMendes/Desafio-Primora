@@ -423,9 +423,10 @@ export default function Comparativo({
                     {...mainChartReset.tooltipProps}
                     isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
-                    cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
+                    cursor={{ fill: themeTokens.mode === 'dark' ? themeTokens.brandPrimary : 'rgba(0, 116, 255, 0.06)', fillOpacity: themeTokens.mode === 'dark' ? 0.06 : 1 }}
                     content={
                       <ExecutiveChartTooltip
+                        anchorRef={mainChartReset.containerRef}
                         valueFormatter={(val, name) => [
                           String(name).includes('%') ? formatarPercentual(val) : `${formatarNumero(val)} contas`,
                           name
@@ -456,7 +457,7 @@ export default function Comparativo({
                           key={entry.id}
                           fill={themeTokens.brandPrimary}
                           cursor="pointer"
-                          opacity={selectedTenantId === 'todos' || isSel ? 1 : 0.35}
+                          opacity={selectedTenantId === 'todos' || isSel ? 1 : (themeTokens?.mode === 'dark' ? 0.65 : 0.35)}
                           style={isSel ? { filter: 'brightness(1.16) saturate(1.3)' } : undefined}
                         />
                       );
@@ -511,9 +512,10 @@ export default function Comparativo({
                     {...mainChartReset.tooltipProps}
                     isAnimationActive={false}
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
-                    cursor={{ fill: 'rgba(0, 116, 255, 0.06)' }}
+                    cursor={{ fill: themeTokens.mode === 'dark' ? themeTokens.brandPrimary : 'rgba(0, 116, 255, 0.06)', fillOpacity: themeTokens.mode === 'dark' ? 0.06 : 1 }}
                     content={
                       <ExecutiveChartTooltip
+                        anchorRef={mainChartReset.containerRef}
                         valueFormatter={(val, name) => [
                           String(name).includes('%') ? formatarPercentual(val) : `${formatarNumero(val)} contas`,
                           name
@@ -596,7 +598,7 @@ export default function Comparativo({
                         key={s.id}
                         fill={s.color}
                         cursor="pointer"
-                        opacity={selectedTenantId === 'todos' || selectedTenantId === s.id ? 1 : 0.3}
+                        opacity={selectedTenantId === 'todos' || selectedTenantId === s.id ? 1 : (themeTokens?.mode === 'dark' ? 0.65 : 0.3)}
                       />
                     ))}
                   </Pie>
@@ -606,6 +608,7 @@ export default function Comparativo({
                     wrapperStyle={{ zIndex: 100, pointerEvents: 'none' }}
                     content={
                       <ExecutiveChartTooltip
+                        anchorRef={donutReset.containerRef}
                         valueFormatter={(val, name, props) => [
                           `${formatarNumero(val)} contas (${formatarPercentual(props.payload.pct)})`,
                           name
@@ -643,7 +646,7 @@ export default function Comparativo({
                         }
                       }}
                       title="Clique ou pressione Enter para filtrar esta regional"
-                      style={{ opacity: selectedTenantId === 'todos' || isSelected ? 1 : 0.6 }}
+                      style={{ opacity: themeTokens.mode === 'dark' || selectedTenantId === 'todos' || isSelected ? 1 : 0.6 }}
                     >
                       <td>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
