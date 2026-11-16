@@ -1,22 +1,22 @@
 # Painel Vetor — Diretrizes visuais atuais
 
-A interface foi adaptada para consulta de indicadores B2B. A referência editorial do Origin, preservada abaixo, serve como inspiração; as decisões deste bloco descrevem a implementação atual.
+Atualizado em 16/11/2026. Este bloco descreve a interface implementada e as decisões do usuário. A referência Origin ao final é histórica e não substitui estas diretrizes. Para continuidade técnica, consulte [HANDOFF.md](HANDOFF.md).
 
 ## Princípios e aplicação
 
-- **Hierarquia:** um título e uma descrição por tela; números em destaque; títulos de seção menores; notas em segundo plano. O NN/g recomenda usar escala, contraste e agrupamento para orientar a leitura: [5 Principles of Visual Design](https://www.nngroup.com/articles/principles-visual-design/).
-- **Cores por função:** superfícies neutras, azul para ações e seleção, verde para saúde, âmbar para atenção e vermelho para situações críticas. As cores regionais são categóricas e mantêm o mesmo mapeamento nas telas. Referência: [Material Design — Color roles](https://m3.material.io/styles/color/the-color-system/).
-- **Legibilidade:** os pares de texto da paleta são avaliados com a fórmula WCAG, buscando pelo menos 4,5:1, inclusive nas notas. Isso verifica a paleta, não certifica a acessibilidade de toda a aplicação. Referência: [W3C — Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
-- **Consistência:** mesma geometria de cards, controles de filtro e espaçamentos entre módulos; superfícies estáticas não se elevam ao passar o mouse.
-- **Concisão:** a faixa de identificação do cliente apresenta nome/código, regional e contrato. Score, variação, eventos e ticket aparecem na grade de indicadores, evitando repetir os mesmos dados em três blocos.
-- **Semântica:** engajamento usa azul; conversão usa verde azulado; o gráfico de participação se chama “Distribuição da carteira”. A cor do score de uma conta acompanha seu status de saúde, enquanto o risco regional usa sua própria taxa.
-- **Destaques:** exposição ao risco recebe fundo, borda e valor em vermelho. Variações favoráveis usam verde; desfavoráveis, vermelho; variação zero permanece neutra. Na Jornada, o card de variação também recebe esse destaque. Em “Maiores mudanças”, a curva e o valor seguem a mesma cor. O delta do engajamento considera as regionais e o período selecionados.
+- As três telas começam pelos controles e indicadores. O cabeçalho geral com identificação, descrição e etiqueta regional foi removido; cada página mantém um `h1` exclusivo para leitores de tela. A navegação identifica a tela e mantém o seletor regional.
+- Cards e KPIs usam superfícies neutras, sem bordas externas decorativas. Sombras separam as superfícies; foco de teclado e divisórias internas de tabelas e listas permanecem visíveis.
+- KPIs não têm pontos antes dos títulos, recuo para esses pontos ou faixas laterais. Exposição, benchmark e variação destacam a fonte; o fundo do KPI permanece neutro nos dois temas.
+- Variações favoráveis usam texto verde; desfavoráveis, vermelho; zero é neutro. As sinalizações de “Maiores mudanças” podem manter seus fundos suaves e suas curvas semânticas: a restrição de fundo neutro vale para os cards de KPI.
+- Na Jornada, o KPI de score usa verde para **score ≥ 70 (Saudável)**, âmbar para **40 ≤ score < 70 (Mediano)** e vermelho para **score < 40 (Crítico)**. O valor 40 está incluído em Mediano. Essas faixas de apresentação não alteram a classificação de risco regional ou os dados da API.
+- Azul indica ações e seleção; verde azulado identifica conversão. As cores regionais são categóricas e mantêm o mapeamento entre telas.
+- A identificação da conta contém nome/código, regional e tempo de contrato. Score, variação, quantidade de eventos e ticket mensal ficam nos quatro KPIs.
 
-## Paleta principal
+## Paleta e sombras
 
 | Função | Claro | Escuro |
 | --- | --- | --- |
-| Fundo | `#F4F6FA` | `#101722` |
+| Fundo principal | `#FAFBFD` | `#101722` |
 | Superfície | `#FFFFFF` | `#182231` |
 | Texto principal | `#17243B` | `#EDF2FA` |
 | Texto secundário | `#52627A` | `#B3C1D4` |
@@ -24,10 +24,50 @@ A interface foi adaptada para consulta de indicadores B2B. A referência editori
 | Azul para texto e dados | `#2563EB` | `#8AB4FF` |
 | Azul de controles preenchidos | `#2563EB` | `#2563EB` |
 | Conversão / sinal secundário | `#0F766E` | `#5FD3C4` |
+| Sombra de superfície | `0 2px 10px rgba(23,36,59,.10)` | `0 3px 12px rgba(0,0,0,.26)` |
+| Sombra de hover, onde aplicada | `0 6px 18px rgba(23,36,59,.12)` | `0 6px 18px rgba(0,0,0,.30)` |
 
-A fonte única das cores está em `src/utils/themeTokens.js`. `applyThemeTokens` publica as variáveis CSS no documento; Ant Design e gráficos recebem a mesma paleta. Alterar um tema nesse arquivo atualiza também os componentes renderizados em portais.
+A fonte única das cores e sombras é [src/utils/themeTokens.js](src/utils/themeTokens.js). `applyThemeTokens` publica as variáveis CSS no documento; Ant Design e gráficos recebem a mesma paleta. A alteração do fundo foi restrita ao tema claro. As sombras foram levemente reforçadas nos dois temas por solicitação do usuário.
 
-A tipografia utiliza Plus Jakarta Sans nos títulos e Inter na interface, com números tabulares. O espaçamento segue múltiplos de 4 px, com 20–24 px no interior dos painéis e 16–20 px entre blocos. Cards usam raio de 16 px; controles, 8–12 px. No celular, a navegação inferior permanece acessível, os indicadores formam duas colunas e os valores monetários têm escala própria.
+Títulos usam Plus Jakarta Sans; a interface usa Inter e números tabulares. Cards usam raio de 16 px e controles, 8–12 px. No celular, a navegação inferior permanece disponível, os KPIs formam duas colunas e valores monetários têm escala própria.
+
+## Layout por tela
+
+### Visão Executiva
+
+- Padding principal e dos painéis: 16 px. Padding dos KPIs: 12 px. Intervalos entre blocos: 12 px.
+- Em desktop com **largura ≥ 1024 px e altura ≥ 720 px**, o conteúdo ocupa a altura disponível, sem rolagem externa. Painéis extensos têm rolagem interna e podem receber foco de teclado.
+- Em telas menores ou janelas abaixo de 720 px de altura, a página mantém rolagem natural. O padding inferior preserva o espaço da navegação móvel.
+- Gráficos se ajustam aos painéis. O gráfico de detalhes da empresa, oculto no layout móvel, não é montado no celular para evitar medições de tamanho zero.
+
+### Comparativo Regional
+
+- Mantém rolagem natural da página. A experiência com KPIs fixos e área de rolagem interna foi **cancelada e desfeita** pelo usuário.
+- Contém KPIs, gráficos regionais, matriz comparativa e notas metodológicas. A lista de clientes foi transferida para a Jornada.
+- A tabela preserva sua rolagem horizontal quando necessária. Os dados das barras incluem o `id` regional para chaves estáveis e seleção correta.
+
+### Jornada de Clientes
+
+- A lista “Clientes das Unidades Regionais” fica no início da página e substitui as antigas abas de contas e o seletor móvel de contas.
+- Busca por nome, código ou segmento, sem distinção de maiúsculas ou acentos. A busca considera todos os clientes da regional selecionada, não apenas a página visível.
+- Mantém filtros Todos, Novos e Risco / Crítico, contagem de resultados e paginação de **6, 12 ou 24 clientes**; o padrão é 6. Alterar busca, filtro, regional ou quantidade por página reinicia a paginação.
+- Clicar no nome, no corpo do card ou no botão “Ver jornada” seleciona a conta. O botão continua sendo a ação acessível por teclado. O card selecionado usa fundo azul suave e texto de seleção.
+- A seleção atualiza identificação, KPIs, gráficos e histórico. Os filtros de eventos e o destaque da pizza são reiniciados ao mudar de conta.
+- Após selecionar, a página rola suavemente até a identificação da conta e transfere o foco sem provocar outro salto. Com preferência de movimento reduzido, a rolagem é imediata.
+- “Trocar cliente” retorna à lista existente. Busca, filtros e paginação permanecem no componente enquanto a tela estiver montada; não há persistência entre saídas e retornos à Jornada.
+- A lista **permanece aberta** após selecionar. A página usa rolagem natural; não há novo layout fixo ou rolagem independente por coluna.
+
+## Limites e decisões de continuidade
+
+A paginação limita os cards renderizados, mas ocorre no navegador. A API ainda retorna a coleção completa de clientes; não há paginação, busca ou filtros no servidor. A interface foi validada com 2.000 clientes simulados, sem equivaler a um teste de carga da API.
+
+A proposta de recolher a lista após selecionar, separar escolha e consulta em dois momentos ou implantar a antiga etapa 7 **não foi autorizada**. O usuário pediu manter a página e produzir apenas a documentação de continuidade. Não aplicar essas propostas como próximo passo automático.
+
+## Verificação visual e funcional
+
+As verificações realizadas durante a implementação incluíram os dois temas; desktop em 1440×900, 1366×768 e 1024×720; celular de 390 px; janelas abaixo do limite de altura; filtros e estados vazios; paginação e acesso ao último cliente; seleção e foco por teclado. A rolagem suave foi verificada com e sem movimento reduzido. O build passou após a última alteração de código, com avisos de chunks vazios e tamanho de bundles.
+
+Mudanças futuras devem preservar APIs, dados e cálculos, e verificar as dimensões e fluxos afetados. A rodada de documentação não modifica a interface.
 
 ## Referência original
 

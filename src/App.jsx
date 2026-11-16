@@ -195,7 +195,7 @@ export default function App() {
           onToggleTheme={handleToggleTheme}
         />
 
-        <main id="main-content" className="app-main-content" tabIndex={-1}>
+        <main id="main-content" className={`app-main-content${currentTab === 'visao-geral' ? ' app-main-content--executive' : ''}`} tabIndex={-1}>
           <h1 className="sr-only">{MODULES[currentTab]}</h1>
           {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
           : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
@@ -226,7 +226,6 @@ export default function App() {
                     selectedTenantId={selectedTenantId}
                     onSelectTenant={setSelectedTenantId}
                     themeTokens={activeTokens}
-                    onNavigateTab={setCurrentTab}
                   />
                 )}
 

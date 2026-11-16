@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
+import ClientDirectory from '../components/ClientDirectory';
 import SegmentedPill from '../components/SegmentedPill';
 import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
 import {
@@ -12,7 +13,6 @@ import {
   Statistic,
   Radio,
   Empty,
-  Select,
   Tooltip,
 } from 'antd';
 import {
@@ -50,6 +50,7 @@ export default function HistoricoClientes({
   onSelectTenant,
   themeTokens
 }) {
+  const detailRef = useRef(null);
   const scoreChartReset = useChartAutoReset(3000);
   const eventosDonutReset = useChartAutoReset(3000);
   const todosClientes = dataset?.clientes || [];
@@ -81,6 +82,11 @@ export default function HistoricoClientes({
     );
   }, [clientesVisiveis, todosClientes, selectedClienteId]);
 
+  useEffect(() => {
+    setFiltroCategoriaEvento('todos');
+    setActivePieSlice(-1);
+  }, [clienteSelecionado?.id]);
+
   const eventosOrdenados = useMemo(() => {
     if (!clienteSelecionado?.eventos) return [];
     let lista = [...clienteSelecionado.eventos];
@@ -93,26 +99,6 @@ export default function HistoricoClientes({
   }, [clienteSelecionado, filtroCategoriaEvento]);
 
   const getStatusTokens = (status) => getRiskSemanticTokens(status, themeTokens);
-
-  const handleTabKeyDown = (e, index) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      const nextIndex = (index + 1) % todosClientes.length;
-      const nextClient = todosClientes[nextIndex];
-      setSelectedClienteId(nextClient.id);
-      if (selectedTenantId !== 'todos' && selectedTenantId !== nextClient.tenantId) {
-        onSelectTenant(nextClient.tenantId);
-      }
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      const prevIndex = (index - 1 + todosClientes.length) % todosClientes.length;
-      const prevClient = todosClientes[prevIndex];
-      setSelectedClienteId(prevClient.id);
-      if (selectedTenantId !== 'todos' && selectedTenantId !== prevClient.tenantId) {
-        onSelectTenant(prevClient.tenantId);
-      }
-    }
-  };
 
   const getEventoCategoryMeta = (categoria) => {
     switch (categoria) {
@@ -319,88 +305,24 @@ export default function HistoricoClientes({
   return (
     <div className="clientes-container">
 
-      {/* 1. SELETOR DIRETO DE CONTAS MONITORADAS (MOBILE-FIRST) */}
-      {isMobile ? (
-        <div className="mobile-client-selector-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span className="mobile-client-selector-label">CONTA EM MONITORAMENTO</span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              {todosClientes.length} cadastradas
-            </span>
-          </div>
-          <Select
-            value={clienteSelecionado?.id}
-            onChange={(val) => {
-              setSelectedClienteId(val);
-              const found = todosClientes.find((c) => c.id === val);
-              if (found && selectedTenantId !== 'todos' && selectedTenantId !== found.tenantId) {
-                onSelectTenant(found.tenantId);
-              }
-            }}
-            style={{ width: '100%' }}
-            size="large"
-            className="mobile-client-select"
-            options={todosClientes.map((c) => {
-              const st = getStatusTokens(c.statusSaude);
-              return {
-                value: c.id,
-                label: (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
-                      <strong style={{ fontSize: 13 }}>{c.nome}</strong>
-                    </div>
-                    <span style={{ fontSize: 11, color: st.color, fontWeight: 700, flexShrink: 0 }}>
-                      {c.scoreSaudeAtual} pts ({c.statusSaude})
-                    </span>
-                  </div>
-                )
-              };
-            })}
-          />
-        </div>
-      ) : (
-        <div className="client-tabs-bar" role="tablist" aria-label="Contas monitoradas">
-          {todosClientes.map((c, idx) => {
-            const active = c.id === clienteSelecionado?.id;
-            const st = getStatusTokens(c.statusSaude);
-
-            return (
-              <button
-                key={c.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                tabIndex={active ? 0 : -1}
-                onClick={() => {
-                  setSelectedClienteId(c.id);
-                  if (selectedTenantId !== 'todos' && selectedTenantId !== c.tenantId) {
-                    onSelectTenant(c.tenantId);
-                  }
-                }}
-                onKeyDown={(e) => handleTabKeyDown(e, idx)}
-                className={`client-tab-item ${active ? 'client-tab-item--active' : ''}`}
-              >
-                <span className="client-tab-title-row">
-                  <span className={`geo-dot ${st.dotClass}`} aria-hidden="true" />
-                  <span className="client-tab-name">{c.nome}</span>
-                </span>
-                <span
-                  className="client-tab-score tabular-nums"
-                  style={{ color: st.color }}
-                >
-                  {c.scoreSaudeAtual}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <ClientDirectory clientes={todosClientes} tenants={tenants} selectedTenantId={selectedTenantId}
+        selectedClientId={clienteSelecionado?.id} themeTokens={themeTokens}
+        onSelectClient={(client) => {
+          setSelectedClienteId(client.id);
+          requestAnimationFrame(() => {
+            detailRef.current?.scrollIntoView({
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+              block: 'start'
+            });
+            detailRef.current?.focus({ preventScroll: true });
+          });
+        }} />
 
       {clienteSelecionado && (
-        <>
+        <React.Fragment key={clienteSelecionado.id}>
+          <div className="client-detail-toolbar"><a className="flat-action-btn" href="#regional-clients-heading">Trocar cliente</a></div>
           {/* 2. FAIXA CONTÍNUA / GRID DE DADOS CONTRATUAIS E FINANCEIROS DA CONTA */}
-          <section className="account-ledger-strip" aria-label="Indicadores contratuais da conta">
+          <section ref={detailRef} tabIndex={-1} className="account-ledger-strip" aria-label="Indicadores contratuais da conta">
             <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-primary, #0074FF)' }}>
               <span className="account-ledger-label">Razão Social · Código</span>
               <span className="account-ledger-val">
@@ -435,8 +357,8 @@ export default function HistoricoClientes({
                 title: 'Score de saúde',
                 rawValue: clienteSelecionado.scoreSaudeAtual,
                 isPercent: false,
-                note: clienteSelecionado.statusSaude,
-                color: statusMeta.color
+                note: clienteSelecionado.scoreSaudeAtual >= 70 ? 'Saudável' : clienteSelecionado.scoreSaudeAtual >= 40 ? 'Mediano' : 'Crítico',
+                tone: clienteSelecionado.scoreSaudeAtual >= 70 ? 'positive' : clienteSelecionado.scoreSaudeAtual >= 40 ? 'warning' : 'negative'
               },
               {
                 title: 'Variação (6m)',
@@ -677,7 +599,7 @@ export default function HistoricoClientes({
               )}
             </ExecutivePanel>
           </div>
-        </>
+        </React.Fragment>
       )}
 
     </div>

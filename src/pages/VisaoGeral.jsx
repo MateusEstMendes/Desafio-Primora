@@ -51,7 +51,7 @@ function Sparkline({ data, dataKey, color, label, isPercent = false, full = fals
   );
 }
 
-export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSelectTenant, onNavigateTab, themeTokens, onOpenClient }) {
+export default function VisaoGeral({ isMobile = false, dataset, selectedTenantId = 'todos', onSelectTenant, onNavigateTab, themeTokens, onOpenClient }) {
   const [period, setPeriod] = useState(3);
   const donutReset = useChartAutoReset(3000);
   const tenants = dataset?.tenants || [];
@@ -91,7 +91,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
     { title: 'Engajamento médio', rawValue: engagement, isPercent: true, note: (deltaEngagement > 0 ? '+' : '') + deltaEngagement.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' p.p.', trend: deltaEngagement, color: themeTokens.brandPrimary },
     { title: 'Carteira ativa', rawValue: total, isPercent: false, note: selected.length + (selected.length === 1 ? ' regional' : ' regionais'), color: themeTokens.textSecondary }
   ];
-  return <div className="executive-dashboard">
+  return <div className={`executive-dashboard${client ? '' : ' executive-dashboard--without-client'}`}>
     <div className="executive-heading">
       <h2 className="section-caption">Indicadores da operação</h2>
       <div className="period-control" role="group" aria-label="Período das tendências">
@@ -114,7 +114,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
       </div>
     </div>
     <ExecutiveKpiGrid metrics={metrics} ariaLabel="Indicadores executivos" />
-    <ExecutivePanel className="reference-panel pulse-panel" delay={0.14} aria-labelledby="pulse-title">
+    <ExecutivePanel className="reference-panel pulse-panel" delay={0.14} tabIndex={0} aria-labelledby="pulse-title">
       <h2 id="pulse-title">Pulso da operação</h2>
       {[
         { key: 'engajamento', label: 'Engajamento médio', value: formatarPercentual(engagement), isPercent: true, color: themeTokens.brandPrimary },
@@ -129,7 +129,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
       <p className="chart-context">Histórico de engajamento e conversão · {period === 1 ? 'Último mês vs. anterior' : 'Últimas ' + period + ' amostras mensais'} ({series[0]?.mes} a {series.at(-1)?.mes}).</p>
     </ExecutivePanel>
     <div className="reference-middle-grid">
-      <section className="reference-panel territories-panel" aria-labelledby="territories-title"><h2 id="territories-title">Distribuição da carteira</h2><div className="reference-territories">
+      <section className="reference-panel territories-panel" tabIndex={0} aria-labelledby="territories-title"><h2 id="territories-title">Distribuição da carteira</h2><div className="reference-territories">
         <div
           ref={donutReset.containerRef}
           className="reference-donut"
@@ -179,7 +179,7 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         </div>
         <div className="territory-list">{regions.map(t => <button type="button" key={t.id} aria-pressed={selectedTenantId === t.id} onClick={() => onSelectTenant(selectedTenantId === t.id ? 'todos' : t.id)}><span className="territory-dot" style={{ background: t.color }} /><span>{t.regiao}</span><strong>{formatarPercentual(nationalTotal ? t.value / nationalTotal * 100 : 0)}</strong></button>)}</div>
       </div><p className="chart-context">Total: {formatarNumero(nationalTotal)} contas · toque em uma regional para filtrar.</p></section>
-      <section className="reference-panel changes-panel" aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores mudanças</h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
+      <section className="reference-panel changes-panel" tabIndex={0} aria-labelledby="changes-title"><div className="reference-panel-heading"><h2 id="changes-title">Maiores mudanças</h2><span className="period-badge">{period === 6 ? '6 meses' : period * 30 + ' dias'}</span></div>
         {changes.map(t => {
           const tone = getTrendTone(t.change);
           const color = tone === 'positive' ? themeTokens.statusSuccess : tone === 'negative' ? themeTokens.statusCritical : themeTokens.textMuted;
@@ -196,8 +196,8 @@ export default function VisaoGeral({ dataset, selectedTenantId = 'todos', onSele
         <p className="chart-context">Variação do engajamento no período.</p>
       </section>
     </div>
-    {client && <section className="reference-panel company-panel" aria-labelledby="company-title"><button type="button" className="company-heading" onClick={openClient}><div><h2 id="company-title">Empresa em foco</h2><p>{client.nome}<span className="company-region">{tenants.find(t => t.id === client.tenantId)?.regiao}</span></p></div><span className={'mobile-focus-score ' + (client.scoreSaudeAtual >= 70 ? 'is-positive' : 'is-negative')}>{client.scoreSaudeAtual}/100</span><RightOutlined /></button>
-      <div className="company-details"><Sparkline data={client.historicoScore || []} dataKey="score" color={themeTokens.brandPrimary} label="Score de saúde" full themeTokens={themeTokens} /><div className="company-facts"><div className="company-metrics"><div className="score-ring" style={{ '--score': Math.min(100, Math.max(0, client.scoreSaudeAtual)) + '%' }}><strong>{client.scoreSaudeAtual}</strong></div><div><span>Score da conta</span><strong>{client.scoreSaudeAtual}/100</strong></div><div><span>Ticket médio</span><strong>{client.ticketMedioMensal}</strong></div></div><ul>{events.map(e => <li key={e.id}><span className="territory-dot" style={{ background: e.categoria === 'sucesso' ? themeTokens.statusSuccess : themeTokens.brandCyan }} /><span>{e.tipo}</span><time dateTime={e.data}>{new Date(e.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</time></li>)}</ul></div></div>
+    {client && <section className="reference-panel company-panel" tabIndex={0} aria-labelledby="company-title"><button type="button" className="company-heading" onClick={openClient}><div><h2 id="company-title">Empresa em foco</h2><p>{client.nome}<span className="company-region">{tenants.find(t => t.id === client.tenantId)?.regiao}</span></p></div><span className={'mobile-focus-score ' + (client.scoreSaudeAtual >= 70 ? 'is-positive' : 'is-negative')}>{client.scoreSaudeAtual}/100</span><RightOutlined /></button>
+      {!isMobile && <div className="company-details"><Sparkline data={client.historicoScore || []} dataKey="score" color={themeTokens.brandPrimary} label="Score de saúde" full themeTokens={themeTokens} /><div className="company-facts"><div className="company-metrics"><div className="score-ring" style={{ '--score': Math.min(100, Math.max(0, client.scoreSaudeAtual)) + '%' }}><strong>{client.scoreSaudeAtual}</strong></div><div><span>Score da conta</span><strong>{client.scoreSaudeAtual}/100</strong></div><div><span>Ticket médio</span><strong>{client.ticketMedioMensal}</strong></div></div><ul>{events.map(e => <li key={e.id}><span className="territory-dot" style={{ background: e.categoria === 'sucesso' ? themeTokens.statusSuccess : themeTokens.brandCyan }} /><span>{e.tipo}</span><time dateTime={e.data}>{new Date(e.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</time></li>)}</ul></div></div>}
     </section>}
   </div>;
 }

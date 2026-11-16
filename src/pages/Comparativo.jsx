@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Table, Tooltip, Typography, Input, Select, Tag, Empty } from 'antd';
+import { Table, Tooltip, Typography } from 'antd';
 import SegmentedPill from '../components/SegmentedPill';
 import ExecutiveChartTooltip, { renderActivePieSlice } from '../components/ExecutiveChartTooltip';
-import { InfoCircleOutlined, UserOutlined, ArrowRightOutlined, CheckCircleOutlined, ThunderboltOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, CheckCircleOutlined, DownOutlined, UpOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { EXECUTIVE_EASE } from '../components/MotionPrimitives';
 import { ExecutiveKpiGrid, ExecutivePanel } from '../components/ExecutiveKpiGrid';
 import {
@@ -37,15 +37,12 @@ export default function Comparativo({
   selectedTenantId = 'todos',
   onSelectTenant,
   themeTokens,
-  onNavigateTab
 }) {
   const mainChartReset = useChartAutoReset(3000);
   const donutReset = useChartAutoReset(3000);
   const [tipoGrafico, setTipoGrafico] = useState('composto');
   const [modoDonut, setModoDonut] = useState('risco'); // 'risco' ou 'carteira'
   const [showRationale, setShowRationale] = useState(false);
-  const [filtroTipoClientes, setFiltroTipoClientes] = useState('todos'); // 'todos', 'novos', 'risco'
-  const [buscaCliente, setBuscaCliente] = useState('');
   const [expandedCardIds, setExpandedCardIds] = useState(() => new Set());
 
   const toggleCardExpanded = (id, e) => {
@@ -62,10 +59,6 @@ export default function Comparativo({
   };
 
   const tenants = dataset?.tenants || [];
-  const todosClientes = dataset?.clientes || [];
-
-  const baseClientIds = useMemo(() => new Set(['CLI-001', 'CLI-002', 'CLI-003']), []);
-  const isClienteNovo = (cli) => !baseClientIds.has(cli.id) || cli.isNovo;
 
   const dadosClassificados = useMemo(() => {
     return classificarUnidadesPorRisco(tenants);
@@ -292,6 +285,7 @@ export default function Comparativo({
 
   const dadosGrafico = useMemo(() => {
     return dadosClassificados.map((d) => ({
+      id: d.id,
       nome: isMobile
         ? d.nome.replace('Unidade ', '').replace(' (Matriz)', '')
         : d.nome.replace('Unidade ', ''),
@@ -302,32 +296,6 @@ export default function Comparativo({
       sucessoFunil: d.taxaConversaoFunil
     }));
   }, [dadosClassificados, isMobile]);
-
-  const clientesFiltrados = useMemo(() => {
-    return todosClientes.filter((cli) => {
-      if (selectedTenantId !== 'todos' && cli.tenantId !== selectedTenantId) {
-        return false;
-      }
-      if (buscaCliente.trim()) {
-        const query = buscaCliente.toLowerCase();
-        const matchNome = (cli.nome || '').toLowerCase().includes(query);
-        const matchId = (cli.id || '').toLowerCase().includes(query);
-        const matchSeg = (cli.segmento || '').toLowerCase().includes(query);
-        if (!matchNome && !matchId && !matchSeg) return false;
-      }
-      if (filtroTipoClientes === 'novos') {
-        return isClienteNovo(cli);
-      }
-      if (filtroTipoClientes === 'risco') {
-        return cli.statusSaude === 'Risco' || cli.statusSaude === 'Crítico';
-      }
-      return true;
-    });
-  }, [todosClientes, selectedTenantId, buscaCliente, filtroTipoClientes, baseClientIds]);
-
-  const totalNovosGeral = useMemo(() => {
-    return todosClientes.filter(isClienteNovo).length;
-  }, [todosClientes, baseClientIds]);
 
   const comparativoKpis = useMemo(() => {
     if (!dadosClassificados.length) return [];
@@ -915,158 +883,6 @@ export default function Comparativo({
           </div>
         )}
       </section>
-
-      {/* 3. CARTEIRA DE CLIENTES REGIONAL & NOVOS CLIENTES ADICIONADOS (INTEGRAÇÃO EM TEMPO REAL) */}
-      <section className="flat-card comparativo-clients-section" aria-labelledby="regional-clients-heading">
-        <div className="comparativo-clients-header">
-          <div>
-            {totalNovosGeral > 0 && (
-              <div style={{ marginBottom: 6 }}>
-                <span className="badge-novo-cliente">
-                  <ThunderboltOutlined /> {totalNovosGeral} {totalNovosGeral === 1 ? 'Novo Cliente Adicionado' : 'Novos Clientes Adicionados'}
-                </span>
-              </div>
-            )}
-            <h2 id="regional-clients-heading" className="flat-card-title">
-              {selectedTenantId === 'todos'
-                ? 'Clientes das Unidades Regionais'
-                : `Clientes Vinculados: ${tenants.find((t) => t.id === selectedTenantId)?.nome || 'Regional'}`}
-            </h2>
-            <p style={{ margin: '4px 0 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>
-              {selectedTenantId === 'todos'
-                ? 'Consulte os clientes das unidades regionais.'
-                : 'Exibindo os clientes desta unidade retornados pela API.'}
-            </p>
-          </div>
-
-        </div>
-
-        {/* Filtros e Busca */}
-        <div className="comparativo-clients-controls-bar">
-          <SegmentedPill
-            size="sm"
-            ariaLabel="Filtro de clientes da carteira"
-            value={filtroTipoClientes}
-            onChange={setFiltroTipoClientes}
-            options={[
-              {
-                value: 'todos',
-                label: `Todos (${todosClientes.filter((c) => selectedTenantId === 'todos' || c.tenantId === selectedTenantId).length})`
-              },
-              {
-                value: 'novos',
-                label: `Novos (${todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && isClienteNovo(c)).length})`
-              },
-              {
-                value: 'risco',
-                label: `Risco / Crítico (${todosClientes.filter((c) => (selectedTenantId === 'todos' || c.tenantId === selectedTenantId) && (c.statusSaude === 'Risco' || c.statusSaude === 'Crítico')).length})`
-              }
-            ]}
-          />
-
-          <Input.Search
-            placeholder="Buscar por cliente ou segmento..."
-            value={buscaCliente}
-            onChange={(e) => setBuscaCliente(e.target.value)}
-            allowClear
-            style={{ maxWidth: 280, width: '100%' }}
-            size="small"
-          />
-        </div>
-
-        {/* Grid de Cards dos Clientes */}
-        {clientesFiltrados.length === 0 ? (
-          <Empty
-            description={
-              <span>
-                Nenhum cliente encontrado com os filtros atuais.{' '}
-
-              </span>
-            }
-            style={{ margin: '24px 0' }}
-          >
-
-          </Empty>
-        ) : (
-          <div className="client-mini-card-grid">
-            {clientesFiltrados.map((cli) => {
-              const novo = isClienteNovo(cli);
-              const semTokens = getRiskSemanticTokens(cli.statusSaude, themeTokens);
-              const corRegional = regionalColors[cli.tenantId] || themeTokens.brandPrimary;
-
-              return (
-                <article
-                  key={cli.id}
-                  className={`client-mini-card ${novo ? 'client-mini-card--novo' : ''}`}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <span className="client-mini-code">{cli.id}</span>
-                        {novo && <span className="badge-novo-cliente">✨ Novo</span>}
-                      </div>
-                      <h4 className="client-mini-name">{cli.nome}</h4>
-                      <span className="client-mini-segment">{cli.segmento}</span>
-                    </div>
-
-                    <div className="client-mini-score-box">
-                      <span className="client-mini-score-val" style={{ color: semTokens.color }}>
-                        {cli.scoreSaudeAtual}
-                      </span>
-                      <span className="client-mini-score-sub">SCORE</span>
-                    </div>
-                  </div>
-
-                  <div className="client-mini-meta-row">
-                    <span className="client-mini-regional-badge">
-                      <span className="geo-dot" style={{ backgroundColor: corRegional }} />
-                      <span>{cli.unidadeNome?.replace('Unidade ', '')}</span>
-                    </span>
-
-                    <Tag
-                      color={
-                        cli.statusSaude === 'Saudável'
-                          ? 'success'
-                          : cli.statusSaude === 'Atenção'
-                          ? 'warning'
-                          : 'error'
-                      }
-                      style={{ margin: 0, borderRadius: 6, fontSize: 11 }}
-                    >
-                      {cli.statusSaude}
-                    </Tag>
-                  </div>
-
-                  <div className="client-mini-footer">
-                    <div>
-                      <span className="client-mini-finance-label">Ticket Mensal</span>
-                      <strong className="client-mini-finance-val">{cli.ticketMedioMensal}</strong>
-                    </div>
-
-                    {onNavigateTab && (
-                      <button
-                        type="button"
-                        className="client-mini-inspect-btn"
-                        onClick={() => {
-                          onSelectTenant(cli.tenantId);
-                          onNavigateTab('historico-clientes');
-                        }}
-                        title="Abrir linha do tempo detalhada deste cliente"
-                      >
-                        <span>Histórico</span>
-                        <ArrowRightOutlined />
-                      </button>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* MODAL DE CADASTRO DE NOVO CLIENTE */}
-
 
       {/* 4. FUNDAMENTAÇÃO METODOLÓGICA COLAPSÁVEL (Inicia recolhida para manter minimalismo) */}
       <section className="flat-card" aria-labelledby="ux-rationale-heading">

@@ -28,8 +28,6 @@
 .app-main-content .geo-badge { font-family: var(--font-suisse-intl); font-size: 11px; line-height: 1.5; letter-spacing: 0; text-transform: none; padding: 4px 9px; }
 .flat-action-btn { min-height: 44px; height: auto; padding: 9px 14px; font-family: var(--font-suisse-intl); font-size: 12px; text-transform: none; letter-spacing: 0; }
 .flat-action-btn:hover { background: var(--brand-primary-soft); color: var(--brand-primary); }
-.app-main-content .client-tab-item { border-radius: 12px; border: 0; box-shadow: var(--shadow-card); }
-.app-main-content .client-tab-item--active { background: var(--brand-primary-soft); box-shadow: var(--shadow-card); }
 .app-main-content .regional-share-table { font-size: 13px; }
 .donut-chart-box, .regional-donut-box { position: relative; width: 185px; height: 185px; display: flex; align-items: center; justify-content: center; }
 .donut-center-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; text-align: center; z-index: 2; width: 100px; }
@@ -45,14 +43,15 @@
 .metric-note.is-positive { background: var(--status-success-soft); color: var(--status-success-text); }
 .metric-note.is-negative { background: var(--status-critical-soft); color: var(--status-critical-text); }
 .metric-note.is-neutral { background: var(--bg-subtle); color: var(--text-secondary); }
-/* Draw attention to risk and meaningful changes without recoloring every KPI. */
-.reference-kpi--negative { --metric-value-color: var(--status-critical-text); background: var(--status-critical-soft); }
-.reference-kpi--positive { --metric-value-color: var(--status-success-text); background: var(--status-success-soft); }
-.reference-kpi--negative h2, .reference-kpi--positive h2 { color: var(--metric-value-color); }
-.reference-kpi--negative .metric-note, .reference-kpi--positive .metric-note { background: var(--bg-surface); color: var(--metric-value-color); }
-/* Risk, exposure and benchmark use semantic text on a neutral surface. */
-.reference-kpi.reference-kpi--text-only { background: var(--bg-surface); }
-.reference-kpi--text-only .metric-note { background: var(--bg-elevated); }
+/* Semantic KPI emphasis uses text only; every card keeps its neutral surface. */
+.reference-kpi--negative { --metric-value-color: var(--status-critical-text); }
+.reference-kpi--positive { --metric-value-color: var(--status-success-text); }
+.reference-kpi--warning { --metric-value-color: var(--status-warning-text); }
+.reference-kpi--negative h2, .reference-kpi--positive h2, .reference-kpi--warning h2 { color: var(--metric-value-color); }
+.reference-kpi--negative .metric-note, .reference-kpi--positive .metric-note, .reference-kpi--warning .metric-note {
+  background: var(--bg-elevated);
+  color: var(--metric-value-color);
+}
 .comparativo-container, .clientes-container { min-width: 0; gap: 20px; }
 .comparativo-top-charts-grid { gap: 20px; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
 .comparativo-top-charts-grid > *, .clientes-container > *, .bottom-summary-grid > * { min-width: 0; }
@@ -115,7 +114,6 @@
   box-shadow: none !important;
 }
 .app-main-content .ant-table-container { border: 0 !important; }
-.app-main-content .client-tab-item--active { color: var(--brand-primary); }
 .app-main-content :is(.ant-select-focused .ant-select-selector, .ant-input-affix-wrapper:focus-within),
 .app-main-content .ant-btn:focus-visible {
   outline: 2px solid var(--border-focus);
