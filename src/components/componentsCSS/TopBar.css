@@ -1,9 +1,9 @@
 /* Navigation uses the same neutral surfaces and blue selection as the content. */
-.sidebar-brand-logo { height: 44px; width: auto; max-width: 160px; object-fit: contain; display: block; }
+.sidebar-brand-logo { height: 60px; width: auto; max-width: 195px; object-fit: contain; display: block; }
 .reference-sidebar { display: none; }
 .reference-brand { display: inline-flex; align-items: center; color: var(--text-primary); text-decoration: none; border-radius: 6px; }
-.reference-mobile-header { min-height: 76px; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 14px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--bg-surface); border-bottom: 0; box-shadow: var(--shadow-card); position: relative; z-index: 1001; }
-.reference-mobile-header .sidebar-brand-logo { width: 96px; height: auto; max-height: 40px; }
+.reference-mobile-header { min-height: 80px; display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 14px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--bg-surface); border-bottom: 0; box-shadow: var(--shadow-card); position: relative; z-index: 1001; }
+.reference-mobile-header .sidebar-brand-logo { width: 120px; height: auto; max-height: 50px; }
 .reference-theme { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 44px; min-height: 44px; padding: 10px; border: 0; box-shadow: var(--shadow-card); border-radius: 10px; background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; font: 500 13px var(--font-suisse-intl); }
 .reference-theme:hover { color: var(--brand-primary); }
 .reference-theme .anticon { font-size: 18px; }
@@ -25,8 +25,8 @@
 @media (min-width: 1024px) {
   .reference-mobile-header, .reference-bottom-nav { display: none; }
   .reference-sidebar { display: flex; flex-direction: column; justify-content: space-between; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 244px; padding: 32px 18px 20px; background: var(--bg-surface); border-right: 0; box-shadow: var(--shadow-card); overflow-y: auto; overflow-x: hidden; }
-  .reference-sidebar .reference-brand { margin: 0 10px; }
-  .reference-company { margin: 16px 10px 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .reference-sidebar .reference-brand { margin: 0 4px; }
+  .reference-company { margin: 14px 4px 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 12px; font-weight: 500; }
   .reference-desktop-nav { display: grid; gap: 6px; }
   .reference-desktop-nav button { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; min-height: 46px; padding: 12px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); text-align: left; font: 500 12px/1.5 var(--font-suisse-intl); cursor: pointer; }
   .reference-desktop-nav button[aria-current] { color: var(--brand-primary); font-weight: 600; }
