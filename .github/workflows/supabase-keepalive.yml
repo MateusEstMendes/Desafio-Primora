@@ -1,0 +1,44 @@
+name: Supabase Keep-Alive Bot
+
+on:
+  # Executa a cada 3 dias às 08:00 UTC (evita a pausa de 7 dias do Supabase)
+  schedule:
+    - cron: '0 8 */3 * *'
+  # Permite disparar manualmente pela aba "Actions" do GitHub a qualquer momento
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase REST API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Executar Requisição Keep-Alive
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "❌ Erro: Secrets SUPABASE_URL ou SUPABASE_ANON_KEY não estão configurados no repositório GitHub!"
+            echo "Acesse Settings > Secrets and variables > Actions para adicionar."
+            exit 1
+          fi
+
+          echo "Enviando ping para o Supabase..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/tenants?select=id&limit=1")
+
+          HTTP_BODY=$(echo "$RESPONSE" | sed -e '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d':' -f2)
+
+          echo "Status retornado: $HTTP_STATUS"
+          echo "Resposta: $HTTP_BODY"
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Supabase está ativo e o contador de inatividade foi renovado com sucesso!"
+          else
+            echo "⚠️ Falha ao comunicar com o Supabase. Verifique a URL e a API key."
+            exit 1
+          fi

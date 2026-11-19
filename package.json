@@ -14,7 +14,9 @@
     "export:ai": "node scripts/export-ai.js",
     "dev:server": "node --watch server/index.js",
     "start:server": "node server/index.js",
-    "test:api": "node --test test-api.js"
+    "test:api": "node --test test-api.js",
+    "keepalive": "node scripts/supabase-keepalive.js",
+    "keepalive:watch": "node scripts/supabase-keepalive.js --watch"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
