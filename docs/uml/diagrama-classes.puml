@@ -1,0 +1,146 @@
+@startuml diagrama-classes-primora
+title Diagrama de Classes — Painel Vetor (Primora / BFD)
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "models (src/models)" {
+  class Unidade {
+    - id : string
+    - nome : string
+    - porte : string
+    - carteiraTotalClientes : number
+    - receitaCarteira90d : number | null
+    - engagementEvents7d : number | null
+    - activeUsers7d : number | null
+    - engagementTrend30d : number | null
+    - funnel90d : { gerada: number, vista: number, sucesso: number }
+    - funnelTrend30d : number | null
+    - healthDistribution : { saudavel: number, atencao: number, risco: number, critico: number }
+    - riscoAbsoluto : number | null
+    - riscoDrivers : string[]
+    - regiao : string | null
+    - engajamentoMedio : number | null
+    - historicoTendencia : Object[]
+    --
+    + constructor(params : Object)
+    + get id() : string
+    + get nome() : string
+    + get porte() : string
+    + get carteiraTotalClientes() : number
+    + get receitaCarteira90d() : number | null
+    + get engagementEvents7d() : number | null
+    + get activeUsers7d() : number | null
+    + get engagementTrend30d() : number | null
+    + get funnel90d() : Readonly<Object>
+    + get funnelTrend30d() : number | null
+    + get healthDistribution() : Readonly<Object>
+    + get saudeCarteira() : Readonly<Object>
+    + get riscoAbsoluto() : number | null
+    + get riscoDrivers() : ReadonlyArray<string>
+    + get regiao() : string | null
+    + get engajamentoMedio() : number | null
+    + get historicoTendencia() : ReadonlyArray<Object>
+    + toJSON() : Readonly<Object>
+  }
+
+  class Cliente {
+    - id : string
+    - nome : string
+    - tenantId : string
+    - tenantNome : string
+    - healthSeries : RegistroSaude[]
+    - eventos : Evento[]
+    - segmento : string | null
+    - statusSaude : string | null
+    - scoreSaudeAtual : number | null
+    - tempoContratoMeses : number | null
+    - ticketMedioMensal : string | null
+    --
+    + constructor(params : Object)
+    + get id() : string
+    + get nome() : string
+    + get tenantId() : string
+    + get tenantNome() : string
+    + get unidadeNome() : string
+    + get healthSeries() : ReadonlyArray<RegistroSaude>
+    + get historicoScore() : ReadonlyArray<RegistroSaude>
+    + get eventos() : ReadonlyArray<Evento>
+    + getEventos() : ReadonlyArray<Evento>
+    + getHistoricoSaude() : ReadonlyArray<RegistroSaude>
+    + get segmento() : string | null
+    + get statusSaude() : string | null
+    + get scoreSaudeAtual() : number | null
+    + get tempoContratoMeses() : number | null
+    + get ticketMedioMensal() : string | null
+    + toJSON() : Readonly<Object>
+  }
+
+  class Evento {
+    - id : string | null
+    - data : string
+    - tipo : string
+    - titulo : string
+    - valor : number | string | null
+    - categoria : string | null
+    - descricao : string
+    --
+    + constructor(params : Object)
+    + get data() : string
+    + get tipo() : string
+    + get titulo() : string
+    + get valor() : number | string | null
+    + get id() : string | null
+    + get categoria() : string | null
+    + get descricao() : string
+    + toJSON() : Readonly<Object>
+  }
+
+  class RegistroSaude {
+    - data : string
+    - score : number
+    --
+    + constructor(params : Object)
+    + get data() : string
+    + get periodo() : string
+    + get score() : number
+    + toJSON() : Readonly<Object>
+  }
+}
+
+package "dao (src/dao)" {
+  class UnidadeDAO {
+    - consultar : Function
+    --
+    + constructor(consultar = consultarArray)
+    + listar() : Promise<Unidade[]>
+    + buscarPorId(id : string) : Promise<Unidade | null>
+  }
+
+  class ClienteDAO {
+    - consultar : Function
+    --
+    + constructor(consultar = consultarArray)
+    + listar() : Promise<Cliente[]>
+    + buscarPorId(id : string) : Promise<Cliente | null>
+    + listarPorUnidade(tenantId : string) : Promise<Cliente[]>
+  }
+}
+
+package "config (src/config)" {
+  class ApiHttpClient <<module>> {
+    + criarClienteHttp(opcoes) : Function
+    + consultarArray(caminho : string) : Promise<Array>
+  }
+}
+
+Cliente "0..*" --> "1" Unidade : vincula-se via tenantId
+Cliente "1" *-- "0..*" Evento : possui
+Cliente "1" *-- "0..*" RegistroSaude : registra
+
+UnidadeDAO ..> Unidade : instancia
+ClienteDAO ..> Cliente : instancia
+UnidadeDAO ..> ApiHttpClient : consome GET /unidades
+ClienteDAO ..> ApiHttpClient : consome GET /clientes
+
+@enduml
