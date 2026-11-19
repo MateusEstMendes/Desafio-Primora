@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { Alert, Button, Empty, Spin, ConfigProvider, Grid, theme as antdTheme } from 'antd';
+import { Alert, Button, Empty, Spin, ConfigProvider, Grid, message, theme as antdTheme } from 'antd';
 import ptBR from 'antd/locale/pt_BR';
 import { MotionConfig, AnimatePresence } from 'motion/react';
 
 import { UnidadeDAO, ClienteDAO } from './dao/index.js';
 import { THEME_TOKENS, applyThemeTokens } from './utils/themeTokens';
+import {
+  carregarClientesLocais,
+  salvarClientesLocais,
+  limparClientesLocais,
+  classificarSaudePorScore,
+  gerarProximoIdCliente,
+  gerarIdEvento
+} from './utils/clienteStorage.js';
+import defaultDataset from '../server/data/dataset_painel_multitenant.json';
 
 import TopBar from './components/TopBar';
 import { PageTransition } from './components/MotionPrimitives';
@@ -83,6 +92,7 @@ export default function App() {
   const [estadoCarga, definirEstadoCarga] = useState({ carregando: true, erro: null });
   const [tentativa, definirTentativa] = useState(0);
   const [focusedClientId, setFocusedClientId] = useState(null);
+  const [modoOffline, setModoOffline] = useState(false);
 
   useEffect(() => {
     // O cleanup impede que uma resposta antiga substitua a carga mais recente.
@@ -92,12 +102,242 @@ export default function App() {
     Promise.all([new UnidadeDAO().listar(), new ClienteDAO().listar()])
       .then(([unidades, clientes]) => {
         if (!cargaAtual) return;
-        definirDados({ tenants: unidades.map(u => u.toJSON()), clientes: clientes.map(c => c.toJSON()) });
+        const clientesAPI = clientes.map(c => c.toJSON());
+        const clientesLocais = carregarClientesLocais();
+        const clientesFinais = clientesLocais && clientesLocais.length > 0 ? clientesLocais : clientesAPI;
+        if (!clientesLocais) {
+          salvarClientesLocais(clientesFinais);
+        }
+        definirDados({
+          tenants: unidades.map(u => u.toJSON()),
+          clientes: clientesFinais
+        });
+        setModoOffline(false);
         definirEstadoCarga({ carregando: false, erro: null });
       })
-      .catch(error => { if (cargaAtual) definirEstadoCarga({ carregando: false, erro: error.message }); });
+      .catch(() => {
+        if (!cargaAtual) return;
+        // Fallback gracioso para dados locais quando a API local não está rodando (ex: apenas Vite na porta 5173)
+        const clientesLocais = carregarClientesLocais() || defaultDataset.clientes;
+        definirDados({
+          tenants: defaultDataset.tenants,
+          clientes: clientesLocais
+        });
+        setModoOffline(true);
+        definirEstadoCarga({ carregando: false, erro: null });
+      });
     return () => { cargaAtual = false; };
   }, [tentativa]);
+
+  // Handlers de Gestão (CRUD) de Clientes
+  const handleAddCliente = (novoClienteData) => {
+    definirDados((prev) => {
+      const id = gerarProximoIdCliente(prev.clientes);
+      const tenantId = novoClienteData.tenantId;
+      const tenantObj = prev.tenants.find((t) => t.id === tenantId);
+      const score = Number(novoClienteData.scoreSaudeAtual ?? 80);
+      const statusSaude = classificarSaudePorScore(score);
+
+      // Gera série inicial de 6 meses até o mês atual/score informado
+      const mesesPadrao = ['Mai/2026', 'Jun/2026', 'Jul/2026', 'Ago/2026', 'Set/2026', 'Out/2026'];
+      const historicoScore = mesesPadrao.map((periodo, idx) => {
+        const scorePasso = Math.max(0, Math.min(100, Math.round(score - (mesesPadrao.length - 1 - idx) * 2)));
+        return { periodo, score: idx === mesesPadrao.length - 1 ? score : scorePasso };
+      });
+
+      const initialEvent = {
+        id: gerarIdEvento(),
+        data: new Date().toISOString(),
+        tipo: 'Início de Contrato',
+        categoria: 'sucesso',
+        descricao: `Contrato iniciado com a unidade ${tenantObj?.nome || tenantId}. Monitoramento de saúde ativo.`,
+        valor: novoClienteData.ticketMedioMensal || null
+      };
+
+      const novoCliente = {
+        id,
+        nome: novoClienteData.nome.trim(),
+        tenantId,
+        tenantNome: tenantObj?.nome || tenantId,
+        unidadeNome: tenantObj?.nome || tenantId,
+        segmento: novoClienteData.segmento,
+        ticketMedioMensal: novoClienteData.ticketMedioMensal,
+        tempoContratoMeses: Number(novoClienteData.tempoContratoMeses ?? 12),
+        scoreSaudeAtual: score,
+        statusSaude,
+        historicoScore,
+        healthSeries: historicoScore,
+        eventos: [initialEvent],
+        isNovo: true
+      };
+
+      const atualizados = [novoCliente, ...prev.clientes];
+      salvarClientesLocais(atualizados);
+      setFocusedClientId(novoCliente.id);
+      message.success(`Cliente ${novoCliente.nome} (${novoCliente.id}) adicionado com sucesso!`);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleUpdateCliente = (clienteAtualizado) => {
+    definirDados((prev) => {
+      const tenantObj = prev.tenants.find((t) => t.id === clienteAtualizado.tenantId);
+      const score = Number(clienteAtualizado.scoreSaudeAtual ?? 80);
+      const statusSaude = classificarSaudePorScore(score);
+
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteAtualizado.id) return c;
+        const hist = [...(c.historicoScore || [])];
+        if (hist.length > 0) {
+          hist[hist.length - 1] = { ...hist[hist.length - 1], score };
+        }
+        return {
+          ...c,
+          ...clienteAtualizado,
+          tenantNome: tenantObj?.nome || c.tenantNome,
+          unidadeNome: tenantObj?.nome || c.unidadeNome,
+          scoreSaudeAtual: score,
+          statusSaude,
+          historicoScore: hist,
+          healthSeries: hist
+        };
+      });
+
+      salvarClientesLocais(atualizados);
+      message.success(`Dados de ${clienteAtualizado.nome} atualizados com sucesso!`);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleDeleteCliente = (clienteId) => {
+    definirDados((prev) => {
+      const clienteAlvo = prev.clientes.find((c) => c.id === clienteId);
+      const atualizados = prev.clientes.filter((c) => c.id !== clienteId);
+      salvarClientesLocais(atualizados);
+      if (focusedClientId === clienteId) {
+        setFocusedClientId(atualizados[0]?.id || null);
+      }
+      message.success(`Cliente ${clienteAlvo?.nome || clienteId} removido da base.`);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  // Handlers de Gestão (CRUD) de Eventos
+  const handleAddEvento = (clienteId, novoEvento) => {
+    definirDados((prev) => {
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const evts = [
+          ...(c.eventos || []),
+          {
+            id: gerarIdEvento(),
+            ...novoEvento
+          }
+        ];
+        return { ...c, eventos: evts };
+      });
+      salvarClientesLocais(atualizados);
+      message.success('Evento registrado na jornada do cliente!');
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleUpdateEvento = (clienteId, eventoAtualizado) => {
+    definirDados((prev) => {
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const evts = (c.eventos || []).map((e) =>
+          e.id === eventoAtualizado.id ? { ...e, ...eventoAtualizado } : e
+        );
+        return { ...c, eventos: evts };
+      });
+      salvarClientesLocais(atualizados);
+      message.success('Evento atualizado com sucesso!');
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleDeleteEvento = (clienteId, eventoId) => {
+    definirDados((prev) => {
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const evts = (c.eventos || []).filter((e) => e.id !== eventoId);
+        return { ...c, eventos: evts };
+      });
+      salvarClientesLocais(atualizados);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  // Handlers de Gestão de Meses / Histórico de Saúde
+  const handleAddMesScore = (clienteId, { periodo, score }) => {
+    definirDados((prev) => {
+      const numScore = Number(score);
+      const statusSaude = classificarSaudePorScore(numScore);
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const hist = [...(c.historicoScore || [])];
+        const idxExistente = hist.findIndex((item) => item.periodo === periodo);
+        if (idxExistente !== -1) {
+          hist[idxExistente] = { ...hist[idxExistente], score: numScore };
+        } else {
+          hist.push({ periodo, score: numScore });
+        }
+        return {
+          ...c,
+          historicoScore: hist,
+          healthSeries: hist,
+          scoreSaudeAtual: numScore,
+          statusSaude
+        };
+      });
+      salvarClientesLocais(atualizados);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleUpdateMesScore = (clienteId, periodoOriginal, { periodo, score }) => {
+    definirDados((prev) => {
+      const numScore = Number(score);
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const hist = (c.historicoScore || []).map((item) =>
+          item.periodo === periodoOriginal ? { periodo: periodo || item.periodo, score: numScore } : item
+        );
+        const ultimo = hist[hist.length - 1];
+        const ultimoScore = ultimo ? ultimo.score : c.scoreSaudeAtual;
+        return {
+          ...c,
+          historicoScore: hist,
+          healthSeries: hist,
+          scoreSaudeAtual: ultimoScore,
+          statusSaude: classificarSaudePorScore(ultimoScore)
+        };
+      });
+      salvarClientesLocais(atualizados);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  const handleDeleteMesScore = (clienteId, periodo) => {
+    definirDados((prev) => {
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        const hist = (c.historicoScore || []).filter((item) => item.periodo !== periodo);
+        const ultimo = hist[hist.length - 1];
+        const ultimoScore = ultimo ? ultimo.score : c.scoreSaudeAtual;
+        return {
+          ...c,
+          historicoScore: hist,
+          healthSeries: hist,
+          scoreSaudeAtual: ultimoScore,
+          statusSaude: classificarSaudePorScore(ultimoScore)
+        };
+      });
+      salvarClientesLocais(atualizados);
+      return { ...prev, clientes: atualizados };
+    });
+  };
 
   const screens = useBreakpoint();
   const isMobile = screens.lg !== undefined ? !screens.lg : (typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
@@ -197,6 +437,23 @@ export default function App() {
 
         <main id="main-content" className={`app-main-content${currentTab === 'visao-geral' ? ' app-main-content--executive' : ''}`} tabIndex={-1}>
           <h1 className="sr-only">{MODULES[currentTab]}</h1>
+          {modoOffline && (
+            <Alert
+              type="info"
+              showIcon
+              closable
+              message="Modo Local / Sincronização no Navegador Ativa"
+              description="A API backend na porta 3001 não respondeu. O painel está totalmente funcional com armazenamento local (LocalStorage), permitindo adicionar, editar e excluir clientes, eventos e meses normalmente."
+              action={
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Button size="small" onClick={() => definirTentativa((a) => a + 1)}>
+                    Reconectar à API
+                  </Button>
+                </div>
+              }
+              style={{ marginBottom: 16 }}
+            />
+          )}
           {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
           : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
           : dadosPainel.tenants.length === 0 && dadosPainel.clientes.length === 0 ? <Empty description="Nenhum resultado encontrado." />
@@ -237,6 +494,15 @@ export default function App() {
                     selectedTenantId={selectedTenantId}
                     onSelectTenant={setSelectedTenantId}
                     themeTokens={activeTokens}
+                    onAddCliente={handleAddCliente}
+                    onUpdateCliente={handleUpdateCliente}
+                    onDeleteCliente={handleDeleteCliente}
+                    onAddEvento={handleAddEvento}
+                    onUpdateEvento={handleUpdateEvento}
+                    onDeleteEvento={handleDeleteEvento}
+                    onAddMesScore={handleAddMesScore}
+                    onUpdateMesScore={handleUpdateMesScore}
+                    onDeleteMesScore={handleDeleteMesScore}
                   />
                 )}
               </PageTransition>

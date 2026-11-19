@@ -15,6 +15,9 @@ import {
   Radio,
   Empty,
   Tooltip,
+  Button,
+  Popconfirm,
+  message
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -22,8 +25,15 @@ import {
   ExclamationCircleOutlined,
   ShoppingCartOutlined,
   InfoCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
+import ModalCliente from '../components/ModalCliente';
+import ModalEvento from '../components/ModalEvento';
+import ModalHistoricoMeses from '../components/ModalHistoricoMeses';
 import {
   ResponsiveContainer,
   LineChart,
@@ -49,7 +59,16 @@ export default function HistoricoClientes({
   isMobile = false,
   selectedTenantId = 'todos',
   onSelectTenant,
-  themeTokens
+  themeTokens,
+  onAddCliente,
+  onUpdateCliente,
+  onDeleteCliente,
+  onAddEvento,
+  onUpdateEvento,
+  onDeleteEvento,
+  onAddMesScore,
+  onUpdateMesScore,
+  onDeleteMesScore
 }) {
   const detailRef = useRef(null);
   const chartMotion = useChartMotion();
@@ -57,6 +76,14 @@ export default function HistoricoClientes({
   const eventosDonutReset = useChartAutoReset(3000);
   const todosClientes = dataset?.clientes || [];
   const tenants = dataset?.tenants || [];
+
+  // Modais de Gestão (CRUD)
+  const [modalClienteOpen, setModalClienteOpen] = useState(false);
+  const [modalClienteMode, setModalClienteMode] = useState('create');
+  const [modalEventoOpen, setModalEventoOpen] = useState(false);
+  const [modalEventoMode, setModalEventoMode] = useState('create');
+  const [editingEvento, setEditingEvento] = useState(null);
+  const [modalMesesOpen, setModalMesesOpen] = useState(false);
 
   const clientesVisiveis = useMemo(() => {
     if (selectedTenantId === 'todos') return todosClientes;
@@ -171,17 +198,60 @@ export default function HistoricoClientes({
           transition={{ duration: 0.22, delay: Math.min(index * 0.04, 0.28), ease: EXECUTIVE_EASE }}
         >
           <div className="antd-timeline-card-header">
-            <Typography.Text strong className="antd-timeline-title">
-              {evt.tipo}
-            </Typography.Text>
-            <div className="timeline-event-meta">
-              <span className={`geo-badge ${meta.badgeClass}`}>
-                {meta.symbol} {meta.label}
-              </span>
-              <span className="antd-timeline-date">
-                <ClockCircleOutlined style={{ marginRight: 4 }} />
-                {dataFormatada}
-              </span>
+            <div>
+              <Typography.Text strong className="antd-timeline-title">
+                {evt.tipo}
+              </Typography.Text>
+              <div className="timeline-event-meta">
+                <span className={`geo-badge ${meta.badgeClass}`}>
+                  {meta.symbol} {meta.label}
+                </span>
+                <span className="antd-timeline-date">
+                  <ClockCircleOutlined style={{ marginRight: 4 }} />
+                  {dataFormatada}
+                </span>
+                {evt.valor && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--brand-primary)', marginLeft: 4 }}>
+                    • {evt.valor}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined style={{ fontSize: 13, color: 'var(--text-secondary)' }} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingEvento(evt);
+                  setModalEventoMode('edit');
+                  setModalEventoOpen(true);
+                }}
+                title="Editar evento"
+              />
+              <Popconfirm
+                title="Excluir este evento?"
+                description="O evento será removido da jornada deste cliente."
+                okText="Excluir"
+                cancelText="Cancelar"
+                okButtonProps={{ danger: true }}
+                onConfirm={(e) => {
+                  e?.stopPropagation();
+                  onDeleteEvento?.(clienteSelecionado.id, evt.id);
+                  message.success('Evento removido da jornada.');
+                }}
+              >
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined style={{ fontSize: 13 }} />}
+                  onClick={(e) => e.stopPropagation()}
+                  title="Excluir evento"
+                />
+              </Popconfirm>
             </div>
           </div>
           <Typography.Paragraph type="secondary" className="antd-timeline-desc">
@@ -308,8 +378,12 @@ export default function HistoricoClientes({
   return (
     <div className="clientes-container">
 
-      <ClientDirectory clientes={todosClientes} tenants={tenants} selectedTenantId={selectedTenantId}
-        selectedClientId={clienteSelecionado?.id} themeTokens={themeTokens}
+      <ClientDirectory
+        clientes={todosClientes}
+        tenants={tenants}
+        selectedTenantId={selectedTenantId}
+        selectedClientId={clienteSelecionado?.id}
+        themeTokens={themeTokens}
         onSelectClient={(client) => {
           setSelectedClienteId(client.id);
           requestAnimationFrame(() => {
@@ -319,11 +393,50 @@ export default function HistoricoClientes({
             });
             detailRef.current?.focus({ preventScroll: true });
           });
-        }} />
+        }}
+        onOpenAddClient={() => {
+          setModalClienteMode('create');
+          setModalClienteOpen(true);
+        }}
+      />
 
       {clienteSelecionado && (
         <React.Fragment key={clienteSelecionado.id}>
-          <div className="client-detail-toolbar"><a className="flat-action-btn" href="#regional-clients-heading">Trocar cliente</a></div>
+          <div className="client-detail-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+            <a className="flat-action-btn" href="#regional-clients-heading">Trocar cliente</a>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Button
+                type="default"
+                icon={<EditOutlined />}
+                onClick={() => {
+                  setModalClienteMode('edit');
+                  setModalClienteOpen(true);
+                }}
+                style={{ borderRadius: 6, fontWeight: 500 }}
+              >
+                Editar Conta
+              </Button>
+              <Popconfirm
+                title={`Excluir conta ${clienteSelecionado.nome}?`}
+                description="Esta ação removerá o cliente, todos os seus eventos e o histórico de saúde."
+                okText="Excluir"
+                cancelText="Cancelar"
+                okButtonProps={{ danger: true }}
+                onConfirm={() => {
+                  onDeleteCliente?.(clienteSelecionado.id);
+                  message.success(`Cliente ${clienteSelecionado.nome} excluído.`);
+                }}
+              >
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  style={{ borderRadius: 6 }}
+                >
+                  Excluir Conta
+                </Button>
+              </Popconfirm>
+            </div>
+          </div>
           {/* 2. FAIXA CONTÍNUA / GRID DE DADOS CONTRATUAIS E FINANCEIROS DA CONTA */}
           <section ref={detailRef} tabIndex={-1} className="account-ledger-strip" aria-label="Indicadores contratuais da conta">
             <div className="account-ledger-cell" style={{ '--cell-accent': 'var(--brand-primary, #0074FF)' }}>
@@ -392,13 +505,24 @@ export default function HistoricoClientes({
             <div className="client-left-stack">
               {/* Evolução do Score */}
               <ExecutivePanel className="flat-card" delay={0.08} aria-labelledby="score-trend-heading">
-                <div className="flat-card-header">
-                  <h2 id="score-trend-heading" className="flat-card-title">
-                    Evolução do Score de Saúde (6m)
-                  </h2>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
-                    Meta Saudável: &ge; 70 pts
-                  </span>
+                <div className="flat-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                  <div>
+                    <h2 id="score-trend-heading" className="flat-card-title">
+                      Evolução do Score de Saúde ({histScore.length}m)
+                    </h2>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
+                      Meta Saudável: &ge; 70 pts
+                    </span>
+                  </div>
+
+                  <Button
+                    size="small"
+                    icon={<CalendarOutlined />}
+                    onClick={() => setModalMesesOpen(true)}
+                    style={{ fontWeight: 600, borderRadius: 6 }}
+                  >
+                    + Gerenciar / Adicionar Meses
+                  </Button>
                 </div>
 
                 <div
@@ -567,7 +691,7 @@ export default function HistoricoClientes({
 
             {/* Direita: Linha do Tempo Cronológica Oficial Ant Design (Timeline - Sprint 2) */}
             <ExecutivePanel className="flat-card" delay={0.2} aria-labelledby="timeline-heading">
-              <div className="flat-card-header">
+              <div className="flat-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
                 <div>
                   <span className="flat-section-eyebrow">HISTÓRICO DE EVENTOS B2B</span>
                   <h2 id="timeline-heading" className="flat-card-title">
@@ -575,19 +699,35 @@ export default function HistoricoClientes({
                   </h2>
                 </div>
 
-                <SegmentedPill
-                  size="sm"
-                  ariaLabel="Filtrar eventos por categoria"
-                  value={filtroCategoriaEvento}
-                  onChange={setFiltroCategoriaEvento}
-                  options={[
-                    { value: 'todos', label: 'Todos' },
-                    { value: 'sucesso', label: 'Sucesso' },
-                    { value: 'comercial', label: 'Comercial' },
-                    { value: 'alerta', label: 'Alertas' },
-                    { value: 'critico', label: 'Críticos' }
-                  ]}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <SegmentedPill
+                    size="sm"
+                    ariaLabel="Filtrar eventos por categoria"
+                    value={filtroCategoriaEvento}
+                    onChange={setFiltroCategoriaEvento}
+                    options={[
+                      { value: 'todos', label: 'Todos' },
+                      { value: 'sucesso', label: 'Sucesso' },
+                      { value: 'comercial', label: 'Comercial' },
+                      { value: 'alerta', label: 'Alertas' },
+                      { value: 'critico', label: 'Críticos' }
+                    ]}
+                  />
+
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      setEditingEvento(null);
+                      setModalEventoMode('create');
+                      setModalEventoOpen(true);
+                    }}
+                    style={{ fontWeight: 600, borderRadius: 6 }}
+                  >
+                    + Novo Evento
+                  </Button>
+                </div>
               </div>
 
               {eventosOrdenados.length === 0 ? (
@@ -606,6 +746,49 @@ export default function HistoricoClientes({
           </div>
         </React.Fragment>
       )}
+
+      {/* Modais de Gestão (Clientes, Eventos, Meses) */}
+      <ModalCliente
+        open={modalClienteOpen}
+        mode={modalClienteMode}
+        initialValues={modalClienteMode === 'edit' ? clienteSelecionado : null}
+        tenants={tenants}
+        onClose={() => setModalClienteOpen(false)}
+        onSubmit={(vals) => {
+          if (modalClienteMode === 'edit') {
+            onUpdateCliente?.({ ...clienteSelecionado, ...vals });
+          } else {
+            onAddCliente?.(vals);
+          }
+        }}
+      />
+
+      <ModalEvento
+        open={modalEventoOpen}
+        mode={modalEventoMode}
+        initialValues={modalEventoMode === 'edit' ? editingEvento : null}
+        clienteNome={clienteSelecionado?.nome}
+        onClose={() => {
+          setModalEventoOpen(false);
+          setEditingEvento(null);
+        }}
+        onSubmit={(vals) => {
+          if (modalEventoMode === 'edit' && editingEvento) {
+            onUpdateEvento?.(clienteSelecionado.id, { ...editingEvento, ...vals });
+          } else {
+            onAddEvento?.(clienteSelecionado.id, vals);
+          }
+        }}
+      />
+
+      <ModalHistoricoMeses
+        open={modalMesesOpen}
+        cliente={clienteSelecionado}
+        onClose={() => setModalMesesOpen(false)}
+        onAddMes={(mesData) => onAddMesScore?.(clienteSelecionado.id, mesData)}
+        onUpdateMes={(periodoOriginal, mesData) => onUpdateMesScore?.(clienteSelecionado.id, periodoOriginal, mesData)}
+        onDeleteMes={(periodo) => onDeleteMesScore?.(clienteSelecionado.id, periodo)}
+      />
 
     </div>
   );

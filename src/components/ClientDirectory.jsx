@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useDeferredValue } from 'react';
-import { Input, Tag, Empty, Pagination } from 'antd';
-import { ThunderboltOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { Input, Tag, Empty, Pagination, Button } from 'antd';
+import { ThunderboltOutlined, ArrowRightOutlined, PlusOutlined } from '@ant-design/icons';
 import SegmentedPill from './SegmentedPill';
 import { getRiskSemanticTokens, getRegionalColors } from '../utils/themeTokens';
 import './componentsCSS/Comparativo.css';
@@ -10,7 +10,15 @@ const BASE_CLIENT_IDS = new Set(['CLI-001', 'CLI-002', 'CLI-003']);
 const normalizarBusca = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
 const isClienteNovo = cli => !BASE_CLIENT_IDS.has(cli.id) || cli.isNovo;
 
-export default function ClientDirectory({ clientes: todosClientes, tenants, selectedTenantId, selectedClientId, themeTokens, onSelectClient }) {
+export default function ClientDirectory({
+  clientes: todosClientes,
+  tenants,
+  selectedTenantId,
+  selectedClientId,
+  themeTokens,
+  onSelectClient,
+  onOpenAddClient
+}) {
   const [filtroTipoClientes, setFiltroTipoClientes] = useState('todos');
   const [buscaCliente, setBuscaCliente] = useState('');
   const buscaAdiada = useDeferredValue(buscaCliente);
@@ -57,6 +65,16 @@ export default function ClientDirectory({ clientes: todosClientes, tenants, sele
             </p>
           </div>
 
+          {onOpenAddClient && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={onOpenAddClient}
+              style={{ fontWeight: 600, borderRadius: 8, height: 38 }}
+            >
+              + Novo Cliente
+            </Button>
+          )}
         </div>
 
         {/* Filtros e Busca */}
