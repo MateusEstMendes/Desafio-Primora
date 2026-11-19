@@ -1,5 +1,18 @@
-// Centraliza o contrato HTTP e evita usar dados locais em caso de falha.
-export function criarClienteHttp({ urlBase = import.meta.env?.VITE_API_BASE_URL ?? 'http://localhost:3001/api/v1', executarFetch = globalThis.fetch } = {}) {
+// Centraliza o contrato HTTP e detecta automaticamente a origem em produção (ex: Vercel)
+function obterUrlBasePadrao() {
+  if (import.meta.env?.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    // Se estiver rodando na nuvem/produção, usa a origem da própria URL
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return `${window.location.origin}/api/v1`;
+    }
+  }
+  return 'http://localhost:3001/api/v1';
+}
+
+export function criarClienteHttp({ urlBase = obterUrlBasePadrao(), executarFetch = globalThis.fetch } = {}) {
   return async function consultarArray(caminho) {
     if (typeof urlBase !== 'string' || !/^https?:\/\/[^\s/]+(?:\/[^\s]*)?$/.test(urlBase)) {
       throw new Error('Configure VITE_API_BASE_URL com uma URL HTTP válida.');
