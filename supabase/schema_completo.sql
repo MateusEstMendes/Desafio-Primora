@@ -40,6 +40,9 @@ CREATE TABLE clientes (
     score_saude_atual INTEGER NOT NULL CHECK (score_saude_atual BETWEEN 0 AND 100),
     tempo_contrato_meses INTEGER NOT NULL DEFAULT 0,
     ticket_medio_mensal TEXT,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    desativado_em TIMESTAMPTZ DEFAULT NULL,
+    excluir_em TIMESTAMPTZ DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -70,3 +70,50 @@ export function gerarProximoIdCliente(clientesExistentes = []) {
 export function gerarIdEvento() {
   return `EVT-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
 }
+
+/** Prazo regulamentar de carência para exclusão definitiva (15 dias) */
+export const DIAS_CARENCIA_EXCLUSAO = 15;
+
+/**
+ * Calcula a data limite para expurgo definitivo somando 15 dias corridos
+ */
+export function calcularDataExclusao(dataBase = new Date()) {
+  const data = new Date(dataBase);
+  data.setDate(data.getDate() + DIAS_CARENCIA_EXCLUSAO);
+  return data.toISOString();
+}
+
+/**
+ * Calcula quantos dias inteiros restam até o expurgo definitivo
+ */
+export function calcularDiasRestantes(excluirEm) {
+  if (!excluirEm) return 0;
+  const agora = new Date().getTime();
+  const limite = new Date(excluirEm).getTime();
+  const diffMs = limite - agora;
+  if (diffMs <= 0) return 0;
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Analisa os clientes e expurga os que já ultrapassaram o período de carência de 15 dias.
+ * @returns {{ clientesRestantes: Array, clientesExpurgados: Array }}
+ */
+export function expurgarClientesExpirados(clientes = []) {
+  const agora = new Date().getTime();
+  const clientesRestantes = [];
+  const clientesExpurgados = [];
+
+  for (const c of clientes) {
+    if (c.ativo === false && c.excluirEm) {
+      const dataLimite = new Date(c.excluirEm).getTime();
+      if (agora >= dataLimite) {
+        clientesExpurgados.push(c);
+        continue;
+      }
+    }
+    clientesRestantes.push(c);
+  }
+
+  return { clientesRestantes, clientesExpurgados };
+}

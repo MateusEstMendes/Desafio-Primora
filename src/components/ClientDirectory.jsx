@@ -72,7 +72,7 @@ export default function ClientDirectory({
               onClick={onOpenAddClient}
               style={{ fontWeight: 600, borderRadius: 8, height: 38 }}
             >
-              + Novo Cliente
+              Novo Cliente
             </Button>
           )}
         </div>

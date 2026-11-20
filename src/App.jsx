@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Alert, Button, Empty, Spin, ConfigProvider, Grid, message, theme as antdTheme } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import ptBR from 'antd/locale/pt_BR';
 import { MotionConfig, AnimatePresence } from 'motion/react';
 
@@ -11,8 +12,16 @@ import {
   limparClientesLocais,
   classificarSaudePorScore,
   gerarProximoIdCliente,
-  gerarIdEvento
+  gerarIdEvento,
+  calcularDataExclusao,
+  expurgarClientesExpirados
 } from './utils/clienteStorage.js';
+import {
+  sincronizarSoftDeleteSupabase,
+  sincronizarReativacaoSupabase,
+  sincronizarExclusaoDefinitivaSupabase,
+  sincronizarUpsertClienteSupabase
+} from './services/supabaseSync.js';
 import defaultDataset from '../server/data/dataset_painel_multitenant.json';
 
 import TopBar from './components/TopBar';
@@ -104,13 +113,18 @@ export default function App() {
         if (!cargaAtual) return;
         const clientesAPI = clientes.map(c => c.toJSON());
         const clientesLocais = carregarClientesLocais();
-        const clientesFinais = clientesLocais && clientesLocais.length > 0 ? clientesLocais : clientesAPI;
-        if (!clientesLocais) {
-          salvarClientesLocais(clientesFinais);
+        const clientesBase = clientesLocais && clientesLocais.length > 0 ? clientesLocais : clientesAPI;
+
+        // Purga automática dos clientes cuja carência de 15 dias já expirou
+        const { clientesRestantes, clientesExpurgados } = expurgarClientesExpirados(clientesBase);
+        if (clientesExpurgados.length > 0) {
+          clientesExpurgados.forEach(c => sincronizarExclusaoDefinitivaSupabase(c.id));
         }
+        salvarClientesLocais(clientesRestantes);
+
         definirDados({
           tenants: unidades.map(u => u.toJSON()),
-          clientes: clientesFinais
+          clientes: clientesRestantes
         });
         setModoOffline(false);
         definirEstadoCarga({ carregando: false, erro: null });
@@ -119,9 +133,15 @@ export default function App() {
         if (!cargaAtual) return;
         // Fallback gracioso para dados locais quando a API local não está rodando (ex: apenas Vite na porta 5173)
         const clientesLocais = carregarClientesLocais() || defaultDataset.clientes;
+        const { clientesRestantes, clientesExpurgados } = expurgarClientesExpirados(clientesLocais);
+        if (clientesExpurgados.length > 0) {
+          clientesExpurgados.forEach(c => sincronizarExclusaoDefinitivaSupabase(c.id));
+        }
+        salvarClientesLocais(clientesRestantes);
+
         definirDados({
           tenants: defaultDataset.tenants,
-          clientes: clientesLocais
+          clientes: clientesRestantes
         });
         setModoOffline(true);
         definirEstadoCarga({ carregando: false, erro: null });
@@ -168,11 +188,15 @@ export default function App() {
         historicoScore,
         healthSeries: historicoScore,
         eventos: [initialEvent],
+        ativo: true,
+        desativadoEm: null,
+        excluirEm: null,
         isNovo: true
       };
 
       const atualizados = [novoCliente, ...prev.clientes];
       salvarClientesLocais(atualizados);
+      sincronizarUpsertClienteSupabase(novoCliente);
       setFocusedClientId(novoCliente.id);
       message.success(`Cliente ${novoCliente.nome} (${novoCliente.id}) adicionado com sucesso!`);
       return { ...prev, clientes: atualizados };
@@ -191,7 +215,7 @@ export default function App() {
         if (hist.length > 0) {
           hist[hist.length - 1] = { ...hist[hist.length - 1], score };
         }
-        return {
+        const merged = {
           ...c,
           ...clienteAtualizado,
           tenantNome: tenantObj?.nome || c.tenantNome,
@@ -201,6 +225,8 @@ export default function App() {
           historicoScore: hist,
           healthSeries: hist
         };
+        sincronizarUpsertClienteSupabase(merged);
+        return merged;
       });
 
       salvarClientesLocais(atualizados);
@@ -209,15 +235,59 @@ export default function App() {
     });
   };
 
+  // Soft-Delete: Desativa e agenda exclusão definitiva em 15 dias corridos
   const handleDeleteCliente = (clienteId) => {
     definirDados((prev) => {
       const clienteAlvo = prev.clientes.find((c) => c.id === clienteId);
-      const atualizados = prev.clientes.filter((c) => c.id !== clienteId);
+      if (!clienteAlvo) return prev;
+
+      const desativadoEm = new Date().toISOString();
+      const excluirEm = calcularDataExclusao(desativadoEm);
+
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        return {
+          ...c,
+          ativo: false,
+          desativadoEm,
+          excluirEm
+        };
+      });
+
       salvarClientesLocais(atualizados);
+      sincronizarSoftDeleteSupabase(clienteId, desativadoEm, excluirEm);
+
+      const ativosRestantes = atualizados.filter((c) => c.ativo !== false);
       if (focusedClientId === clienteId) {
-        setFocusedClientId(atualizados[0]?.id || null);
+        setFocusedClientId(ativosRestantes[0]?.id || null);
       }
-      message.success(`Cliente ${clienteAlvo?.nome || clienteId} removido da base.`);
+
+      message.warning(`Conta ${clienteAlvo.nome} desativada. A exclusão definitiva ocorrerá automaticamente em 15 dias.`);
+      return { ...prev, clientes: atualizados };
+    });
+  };
+
+  // Reativação da conta dentro do período de carência de 15 dias
+  const handleReativarCliente = (clienteId) => {
+    definirDados((prev) => {
+      const clienteAlvo = prev.clientes.find((c) => c.id === clienteId);
+      if (!clienteAlvo) return prev;
+
+      const atualizados = prev.clientes.map((c) => {
+        if (c.id !== clienteId) return c;
+        return {
+          ...c,
+          ativo: true,
+          desativadoEm: null,
+          excluirEm: null
+        };
+      });
+
+      salvarClientesLocais(atualizados);
+      sincronizarReativacaoSupabase(clienteId);
+      setFocusedClientId(clienteId);
+
+      message.success(`Conta ${clienteAlvo.nome} reativada com sucesso!`);
       return { ...prev, clientes: atualizados };
     });
   };
@@ -457,57 +527,66 @@ export default function App() {
           {estadoCarga.carregando ? <Spin tip="Carregando dados da API…"><div style={{ minHeight: 240 }} /></Spin>
           : estadoCarga.erro ? <Alert type="error" showIcon message="Não foi possível carregar os dados" description={estadoCarga.erro} action={<Button onClick={() => definirTentativa(a => a + 1)}>Tentar novamente</Button>} />
           : dadosPainel.tenants.length === 0 && dadosPainel.clientes.length === 0 ? <Empty description="Nenhum resultado encontrado." />
-          : <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
-            <AnimatePresence mode="wait">
-              <PageTransition pageKey={currentTab}>
-                {currentTab === 'visao-geral' && (
-                  <VisaoGeral
-                    dataset={dadosPainel}
-                    isMobile={isMobile}
-                    selectedTenantId={selectedTenantId}
-                    onSelectTenant={setSelectedTenantId}
-                    onNavigateTab={setCurrentTab}
-                    themeTokens={activeTokens}
-                    onOpenClient={(client) => {
-                      setFocusedClientId(client.id);
-                      setSelectedTenantId(client.tenantId);
-                      setCurrentTab('historico-clientes');
-                    }}
-                  />
-                )}
+          : (() => {
+            const clientesAtivos = dadosPainel.clientes.filter((c) => c.ativo !== false);
+            const datasetAtivo = { tenants: dadosPainel.tenants, clientes: clientesAtivos };
 
-                {currentTab === 'comparativo' && (
-                  <Comparativo
-                    dataset={dadosPainel}
-                    isMobile={isMobile}
-                    selectedTenantId={selectedTenantId}
-                    onSelectTenant={setSelectedTenantId}
-                    themeTokens={activeTokens}
-                  />
-                )}
+            return (
+              <ErrorBoundary key={currentTab} onReset={() => setCurrentTab('visao-geral')}>
+                <AnimatePresence mode="wait">
+                  <PageTransition pageKey={currentTab}>
+                    {currentTab === 'visao-geral' && (
+                      <VisaoGeral
+                        dataset={datasetAtivo}
+                        isMobile={isMobile}
+                        selectedTenantId={selectedTenantId}
+                        onSelectTenant={setSelectedTenantId}
+                        onNavigateTab={setCurrentTab}
+                        themeTokens={activeTokens}
+                        onOpenClient={(client) => {
+                          setFocusedClientId(client.id);
+                          setSelectedTenantId(client.tenantId);
+                          setCurrentTab('historico-clientes');
+                        }}
+                      />
+                    )}
 
-                {currentTab === 'historico-clientes' && (
-                  <HistoricoClientes
-                    initialClientId={focusedClientId}
-                    dataset={dadosPainel}
-                    isMobile={isMobile}
-                    selectedTenantId={selectedTenantId}
-                    onSelectTenant={setSelectedTenantId}
-                    themeTokens={activeTokens}
-                    onAddCliente={handleAddCliente}
-                    onUpdateCliente={handleUpdateCliente}
-                    onDeleteCliente={handleDeleteCliente}
-                    onAddEvento={handleAddEvento}
-                    onUpdateEvento={handleUpdateEvento}
-                    onDeleteEvento={handleDeleteEvento}
-                    onAddMesScore={handleAddMesScore}
-                    onUpdateMesScore={handleUpdateMesScore}
-                    onDeleteMesScore={handleDeleteMesScore}
-                  />
-                )}
-              </PageTransition>
-            </AnimatePresence>
-          </ErrorBoundary>}
+                    {currentTab === 'comparativo' && (
+                      <Comparativo
+                        dataset={datasetAtivo}
+                        isMobile={isMobile}
+                        selectedTenantId={selectedTenantId}
+                        onSelectTenant={setSelectedTenantId}
+                        themeTokens={activeTokens}
+                      />
+                    )}
+
+                    {currentTab === 'historico-clientes' && (
+                      <HistoricoClientes
+                        initialClientId={focusedClientId}
+                        dataset={datasetAtivo}
+                        isMobile={isMobile}
+                        selectedTenantId={selectedTenantId}
+                        onSelectTenant={setSelectedTenantId}
+                        themeTokens={activeTokens}
+                        onAddCliente={handleAddCliente}
+                        onUpdateCliente={handleUpdateCliente}
+                        onDeleteCliente={handleDeleteCliente}
+                        onAddEvento={handleAddEvento}
+                        onUpdateEvento={handleUpdateEvento}
+                        onDeleteEvento={handleDeleteEvento}
+                        onAddMesScore={handleAddMesScore}
+                        onUpdateMesScore={handleUpdateMesScore}
+                        onDeleteMesScore={handleDeleteMesScore}
+                        clientesDesativados={dadosPainel.clientes.filter(c => c.ativo === false)}
+                        onReativarCliente={handleReativarCliente}
+                      />
+                    )}
+                  </PageTransition>
+                </AnimatePresence>
+              </ErrorBoundary>
+            );
+          })()}
         </main>
 
       </div>

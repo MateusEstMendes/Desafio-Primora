@@ -34,6 +34,7 @@ import {
 import ModalCliente from '../components/ModalCliente';
 import ModalEvento from '../components/ModalEvento';
 import ModalHistoricoMeses from '../components/ModalHistoricoMeses';
+import ModalLixeira from '../components/ModalLixeira';
 import {
   ResponsiveContainer,
   LineChart,
@@ -68,7 +69,9 @@ export default function HistoricoClientes({
   onDeleteEvento,
   onAddMesScore,
   onUpdateMesScore,
-  onDeleteMesScore
+  onDeleteMesScore,
+  clientesDesativados = [],
+  onReativarCliente
 }) {
   const detailRef = useRef(null);
   const chartMotion = useChartMotion();
@@ -84,6 +87,7 @@ export default function HistoricoClientes({
   const [modalEventoMode, setModalEventoMode] = useState('create');
   const [editingEvento, setEditingEvento] = useState(null);
   const [modalMesesOpen, setModalMesesOpen] = useState(false);
+  const [modalLixeiraOpen, setModalLixeiraOpen] = useState(false);
 
   const clientesVisiveis = useMemo(() => {
     if (selectedTenantId === 'todos') return todosClientes;
@@ -417,14 +421,13 @@ export default function HistoricoClientes({
                 Editar Conta
               </Button>
               <Popconfirm
-                title={`Excluir conta ${clienteSelecionado.nome}?`}
-                description="Esta ação removerá o cliente, todos os seus eventos e o histórico de saúde."
-                okText="Excluir"
+                title={`Desativar conta ${clienteSelecionado.nome}?`}
+                description="A conta será desativada e ocultada de todas as listagens. A exclusão definitiva ocorrerá automaticamente após 15 dias corridos (podendo ser reativada a qualquer momento na Lixeira)."
+                okText="Desativar Conta"
                 cancelText="Cancelar"
                 okButtonProps={{ danger: true }}
                 onConfirm={() => {
                   onDeleteCliente?.(clienteSelecionado.id);
-                  message.success(`Cliente ${clienteSelecionado.nome} excluído.`);
                 }}
               >
                 <Button
@@ -521,7 +524,7 @@ export default function HistoricoClientes({
                     onClick={() => setModalMesesOpen(true)}
                     style={{ fontWeight: 600, borderRadius: 6 }}
                   >
-                    + Gerenciar / Adicionar Meses
+                    Gerenciar / Adicionar Meses
                   </Button>
                 </div>
 
@@ -725,7 +728,7 @@ export default function HistoricoClientes({
                     }}
                     style={{ fontWeight: 600, borderRadius: 6 }}
                   >
-                    + Novo Evento
+                    Novo Evento
                   </Button>
                 </div>
               </div>
@@ -788,6 +791,41 @@ export default function HistoricoClientes({
         onAddMes={(mesData) => onAddMesScore?.(clienteSelecionado.id, mesData)}
         onUpdateMes={(periodoOriginal, mesData) => onUpdateMesScore?.(clienteSelecionado.id, periodoOriginal, mesData)}
         onDeleteMes={(periodo) => onDeleteMesScore?.(clienteSelecionado.id, periodo)}
+      />
+
+      {/* Link de auditoria discreto exclusivo da Jornada de Clientes */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16, padding: '4px 0' }}>
+        <button
+          type="button"
+          onClick={() => setModalLixeiraOpen(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            opacity: 0.45,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            textDecoration: 'none',
+            transition: 'opacity 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.45'; }}
+          title="Contas em período de desativação (carência de 15 dias)"
+        >
+          <DeleteOutlined style={{ fontSize: 10 }} />
+          <span>Contas em desativação ({clientesDesativados.length})</span>
+        </button>
+      </div>
+
+      <ModalLixeira
+        open={modalLixeiraOpen}
+        clientesDesativados={clientesDesativados}
+        onClose={() => setModalLixeiraOpen(false)}
+        onReativarCliente={onReativarCliente}
       />
 
     </div>
